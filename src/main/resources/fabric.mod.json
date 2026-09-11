@@ -3,15 +3,14 @@
 	"id": "bokarts",
 	"version": "${version}",
 	"name": "BoKarts",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "GoKarts but like Ice Boats",
 	"authors": [
-		"Me!"
+		"cxlledjay"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"sources": "https://github.com/cxlledjay/bokarts"
 	},
-	"license": "CC0-1.0",
+	"license": "MIT",
 	"icon": "assets/bokarts/icon.png",
 	"environment": "*",
 	"entrypoints": {
@@ -20,6 +19,9 @@
 		],
 		"fabric-datagen": [
 			"de.cxlledjay.bokarts.BoKartsDataGenerator"
+		],
+		"client": [
+			"de.cxlledjay.bokarts.BoKartClient"
 		]
 	},
 	"mixins": [
