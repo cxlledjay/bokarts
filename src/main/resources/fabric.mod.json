@@ -21,7 +21,7 @@
 			"de.cxlledjay.bokarts.BoKartsDataGenerator"
 		],
 		"client": [
-			"de.cxlledjay.bokarts.BoKartClient"
+			"de.cxlledjay.bokarts.BoKartsClient"
 		]
 	},
 	"mixins": [
