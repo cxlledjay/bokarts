@@ -1,6 +1,7 @@
 package de.cxlledjay.bokarts;
 
 import de.cxlledjay.bokarts.entity.ModEntities;
+import de.cxlledjay.bokarts.item.ModItems;
 import net.fabricmc.api.ModInitializer;
 
 import net.minecraft.util.Identifier;
@@ -15,6 +16,7 @@ public class BoKarts implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		ModItems.registerModItems();
 		ModEntities.registerModEntities();
 	}
 

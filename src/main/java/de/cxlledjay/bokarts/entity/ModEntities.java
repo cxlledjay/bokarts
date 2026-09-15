@@ -9,12 +9,14 @@ import net.minecraft.registry.Registry;
 
 public class ModEntities {
 
-    public static final EntityType<KartEntity> KART_ENTITY_TYPE = Registry.register(Registries.ENTITY_TYPE,
+    public static final EntityType<KartEntity> KART_ENTITY_TYPE = Registry.register(
+            Registries.ENTITY_TYPE,
             BoKarts.id("kart"),
-            EntityType.Builder.create(KartEntity::new, SpawnGroup.MISC)
-                    .dimensions(1.25f, 0.8f).build());
-
-
+            EntityType.Builder.<KartEntity>create(KartEntity::new, SpawnGroup.MISC)
+                    .dimensions(1.25f, 0.8f)
+                    .eyeHeight(0.5625F)
+                    .maxTrackingRange(10)
+                    .build());
 
     public static void registerModEntities() {
         BoKarts.LOGGER.info("Registering Mod Entities for " + BoKarts.MOD_ID);

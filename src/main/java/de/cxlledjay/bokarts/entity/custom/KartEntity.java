@@ -1,5 +1,7 @@
 package de.cxlledjay.bokarts.entity.custom;
 
+import de.cxlledjay.bokarts.BoKarts;
+import de.cxlledjay.bokarts.entity.ModEntities;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.*;
 import net.minecraft.entity.data.DataTracker;
@@ -23,6 +25,14 @@ public class KartEntity extends BoatEntity {
 
     public KartEntity(EntityType<? extends BoatEntity> entityType, World world) {
         super(entityType, world);
+    }
+
+    public KartEntity(World world, double x, double y, double z) {
+        this(ModEntities.KART_ENTITY_TYPE, world);
+        this.setPosition(x, y, z);
+        this.prevX = x;
+        this.prevY = y;
+        this.prevZ = z;
     }
 
     // fix driver position and number
