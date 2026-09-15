@@ -2,6 +2,7 @@ package de.cxlledjay.bokarts.entity.custom;
 
 import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.entity.ModEntities;
+import de.cxlledjay.bokarts.item.ModItems;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.*;
 import net.minecraft.entity.data.DataTracker;
@@ -13,6 +14,7 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -20,7 +22,14 @@ public class KartEntity extends BoatEntity {
 
 
     public boolean pressingLeft, pressingRight, pressingForward, pressingBack, pressingSpace;
+
+    private static final float steeringSpeed = 20.0f;
+    private static final float steeringCenter = 0.0f;
+
     private static final TrackedData<String> PAINT_COLOR = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.STRING);
+    private static final TrackedData<Float> WHEEL_SPEED = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
+    private static final TrackedData<Float> ENGINE_SPEED = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
+    private static final TrackedData<Float> STEERING_ANGLE = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
 
 
     public KartEntity(EntityType<? extends BoatEntity> entityType, World world) {
@@ -110,9 +119,15 @@ public class KartEntity extends BoatEntity {
 
     @Override
     public Item asItem() {
-        // If you have created a custom BoKart item, return it here.
-        // If you haven't made an item for it yet, return Items.AIR so it drops nothing.
-        return Items.FURNACE;
+        Item dropItem = ModItems.KART_DEFAULT;
+
+        switch(this.getPaintColor()) {
+            case DEBUG:
+                dropItem = Items.FURNACE;
+                break;
+        }
+
+        return dropItem;
     }
 
 
@@ -129,17 +144,79 @@ public class KartEntity extends BoatEntity {
         this.pressingBack = pressingBack;
     }
 
+    private float applySteeringWheelCenterSpring(float angle) {
 
+        if(angle < (steeringCenter + steeringSpeed) && angle > (steeringCenter - steeringSpeed)) {
+            angle = steeringCenter;
+        } else if(angle > steeringCenter) {
+            angle -= steeringSpeed;
+        } else if(angle < steeringCenter) {
+            angle += steeringSpeed;
+        }
 
+        return angle;
+    }
 
+    @Override
+    public void tick() {
+        super.tick();
 
+        // handle animations
+
+        // steering
+        float newAngle = this.getSteeringAngle();
+
+        if(!(pressingLeft && pressingRight)) {
+            if(pressingLeft) {
+                // steering to the left
+                newAngle += steeringSpeed;
+            } else if (pressingRight) {
+                // steering to the right
+                newAngle -= steeringSpeed;
+            } else {
+                // no button pressed => center spring
+                newAngle = applySteeringWheelCenterSpring(newAngle);
+            }
+        } else {
+            // pressing left & right => center spring
+            newAngle = applySteeringWheelCenterSpring(newAngle);
+        }
+        // clamp steering to 0 - 180 degs
+        newAngle = MathHelper.clamp(newAngle, steeringCenter-(steeringSpeed*5), steeringCenter+(steeringSpeed*5));
+
+        // write to data tracker
+        this.setSteeringAngle(newAngle);
+    }
 
     // attributes
     @Override
     protected void initDataTracker(DataTracker.Builder builder) {
         super.initDataTracker(builder);
         builder.add(PAINT_COLOR, "default");
+        builder.add(WHEEL_SPEED, 0.0f);
+        builder.add(ENGINE_SPEED, 0.0f);
+        builder.add(STEERING_ANGLE, steeringCenter);
     }
+
+    @Override
+    protected void writeCustomDataToNbt(NbtCompound nbt) {
+        super.writeCustomDataToNbt(nbt);
+        nbt.putString("PaintColor", this.getPaintColor().toString());
+        nbt.putFloat("WheelSpeed", this.getWheelSpeed());
+        nbt.putFloat("EngineSpeed", this.getEngineSpeed());
+        nbt.putFloat("SteeringAngle", this.getSteeringAngle());
+    }
+
+    @Override
+    protected void readCustomDataFromNbt(NbtCompound nbt) {
+        super.readCustomDataFromNbt(nbt);
+        this.dataTracker.set(PAINT_COLOR, nbt.getString("PaintColor"));
+        this.dataTracker.set(WHEEL_SPEED, nbt.getFloat("WheelSpeed"));
+        this.dataTracker.set(ENGINE_SPEED, nbt.getFloat("EngineSpeed"));
+        this.dataTracker.set(STEERING_ANGLE, nbt.getFloat("SteeringAngle"));
+    }
+
+    // getter and setter for attributes
 
     public PaintColor getPaintColor() {
         return PaintColor.getColor(this.dataTracker.get(PAINT_COLOR));
@@ -149,17 +226,39 @@ public class KartEntity extends BoatEntity {
         this.dataTracker.set(PAINT_COLOR, paintColor.toString());
     }
 
-    @Override
-    protected void writeCustomDataToNbt(NbtCompound nbt) {
-        super.writeCustomDataToNbt(nbt);
-        nbt.putString("PaintColor", this.getPaintColor().toString());
+
+    public Float getWheelSpeed() {
+        return this.dataTracker.get(WHEEL_SPEED);
     }
 
-    @Override
-    protected void readCustomDataFromNbt(NbtCompound nbt) {
-        super.readCustomDataFromNbt(nbt);
-        this.dataTracker.set(PAINT_COLOR, nbt.getString("PaintColor"));
+    public void setWheelSpeed(Float speed) {
+        this.dataTracker.set(WHEEL_SPEED, speed);
     }
+
+
+    public Float getEngineSpeed() {
+        return this.dataTracker.get(ENGINE_SPEED);
+    }
+
+    public void setEngineSpeed(Float speed) {
+        this.dataTracker.set(ENGINE_SPEED, speed);
+    }
+
+
+    public Float getSteeringAngle() {
+        return this.dataTracker.get(STEERING_ANGLE);
+    }
+
+    public void setSteeringAngle(Float speed) {
+        this.dataTracker.set(STEERING_ANGLE, speed);
+    }
+
+
+
+
+
+
+
 
     // variants
     public enum PaintColor implements StringIdentifiable {

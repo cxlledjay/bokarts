@@ -1,0 +1,87 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_cyan_terracotta": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:cyan_terracotta"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_furnace": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:furnace"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_hopper": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:hopper"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_kart_seat": {
+      "conditions": {
+        "items": [
+          {
+            "items": "bokarts:kart_seat"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_kart_steering_wheel": {
+      "conditions": {
+        "items": [
+          {
+            "items": "bokarts:kart_steering_wheel"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_kart_wheel": {
+      "conditions": {
+        "items": [
+          {
+            "items": "bokarts:kart_wheel"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "bokarts:kart_default"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_hopper",
+      "has_furnace",
+      "has_cyan_terracotta",
+      "has_kart_seat",
+      "has_kart_wheel",
+      "has_kart_steering_wheel"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "bokarts:kart_default"
+    ]
+  }
+}

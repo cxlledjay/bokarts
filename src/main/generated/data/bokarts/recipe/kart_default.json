@@ -1,0 +1,33 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "minecraft:cyan_terracotta"
+    },
+    "F": {
+      "item": "minecraft:furnace"
+    },
+    "H": {
+      "item": "minecraft:hopper"
+    },
+    "L": {
+      "item": "bokarts:kart_steering_wheel"
+    },
+    "S": {
+      "item": "bokarts:kart_seat"
+    },
+    "W": {
+      "item": "bokarts:kart_wheel"
+    }
+  },
+  "pattern": [
+    "  H",
+    "LSF",
+    "WBW"
+  ],
+  "result": {
+    "count": 1,
+    "id": "bokarts:kart_default"
+  }
+}

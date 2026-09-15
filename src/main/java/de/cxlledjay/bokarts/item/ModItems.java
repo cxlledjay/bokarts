@@ -12,7 +12,24 @@ import net.minecraft.registry.Registry;
 
 public class ModItems {
 
-    public static final Item KART_DEFAULT = registerItem("kart_default", new KartItem(KartEntity.PaintColor.DEBUG, new Item.Settings().maxCount(1)));
+
+
+
+    // kart crafting ingredients
+
+    public static final Item KART_CRAFTING_WHEEL = registerItem("kart_wheel", new Item(new Item.Settings()));
+    public static final Item KART_CRAFTING_STEERING_WHEEL = registerItem("kart_steering_wheel", new Item(new Item.Settings()));
+    public static final Item KART_CRAFTING_SEAT = registerItem("kart_seat", new Item(new Item.Settings()));
+
+
+
+
+
+
+
+
+
+    public static final Item KART_DEFAULT = registerItem("kart_default", new KartItem(KartEntity.PaintColor.DEFAULT, new Item.Settings().maxCount(1)));
 
 
 
@@ -30,6 +47,9 @@ public class ModItems {
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(entries -> {
             entries.add(KART_DEFAULT);
+            entries.add(KART_CRAFTING_WHEEL);
+            entries.add(KART_CRAFTING_STEERING_WHEEL);
+            entries.add(KART_CRAFTING_SEAT);
         });
     }
 

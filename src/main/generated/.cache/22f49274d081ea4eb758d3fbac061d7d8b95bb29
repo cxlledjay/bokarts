@@ -1,0 +1,9 @@
+// 1.21.1	2026-09-15T12:40:53.8521876	BoKarts/Recipes
+d08342c30267b48a3a83852f7b3ccff7c164a946 data\bokarts\advancement\recipes\transportation\kart_wheel.json
+84481f8480ded5f62fc512e0c565e63e5ab35e85 data\bokarts\recipe\kart_wheel.json
+79581af5bb8e27018ab61acd0891253f15ea75b1 data\bokarts\recipe\kart_default.json
+9aff6883fb32acad45ca39e8cfcad7e4ca7a589f data\bokarts\advancement\recipes\transportation\kart_default.json
+75550faf5ebe90edb4ff727ac0397dd7fbae1711 data\bokarts\advancement\recipes\transportation\kart_steering_wheel.json
+d60eefdc74bbd3ded1f2bdec921a65509e2b117c data\bokarts\recipe\kart_steering_wheel.json
+d48b580d1794ade795a25c1ad17da59a20ce58b1 data\bokarts\recipe\kart_seat.json
+e00c4b3f43b856f0258c38749d9030a59407faf8 data\bokarts\advancement\recipes\transportation\kart_seat.json
