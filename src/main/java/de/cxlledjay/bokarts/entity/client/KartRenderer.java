@@ -30,7 +30,7 @@ public class KartRenderer extends EntityRenderer<KartEntity> {
 
     @Override
     public Identifier getTexture(KartEntity entity) {
-        return BoKarts.id("textures/entity/kart/default.png");
+        return BoKarts.id("textures/entity/kart/" + entity.getPaintColor().asString() + ".png");
     }
 
     @Override
