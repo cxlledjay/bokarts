@@ -16,11 +16,14 @@ import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -102,7 +105,7 @@ public class KartEntity extends BoatEntity {
     public float getNearbySlipperiness() {
 
         float slipperiness = 0.6f; //< default boat
-        BlockState groundBlock = this.getWorld().getBlockState(this.getVelocityAffectingPos());
+        BlockState groundBlock = this.getWorld().getBlockState(this.getSteppingPos());
 
         if(hasControllingPassenger() && getControllingPassenger() instanceof PlayerEntity) {
             if(isDrivableBlock(groundBlock)) {
@@ -254,6 +257,19 @@ public class KartEntity extends BoatEntity {
         float backAxleRotationThisTick = radiansThisTick + currentRevs;
         this.setEngineRotation(this.getEngineRotation() + backAxleRotationThisTick);
     }
+
+
+
+    // sounds
+
+    @Override
+    @Nullable
+    protected SoundEvent getPaddleSoundEvent() {
+        return null;
+    }
+
+
+
 
     // attributes
     @Override
