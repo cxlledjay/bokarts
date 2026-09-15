@@ -19,6 +19,7 @@ public class bokart extends EntityModel<Entity> {
 	private final ModelPart front_right;
 	private final ModelPart tire2;
 	private final ModelPart rim2;
+	private final ModelPart axle;
 	private final ModelPart steering;
 	private final ModelPart steering_column;
 	private final ModelPart steering_wheel;
@@ -50,6 +51,7 @@ public class bokart extends EntityModel<Entity> {
 		this.front_right = this.front_axle.getChild("front_right");
 		this.tire2 = this.front_right.getChild("tire2");
 		this.rim2 = this.front_right.getChild("rim2");
+		this.axle = this.front_axle.getChild("axle");
 		this.steering = this.bokart.getChild("steering");
 		this.steering_column = this.steering.getChild("steering_column");
 		this.steering_wheel = this.steering.getChild("steering_wheel");
@@ -189,7 +191,7 @@ public class bokart extends EntityModel<Entity> {
 
 		ModelPartData cube_r42 = rim4.addChild("cube_r42", ModelPartBuilder.create().uv(84, 50).cuboid(-0.5F, -3.0F, -0.5F, 3.0F, 6.0F, 1.0F, new Dilation(-0.15F)), ModelTransform.of(-11.25F, -4.7F, 1.0F, -0.5236F, 0.0F, 0.0F));
 
-		ModelPartData front_axle = wheels.addChild("front_axle", ModelPartBuilder.create().uv(30, 49).cuboid(-10.0F, -0.5F, -0.5F, 20.0F, 1.0F, 1.0F, new Dilation(-0.25F)), ModelTransform.pivot(0.0F, -2.5F, -9.5F));
+		ModelPartData front_axle = wheels.addChild("front_axle", ModelPartBuilder.create(), ModelTransform.pivot(0.0F, -2.5F, -9.5F));
 
 		ModelPartData front_left = front_axle.addChild("front_left", ModelPartBuilder.create(), ModelTransform.pivot(9.2F, 0.0F, 0.0F));
 
@@ -273,6 +275,8 @@ public class bokart extends EntityModel<Entity> {
 
 		ModelPartData cube_r76 = rim2.addChild("cube_r76", ModelPartBuilder.create().uv(88, 24).cuboid(-1.5F, -3.0F, -0.5F, 2.0F, 6.0F, 1.0F, new Dilation(-0.15F)), ModelTransform.of(-10.25F, -4.7F, 1.0F, -0.5236F, 0.0F, 0.0F));
 
+		ModelPartData axle = front_axle.addChild("axle", ModelPartBuilder.create().uv(30, 49).cuboid(-10.0F, -0.5F, -0.5F, 20.0F, 1.0F, 1.0F, new Dilation(-0.25F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
+
 		ModelPartData steering = bokart.addChild("steering", ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 
 		ModelPartData steering_column = steering.addChild("steering_column", ModelPartBuilder.create().uv(56, 14).cuboid(-9.5F, -3.0F, -11.25F, 19.0F, 1.0F, 1.0F, new Dilation(-0.25F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
@@ -347,8 +351,8 @@ public class bokart extends EntityModel<Entity> {
 		.uv(84, 6).cuboid(2.0F, -6.5F, 12.0F, 3.0F, 3.0F, 3.0F, new Dilation(0.0F))
 		.uv(76, 97).cuboid(1.0F, -5.0F, 13.0F, 1.0F, 1.0F, 1.0F, new Dilation(0.5F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 
-		ModelPartData drive_gear = engine.addChild("drive_gear", ModelPartBuilder.create().uv(94, 37).cuboid(-6.0F, -4.75F, 13.0F, 3.0F, 1.0F, 1.0F, new Dilation(-0.25F))
-		.uv(44, 86).cuboid(-6.0F, -5.75F, 12.0F, 1.0F, 3.0F, 3.0F, new Dilation(0.01F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
+		ModelPartData drive_gear = engine.addChild("drive_gear", ModelPartBuilder.create().uv(94, 37).cuboid(-1.0F, -0.5F, -0.5F, 3.0F, 1.0F, 1.0F, new Dilation(-0.25F))
+		.uv(44, 86).cuboid(-1.0F, -1.5F, -1.5F, 1.0F, 3.0F, 3.0F, new Dilation(0.01F)), ModelTransform.pivot(-5.0F, -4.25F, 13.5F));
 
 		ModelPartData accessoirs = bokart.addChild("accessoirs", ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 

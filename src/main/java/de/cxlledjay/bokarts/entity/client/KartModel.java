@@ -2,11 +2,13 @@ package de.cxlledjay.bokarts.entity.client;
 
 import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.entity.custom.KartEntity;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.model.*;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.client.render.entity.model.SinglePartEntityModel;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.MathHelper;
 
 public class KartModel<T extends KartEntity> extends SinglePartEntityModel<T> {
 
@@ -22,6 +24,7 @@ public class KartModel<T extends KartEntity> extends SinglePartEntityModel<T> {
     private final ModelPart steering_column;
     private final ModelPart steering_wheel;
     private final ModelPart front_axle;
+    private final ModelPart axle;
     private final ModelPart front_left;
     private final ModelPart front_right;
     private final ModelPart rear_axle;
@@ -37,6 +40,7 @@ public class KartModel<T extends KartEntity> extends SinglePartEntityModel<T> {
         this.steering_column = this.steering.getChild("steering_column");
         this.steering_wheel = this.steering.getChild("steering_wheel");
         this.front_axle = this.wheels.getChild("front_axle");
+        this.axle = this.front_axle.getChild("axle");
         this.front_left = this.front_axle.getChild("front_left");
         this.front_right = this.front_axle.getChild("front_right");
         this.rear_axle = this.wheels.getChild("rear_axle");
@@ -169,7 +173,7 @@ public class KartModel<T extends KartEntity> extends SinglePartEntityModel<T> {
 
         ModelPartData cube_r42 = rim4.addChild("cube_r42", ModelPartBuilder.create().uv(84, 50).cuboid(-0.5F, -3.0F, -0.5F, 3.0F, 6.0F, 1.0F, new Dilation(-0.15F)), ModelTransform.of(-11.25F, -4.7F, 1.0F, -0.5236F, 0.0F, 0.0F));
 
-        ModelPartData front_axle = wheels.addChild("front_axle", ModelPartBuilder.create().uv(30, 49).cuboid(-10.0F, -0.5F, -0.5F, 20.0F, 1.0F, 1.0F, new Dilation(-0.25F)), ModelTransform.pivot(0.0F, -2.5F, -9.5F));
+        ModelPartData front_axle = wheels.addChild("front_axle", ModelPartBuilder.create(), ModelTransform.pivot(0.0F, -2.5F, -9.5F));
 
         ModelPartData front_left = front_axle.addChild("front_left", ModelPartBuilder.create(), ModelTransform.pivot(9.2F, 0.0F, 0.0F));
 
@@ -253,6 +257,8 @@ public class KartModel<T extends KartEntity> extends SinglePartEntityModel<T> {
 
         ModelPartData cube_r76 = rim2.addChild("cube_r76", ModelPartBuilder.create().uv(88, 24).cuboid(-1.5F, -3.0F, -0.5F, 2.0F, 6.0F, 1.0F, new Dilation(-0.15F)), ModelTransform.of(-10.25F, -4.7F, 1.0F, -0.5236F, 0.0F, 0.0F));
 
+        ModelPartData axle = front_axle.addChild("axle", ModelPartBuilder.create().uv(30, 49).cuboid(-10.0F, -0.5F, -0.5F, 20.0F, 1.0F, 1.0F, new Dilation(-0.25F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
+
         ModelPartData steering = bokart.addChild("steering", ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 
         ModelPartData steering_column = steering.addChild("steering_column", ModelPartBuilder.create().uv(56, 14).cuboid(-9.5F, -3.0F, -11.25F, 19.0F, 1.0F, 1.0F, new Dilation(-0.25F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
@@ -327,8 +333,8 @@ public class KartModel<T extends KartEntity> extends SinglePartEntityModel<T> {
                 .uv(84, 6).cuboid(2.0F, -6.5F, 12.0F, 3.0F, 3.0F, 3.0F, new Dilation(0.0F))
                 .uv(76, 97).cuboid(1.0F, -5.0F, 13.0F, 1.0F, 1.0F, 1.0F, new Dilation(0.5F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 
-        ModelPartData drive_gear = engine.addChild("drive_gear", ModelPartBuilder.create().uv(94, 37).cuboid(-6.0F, -4.75F, 13.0F, 3.0F, 1.0F, 1.0F, new Dilation(-0.25F))
-                .uv(44, 86).cuboid(-6.0F, -5.75F, 12.0F, 1.0F, 3.0F, 3.0F, new Dilation(0.01F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
+        ModelPartData drive_gear = engine.addChild("drive_gear", ModelPartBuilder.create().uv(94, 37).cuboid(-1.0F, -0.5F, -0.5F, 3.0F, 1.0F, 1.0F, new Dilation(-0.25F))
+                .uv(44, 86).cuboid(-1.0F, -1.5F, -1.5F, 1.0F, 3.0F, 3.0F, new Dilation(0.01F)), ModelTransform.pivot(-5.0F, -4.25F, 13.5F));
 
         ModelPartData accessoirs = bokart.addChild("accessoirs", ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 
@@ -364,6 +370,21 @@ public class KartModel<T extends KartEntity> extends SinglePartEntityModel<T> {
         this.front_left.yaw = angle_front_wheels;
         this.front_right.yaw = angle_front_wheels;
         this.steering_column.pivotX = position_steering_column;
+
+
+        // lerps
+        float tickDelta = MinecraftClient.getInstance().getRenderTickCounter().getTickDelta(true);
+
+        // ---------------- wheels ----------------
+        float smoothRotationFront = MathHelper.lerp(tickDelta, entity.getWheelRotationPrev(), entity.getWheelRotation());
+        this.axle.pitch = smoothRotationFront;
+        this.front_left.pitch = smoothRotationFront;
+        this.front_right.pitch = smoothRotationFront;
+
+        float smoothRotationBack = MathHelper.lerp(tickDelta, entity.getEngineRotationPrev(), entity.getEngineRotation());
+        this.rear_axle.pitch = smoothRotationBack;
+        this.drive_gear.pitch = -smoothRotationBack;
+
     }
 
 

@@ -25,10 +25,14 @@ public class KartEntity extends BoatEntity {
 
     private static final float steeringSpeed = 20.0f;
     private static final float steeringCenter = 0.0f;
+    private static final float engineAcceleration = 0.1f;
 
     private static final TrackedData<String> PAINT_COLOR = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.STRING);
-    private static final TrackedData<Float> WHEEL_SPEED = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
-    private static final TrackedData<Float> ENGINE_SPEED = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
+    private static final TrackedData<Float> ENGINE_REVS = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
+    private static final TrackedData<Float> WHEEL_ROTATION = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
+    private static final TrackedData<Float> WHEEL_ROTATION_PREV = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
+    private static final TrackedData<Float> ENGINE_ROTATION = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
+    private static final TrackedData<Float> ENGINE_ROTATION_PREV = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
     private static final TrackedData<Float> STEERING_ANGLE = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
 
 
@@ -145,7 +149,6 @@ public class KartEntity extends BoatEntity {
     }
 
     private float applySteeringWheelCenterSpring(float angle) {
-
         if(angle < (steeringCenter + steeringSpeed) && angle > (steeringCenter - steeringSpeed)) {
             angle = steeringCenter;
         } else if(angle > steeringCenter) {
@@ -157,15 +160,26 @@ public class KartEntity extends BoatEntity {
         return angle;
     }
 
+    private float applyEngineFlywheel(float engineRotationDelta) {
+        if(engineRotationDelta < (0 + engineAcceleration * 2) && engineRotationDelta > (0 - engineAcceleration * 2)) {
+            engineRotationDelta = 0;
+        } else if(engineRotationDelta > 0) {
+            engineRotationDelta -= engineAcceleration * 2;
+        } else if(engineRotationDelta < 0) {
+            engineRotationDelta += engineAcceleration * 2;
+        }
+
+        return engineRotationDelta;
+    }
+
     @Override
     public void tick() {
         super.tick();
 
         // handle animations
 
-        // steering
+        // ---------------- steering ----------------
         float newAngle = this.getSteeringAngle();
-
         if(!(pressingLeft && pressingRight)) {
             if(pressingLeft) {
                 // steering to the left
@@ -183,9 +197,39 @@ public class KartEntity extends BoatEntity {
         }
         // clamp steering to 0 - 180 degs
         newAngle = MathHelper.clamp(newAngle, steeringCenter-(steeringSpeed*5), steeringCenter+(steeringSpeed*5));
-
         // write to data tracker
         this.setSteeringAngle(newAngle);
+
+        // ---------------- wheel spin front ----------------
+        this.setWheelRotationPrev(this.getWheelRotation());
+
+        Vec3d velocity = this.getVelocity();
+        double yawRad = Math.toRadians(this.getYaw());
+        double forwardX = -Math.sin(yawRad);
+        double forwardZ = Math.cos(yawRad);
+        double forwardSpeed = (velocity.x * forwardX) + (velocity.z * forwardZ);
+        float radiansThisTick = (float) (forwardSpeed * 5.34);
+        this.setWheelRotation(this.getWheelRotation() + radiansThisTick);
+
+        // ---------------- engine revs ----------------
+        float currentRevs = this.getEngineRevs();
+        if(pressingForward) {
+            // positive acceleration
+            currentRevs += engineAcceleration;
+        } else if (pressingBack) {
+            // negative acceleration
+            currentRevs -= engineAcceleration;
+        } else {
+            // no button pressed => slow return to idle
+            currentRevs = applyEngineFlywheel(currentRevs);
+        }
+        currentRevs = MathHelper.clamp(currentRevs, 0-(engineAcceleration*25), 0+(engineAcceleration*25));
+        this.setEngineRevs(currentRevs);
+
+        // ---------------- wheel spin back ----------------
+        this.setEngineRotationPrev(this.getEngineRotation());
+        float backAxleRotationThisTick = radiansThisTick + currentRevs;
+        this.setEngineRotation(this.getEngineRotation() + backAxleRotationThisTick);
     }
 
     // attributes
@@ -193,8 +237,11 @@ public class KartEntity extends BoatEntity {
     protected void initDataTracker(DataTracker.Builder builder) {
         super.initDataTracker(builder);
         builder.add(PAINT_COLOR, "default");
-        builder.add(WHEEL_SPEED, 0.0f);
-        builder.add(ENGINE_SPEED, 0.0f);
+        builder.add(ENGINE_REVS, 0.0f);
+        builder.add(WHEEL_ROTATION, 0.0f);
+        builder.add(WHEEL_ROTATION_PREV, 0.0f);
+        builder.add(ENGINE_ROTATION, 0.0f);
+        builder.add(ENGINE_ROTATION_PREV, 0.0f);
         builder.add(STEERING_ANGLE, steeringCenter);
     }
 
@@ -202,8 +249,11 @@ public class KartEntity extends BoatEntity {
     protected void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
         nbt.putString("PaintColor", this.getPaintColor().toString());
-        nbt.putFloat("WheelSpeed", this.getWheelSpeed());
-        nbt.putFloat("EngineSpeed", this.getEngineSpeed());
+        nbt.putFloat("EngineRevs", this.getEngineRevs());
+        nbt.putFloat("WheelRotation", this.getWheelRotation());
+        nbt.putFloat("WheelRotationPrev", this.getWheelRotationPrev());
+        nbt.putFloat("EngineRotation", this.getEngineRotation());
+        nbt.putFloat("EngineRotationPrev", this.getEngineRotationPrev());
         nbt.putFloat("SteeringAngle", this.getSteeringAngle());
     }
 
@@ -211,8 +261,11 @@ public class KartEntity extends BoatEntity {
     protected void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
         this.dataTracker.set(PAINT_COLOR, nbt.getString("PaintColor"));
-        this.dataTracker.set(WHEEL_SPEED, nbt.getFloat("WheelSpeed"));
-        this.dataTracker.set(ENGINE_SPEED, nbt.getFloat("EngineSpeed"));
+        this.dataTracker.set(ENGINE_REVS, nbt.getFloat("EngineRevs"));
+        this.dataTracker.set(WHEEL_ROTATION, nbt.getFloat("WheelRotation"));
+        this.dataTracker.set(WHEEL_ROTATION_PREV, nbt.getFloat("WheelRotationPrev"));
+        this.dataTracker.set(ENGINE_ROTATION, nbt.getFloat("EngineRotation"));
+        this.dataTracker.set(ENGINE_ROTATION_PREV, nbt.getFloat("EngineRotationPrev"));
         this.dataTracker.set(STEERING_ANGLE, nbt.getFloat("SteeringAngle"));
     }
 
@@ -227,21 +280,46 @@ public class KartEntity extends BoatEntity {
     }
 
 
-    public Float getWheelSpeed() {
-        return this.dataTracker.get(WHEEL_SPEED);
+    public Float getEngineRevs() {
+        return this.dataTracker.get(ENGINE_REVS);
     }
 
-    public void setWheelSpeed(Float speed) {
-        this.dataTracker.set(WHEEL_SPEED, speed);
+    public void setEngineRevs(Float acceleration) {
+        this.dataTracker.set(ENGINE_REVS, acceleration);
     }
 
 
-    public Float getEngineSpeed() {
-        return this.dataTracker.get(ENGINE_SPEED);
+    public Float getWheelRotation() {
+        return this.dataTracker.get(WHEEL_ROTATION);
     }
 
-    public void setEngineSpeed(Float speed) {
-        this.dataTracker.set(ENGINE_SPEED, speed);
+    public void setWheelRotation(Float rotation) {
+        this.dataTracker.set(WHEEL_ROTATION, rotation);
+    }
+
+    public Float getWheelRotationPrev() {
+        return this.dataTracker.get(WHEEL_ROTATION_PREV);
+    }
+
+    public void setWheelRotationPrev(Float rotation) {
+        this.dataTracker.set(WHEEL_ROTATION_PREV, rotation);
+    }
+
+
+    public Float getEngineRotation() {
+        return this.dataTracker.get(ENGINE_ROTATION);
+    }
+
+    public void setEngineRotation(Float rotation) {
+        this.dataTracker.set(ENGINE_ROTATION, rotation);
+    }
+
+    public Float getEngineRotationPrev() {
+        return this.dataTracker.get(ENGINE_ROTATION_PREV);
+    }
+
+    public void setEngineRotationPrev(Float rotation) {
+        this.dataTracker.set(ENGINE_ROTATION_PREV, rotation);
     }
 
 
