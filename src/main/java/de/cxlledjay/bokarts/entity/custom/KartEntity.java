@@ -3,11 +3,15 @@ package de.cxlledjay.bokarts.entity.custom;
 import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.entity.ModEntities;
 import de.cxlledjay.bokarts.item.ModItems;
+import de.cxlledjay.bokarts.util.ModTags;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.*;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
@@ -17,6 +21,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+
+import java.util.Objects;
 
 public class KartEntity extends BoatEntity {
 
@@ -94,7 +100,24 @@ public class KartEntity extends BoatEntity {
 
     @Override
     public float getNearbySlipperiness() {
-        return 0.98F;
+
+        float slipperiness = 0.6f; //< default boat
+        BlockState groundBlock = this.getWorld().getBlockState(this.getVelocityAffectingPos());
+
+        if(hasControllingPassenger() && getControllingPassenger() instanceof PlayerEntity) {
+            if(isDrivableBlock(groundBlock)) {
+                // is on road => go brr
+                slipperiness = 0.98f;
+            } else {
+                slipperiness = 0.9f;
+            }
+        }
+
+        return slipperiness;
+    }
+
+    private boolean isDrivableBlock(BlockState blockState) {
+        return blockState.isIn(ModTags.Blocks.DRIVABLE_BLOCKS);
     }
 
     @Override

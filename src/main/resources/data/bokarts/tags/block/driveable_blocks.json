@@ -1,0 +1,14 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:blackstone",
+    "minecraft:deepslate_tiles",
+    "minecraft:mud",
+    "minecraft:deepslate_bricks",
+    "minecraft:deepslate",
+    "minecraft:gray_concrete_powder",
+    "minecraft:diorite",
+    "minecraft:diorite_slab",
+    "minecraft:diorite_stairs"
+  ]
+}
