@@ -4,6 +4,7 @@ import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.entity.ModEntities;
 import de.cxlledjay.bokarts.item.ModItems;
 import de.cxlledjay.bokarts.sound.KartEngineSound;
+import de.cxlledjay.bokarts.sound.ModSounds;
 import de.cxlledjay.bokarts.util.ModTags;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -18,6 +19,7 @@ import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.StringIdentifiable;
@@ -45,6 +47,8 @@ public class KartEntity extends BoatEntity {
 
     // attributes tracking
     private static final TrackedData<String> PAINT_COLOR = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.STRING);
+    private static final TrackedData<String> HORN_SOUND = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.STRING);
+
     private static final TrackedData<Float> ENGINE_REVS = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
     private static final TrackedData<Float> WHEEL_ROTATION = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
     private static final TrackedData<Float> WHEEL_ROTATION_PREV = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
@@ -294,12 +298,14 @@ public class KartEntity extends BoatEntity {
 
     // horn
     public void playHornSound() {
-        // 1. Calculate a slightly randomized pitch (e.g., between 0.9 and 1.1)
-        float basePitch = 1.0F;
-        float randomWobble = (this.random.nextFloat() - this.random.nextFloat()) * 0.1F;
-
-        // 2. Play the sound
-        this.playSound(SoundEvents.ENTITY_VILLAGER_DEATH, 1.0F, basePitch + randomWobble);
+        this.getWorld().playSound(
+                null, // Excluded player (null = everyone hears it)
+                this.getX(), this.getY(), this.getZ(),
+                this.getHornSound().getSoundEvent(),
+                SoundCategory.PLAYERS,
+                0.8f, // Volume
+                1.0f  // Pitch
+        );
     }
 
 
@@ -311,6 +317,8 @@ public class KartEntity extends BoatEntity {
     protected void initDataTracker(DataTracker.Builder builder) {
         super.initDataTracker(builder);
         builder.add(PAINT_COLOR, "default");
+        builder.add(HORN_SOUND, "civic");
+
         builder.add(ENGINE_REVS, 0.0f);
         builder.add(WHEEL_ROTATION, 0.0f);
         builder.add(WHEEL_ROTATION_PREV, 0.0f);
@@ -322,7 +330,10 @@ public class KartEntity extends BoatEntity {
     @Override
     protected void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
+
         nbt.putString("PaintColor", this.getPaintColor().toString());
+        nbt.putString("HornSound", this.getHornSound().toString());
+
         nbt.putFloat("EngineRevs", this.getEngineRevs());
         nbt.putFloat("WheelRotation", this.getWheelRotation());
         nbt.putFloat("WheelRotationPrev", this.getWheelRotationPrev());
@@ -334,7 +345,11 @@ public class KartEntity extends BoatEntity {
     @Override
     protected void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
+        // customization
         this.dataTracker.set(PAINT_COLOR, nbt.getString("PaintColor"));
+        this.dataTracker.set(HORN_SOUND, nbt.getString("HornSound"));
+
+        // animations
         this.dataTracker.set(ENGINE_REVS, nbt.getFloat("EngineRevs"));
         this.dataTracker.set(WHEEL_ROTATION, nbt.getFloat("WheelRotation"));
         this.dataTracker.set(WHEEL_ROTATION_PREV, nbt.getFloat("WheelRotationPrev"));
@@ -352,6 +367,16 @@ public class KartEntity extends BoatEntity {
     public void setPaintColor(PaintColor paintColor) {
         this.dataTracker.set(PAINT_COLOR, paintColor.toString());
     }
+
+    public HornSounds getHornSound() {
+        return HornSounds.getHornSound(this.dataTracker.get(HORN_SOUND));
+    }
+
+    public void setHornSound(HornSounds hornSounds) {
+        this.dataTracker.set(HORN_SOUND, hornSounds.toString());
+    }
+
+
 
 
     public Float getEngineRevs() {
@@ -450,10 +475,6 @@ public class KartEntity extends BoatEntity {
             return this.name;
         }
 
-        public String getName() {
-            return this.name;
-        }
-
         @Override
         public String toString() {
             return this.name;
@@ -464,4 +485,46 @@ public class KartEntity extends BoatEntity {
         }
     }
 
+
+    // horn sound effects
+    public enum HornSounds implements StringIdentifiable {
+        CIVIC("civic", ModSounds.HORN_CIVIC),
+        MINI("mini", ModSounds.HORN_MINI),
+        BIKE("bike", ModSounds.HORN_BIKE),
+        VILLAGER("villager", SoundEvents.ENTITY_VILLAGER_HURT),
+        METAL_PIPE("metal_pipe", ModSounds.HORN_METAL_PIPE),
+        DISCORD_JOIN("discord_join", ModSounds.HORN_DISCORD_JOIN),
+        DISCORD_LEAVE("discord_leave", ModSounds.HORN_DISCORD_LEAVE),
+        AUGHH("aughh", ModSounds.HORN_AUGHH),
+        RIZZ("rizz", ModSounds.HORN_RIZZ),
+        LEGO_YODA("lego_yoda", ModSounds.HORN_YODA);
+
+
+        private final String name;
+        private final SoundEvent soundEvent;
+        public static final StringIdentifiable.EnumCodec<KartEntity.HornSounds> CODEC = StringIdentifiable.createCodec(KartEntity.HornSounds::values);
+
+        HornSounds(final String name, SoundEvent soundEvent) {
+            this.name = name;
+            this.soundEvent = soundEvent;
+        }
+
+        @Override
+        public String asString() {
+            return this.name;
+        }
+
+        @Override
+        public String toString() {
+            return this.name;
+        }
+
+        public static KartEntity.HornSounds getHornSound(String name) {
+            return CODEC.byId(name, CIVIC);
+        }
+
+        public SoundEvent getSoundEvent() {
+            return this.soundEvent;
+        }
+    }
 }

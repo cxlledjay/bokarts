@@ -1,17 +1,13 @@
 {
   "itemgroup.bokarts.bokart_items" : "BoKarts",
-
   "item.bokarts.kart_seat" : "Kart Seat",
   "item.bokarts.kart_wheel" : "Kart Wheel",
   "item.bokarts.kart_steering_wheel" : "Kart Steering Wheel",
-
-
   "item.bokarts.kart_default" : "Kart (default)",
-
 
   "entity.bokarts.kart" : "BoKart",
   "sounds.bokarts.kart_engine": "Kart Engine",
-
+  "sounds.bokarts.horn": "Kart Horn",
 
   "key.category.bokarts.controls" : "BoKarts Controls",
   "key.bokarts.horn": "Horn"

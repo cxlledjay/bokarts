@@ -1,8 +1,72 @@
 {
   "kart_engine": {
+    "category": "player",
     "subtitle": "sounds.bokarts.kart_engine",
     "sounds": [
       "bokarts:engine_loop"
+    ]
+  },
+  "horn_aughh": {
+    "category": "player",
+    "subtitle": "sounds.bokarts.horn",
+    "sounds": [
+      "bokarts:horn_aughh"
+    ]
+  },
+  "horn_bike": {
+    "category": "player",
+    "subtitle": "sounds.bokarts.horn",
+    "sounds": [
+      "bokarts:horn_bike"
+    ]
+  },
+  "horn_civic": {
+    "category": "player",
+    "subtitle": "sounds.bokarts.horn",
+    "sounds": [
+      "bokarts:horn_civic"
+    ]
+  },
+  "horn_discord_join": {
+    "category": "player",
+    "subtitle": "sounds.bokarts.horn",
+    "sounds": [
+      "bokarts:horn_discord_join"
+    ]
+  },
+  "horn_discord_leave": {
+    "category": "player",
+    "subtitle": "sounds.bokarts.horn",
+    "sounds": [
+      "bokarts:horn_discord_leave"
+    ]
+  },
+  "horn_metal_pipe": {
+    "category": "player",
+    "subtitle": "sounds.bokarts.horn",
+    "sounds": [
+      "bokarts:horn_metal_pipe"
+    ]
+  },
+  "horn_mini": {
+    "category": "player",
+    "subtitle": "sounds.bokarts.horn",
+    "sounds": [
+      "bokarts:horn_mini"
+    ]
+  },
+  "horn_rizz": {
+    "category": "player",
+    "subtitle": "sounds.bokarts.horn",
+    "sounds": [
+      "bokarts:horn_rizz"
+    ]
+  },
+  "horn_yoda": {
+    "category": "player",
+    "subtitle": "sounds.bokarts.horn",
+    "sounds": [
+      "bokarts:horn_yoda"
     ]
   }
 }
