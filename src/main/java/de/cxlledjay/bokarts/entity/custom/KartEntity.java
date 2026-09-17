@@ -3,10 +3,12 @@ package de.cxlledjay.bokarts.entity.custom;
 import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.entity.ModEntities;
 import de.cxlledjay.bokarts.item.ModItems;
+import de.cxlledjay.bokarts.sound.KartEngineSound;
 import de.cxlledjay.bokarts.util.ModTags;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.sound.SoundSystem;
 import net.minecraft.entity.*;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
@@ -29,13 +31,19 @@ import java.util.Objects;
 
 public class KartEntity extends BoatEntity {
 
-
+    // input tracking
     public boolean pressingLeft, pressingRight, pressingForward, pressingBack, pressingSpace;
 
+    // animation stuff
     private static final float steeringSpeed = 20.0f;
     private static final float steeringCenter = 0.0f;
     private static final float engineAcceleration = 0.1f;
 
+    // sound stuff
+    private boolean engineSoundStarted = false;
+    private float soundScaling = 0.0f;
+
+    // attributes tracking
     private static final TrackedData<String> PAINT_COLOR = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<Float> ENGINE_REVS = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
     private static final TrackedData<Float> WHEEL_ROTATION = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
@@ -256,17 +264,44 @@ public class KartEntity extends BoatEntity {
         this.setEngineRotationPrev(this.getEngineRotation());
         float backAxleRotationThisTick = radiansThisTick + currentRevs;
         this.setEngineRotation(this.getEngineRotation() + backAxleRotationThisTick);
+
+
+
+        // ---------------- sound logic for client ----------------
+        this.setSoundScaling(((float) forwardSpeed * 5) + (Math.abs(currentRevs) * 10));
+
+        // audio engine is client sided
+        if (this.getWorld().isClient) {
+            if (this.hasPassengers() && !this.engineSoundStarted) {
+                KartEngineSound.playEngineSound(this);
+                this.engineSoundStarted = true;
+            } else if (!this.hasPassengers() && this.engineSoundStarted) {
+                this.engineSoundStarted = false;
+            }
+        }
     }
 
 
 
-    // sounds
+    // ---------------- sounds ----------------
 
     @Override
     @Nullable
     protected SoundEvent getPaddleSoundEvent() {
         return null;
     }
+
+
+    // horn
+    public void playHornSound() {
+        // 1. Calculate a slightly randomized pitch (e.g., between 0.9 and 1.1)
+        float basePitch = 1.0F;
+        float randomWobble = (this.random.nextFloat() - this.random.nextFloat()) * 0.1F;
+
+        // 2. Play the sound
+        this.playSound(SoundEvents.ENTITY_VILLAGER_DEATH, 1.0F, basePitch + randomWobble);
+    }
+
 
 
 
@@ -370,11 +405,13 @@ public class KartEntity extends BoatEntity {
         this.dataTracker.set(STEERING_ANGLE, speed);
     }
 
+    public float getSoundScaling() {
+        return soundScaling;
+    }
 
-
-
-
-
+    public void setSoundScaling(float soundScaling) {
+        this.soundScaling = soundScaling;
+    }
 
 
     // variants

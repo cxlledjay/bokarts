@@ -9,5 +9,10 @@
   "item.bokarts.kart_default" : "Kart (default)",
 
 
-  "entity.bokarts.kart" : "BoKart"
+  "entity.bokarts.kart" : "BoKart",
+  "sounds.bokarts.kart_engine": "Kart Engine",
+
+
+  "key.category.bokarts.controls" : "BoKarts Controls",
+  "key.bokarts.horn": "Horn"
 }

@@ -1,0 +1,8 @@
+{
+  "kart_engine": {
+    "subtitle": "sounds.bokarts.kart_engine",
+    "sounds": [
+      "bokarts:engine_loop"
+    ]
+  }
+}
