@@ -20,8 +20,8 @@ public class KartEngineSound extends MovingSoundInstance {
         Idle:       0.5f       0.9f
         MaxSpeed:   0.8f       1.25f
      */
-    private static final float volumeIdle = 0.5f;
-    private static final float volumeMaxSpeed = 0.8f;
+    private static final float volumeIdle = 0.40f;
+    private static final float volumeMaxSpeed = 0.9f;
     private static final float pitchIdle = 0.9f;
     private static final float pitchMaxSpeed = 1.25f;
 
