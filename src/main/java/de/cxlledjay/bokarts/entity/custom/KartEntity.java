@@ -1,6 +1,5 @@
 package de.cxlledjay.bokarts.entity.custom;
 
-import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.entity.ModEntities;
 import de.cxlledjay.bokarts.item.ModItems;
 import de.cxlledjay.bokarts.screen.custom.KartInventoryScreenHandler;
@@ -8,10 +7,7 @@ import de.cxlledjay.bokarts.sound.KartEngineSound;
 import de.cxlledjay.bokarts.sound.ModSounds;
 import de.cxlledjay.bokarts.util.KartFuelItems;
 import de.cxlledjay.bokarts.util.ModTags;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.sound.SoundSystem;
 import net.minecraft.entity.*;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
@@ -22,11 +18,14 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.packet.s2c.play.StopSoundS2CPacket;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -55,6 +54,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     private static final TrackedData<String> PAINT_COLOR = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<String> HORN_SOUND = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<Float> FUEL_RANGE = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
+    private static final TrackedData<Float> ODO = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
 
     private static final TrackedData<Float> ENGINE_REVS = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
     private static final TrackedData<Float> WHEEL_ROTATION = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
@@ -315,6 +315,27 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         );
     }
 
+    public void cycleHornSound(ServerPlayerEntity player, int direction) {
+
+        // calculate HornSound
+        KartEntity.HornSounds newSound;
+        if(direction > 0) {
+            // next
+            newSound = this.getHornSound().next();
+        } else {
+            // previous
+            newSound = this.getHornSound().previous();
+        }
+
+        // preview HornSound
+        Identifier oldSoundId = this.getHornSound().getSoundEvent().getId();
+        player.networkHandler.sendPacket(new StopSoundS2CPacket(oldSoundId, SoundCategory.PLAYERS));
+        player.playSoundToPlayer(newSound.getSoundEvent(), SoundCategory.PLAYERS, 1.0f, 1.0f);
+
+        // set HornSound for Kart
+        this.setHornSound(newSound);
+    }
+
 
 
 
@@ -341,17 +362,16 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         }
     }
 
-    public String getFuelRangeString() {
+    public String getFormattedDistanceString(Float distance) {
         String  rangeString = "";
         DecimalFormat decimalFormat = new DecimalFormat("0.0");
 
-        float currentRange = this.getFuelRange();
-        if(currentRange < 1000) {
+        if(distance < 1000) {
             // less than 1km
-            rangeString = decimalFormat.format(currentRange) + " m";
+            rangeString = decimalFormat.format(distance) + " m";
         } else {
             // 1km or more
-            rangeString = decimalFormat.format(currentRange / 1000.0f) + " km";
+            rangeString = decimalFormat.format(distance / 1000.0f) + " km";
         }
 
         return rangeString;
@@ -364,11 +384,15 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     @Override
     protected void initDataTracker(DataTracker.Builder builder) {
         super.initDataTracker(builder);
+        // customization
         builder.add(PAINT_COLOR, "default");
         builder.add(HORN_SOUND, "civic");
 
+        // fuel and distance
         builder.add(FUEL_RANGE, 0.0f);
+        builder.add(ODO, 0.0f);
 
+        // animations
         builder.add(ENGINE_REVS, 0.0f);
         builder.add(WHEEL_ROTATION, 0.0f);
         builder.add(WHEEL_ROTATION_PREV, 0.0f);
@@ -385,6 +409,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         nbt.putString("HornSound", this.getHornSound().toString());
 
         nbt.putFloat("FuelRange", this.getFuelRange());
+        nbt.putFloat("Odo", this.getOdometer());
 
         nbt.putFloat("EngineRevs", this.getEngineRevs());
         nbt.putFloat("WheelRotation", this.getWheelRotation());
@@ -397,14 +422,12 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     @Override
     protected void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
-        // customization
         this.dataTracker.set(PAINT_COLOR, nbt.getString("PaintColor"));
         this.dataTracker.set(HORN_SOUND, nbt.getString("HornSound"));
 
-        // fuel
         this.dataTracker.set(FUEL_RANGE, nbt.getFloat("FuelRange"));
+        this.dataTracker.set(ODO, nbt.getFloat("Odo"));
 
-        // animations
         this.dataTracker.set(ENGINE_REVS, nbt.getFloat("EngineRevs"));
         this.dataTracker.set(WHEEL_ROTATION, nbt.getFloat("WheelRotation"));
         this.dataTracker.set(WHEEL_ROTATION_PREV, nbt.getFloat("WheelRotationPrev"));
@@ -435,13 +458,22 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
 
 
-    private Float getFuelRange() {
+    public Float getFuelRange() {
         return this.dataTracker.get(FUEL_RANGE);
     }
 
     private void setFuelRange(Float range) {
         if(range < 0.0f) range = 0.0f;
         this.dataTracker.set(FUEL_RANGE, range);
+    }
+
+    public Float getOdometer() {
+        return this.dataTracker.get(ODO);
+    }
+
+    private void setOdometer(Float odometer) {
+        if(odometer < 0.0f) odometer = 0.0f;
+        this.dataTracker.set(ODO, odometer);
     }
 
 
@@ -453,7 +485,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         return this.dataTracker.get(ENGINE_REVS);
     }
 
-    public void setEngineRevs(Float acceleration) {
+    private void setEngineRevs(Float acceleration) {
         this.dataTracker.set(ENGINE_REVS, acceleration);
     }
 
@@ -462,7 +494,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         return this.dataTracker.get(WHEEL_ROTATION);
     }
 
-    public void setWheelRotation(Float rotation) {
+    private void setWheelRotation(Float rotation) {
         this.dataTracker.set(WHEEL_ROTATION, rotation);
     }
 
@@ -470,7 +502,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         return this.dataTracker.get(WHEEL_ROTATION_PREV);
     }
 
-    public void setWheelRotationPrev(Float rotation) {
+    private void setWheelRotationPrev(Float rotation) {
         this.dataTracker.set(WHEEL_ROTATION_PREV, rotation);
     }
 
@@ -479,7 +511,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         return this.dataTracker.get(ENGINE_ROTATION);
     }
 
-    public void setEngineRotation(Float rotation) {
+    private void setEngineRotation(Float rotation) {
         this.dataTracker.set(ENGINE_ROTATION, rotation);
     }
 
@@ -487,7 +519,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         return this.dataTracker.get(ENGINE_ROTATION_PREV);
     }
 
-    public void setEngineRotationPrev(Float rotation) {
+    private void setEngineRotationPrev(Float rotation) {
         this.dataTracker.set(ENGINE_ROTATION_PREV, rotation);
     }
 
@@ -496,7 +528,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         return this.dataTracker.get(STEERING_ANGLE);
     }
 
-    public void setSteeringAngle(Float speed) {
+    private void setSteeringAngle(Float speed) {
         this.dataTracker.set(STEERING_ANGLE, speed);
     }
 
@@ -504,7 +536,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         return soundScaling;
     }
 
-    public void setSoundScaling(float soundScaling) {
+    private void setSoundScaling(float soundScaling) {
         this.soundScaling = soundScaling;
     }
 
@@ -559,16 +591,16 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
     // horn sound effects
     public enum HornSounds implements StringIdentifiable {
-        CIVIC("civic", ModSounds.HORN_CIVIC),
-        MINI("mini", ModSounds.HORN_MINI),
-        BIKE("bike", ModSounds.HORN_BIKE),
+        HORN1("horn_1", ModSounds.HORN_CIVIC),
+        HORN2("horn_2", ModSounds.HORN_MINI),
+        HORN3("horn_3", ModSounds.HORN_BIKE),
         VILLAGER("villager", SoundEvents.ENTITY_VILLAGER_HURT),
         METAL_PIPE("metal_pipe", ModSounds.HORN_METAL_PIPE),
         DISCORD_JOIN("discord_join", ModSounds.HORN_DISCORD_JOIN),
         DISCORD_LEAVE("discord_leave", ModSounds.HORN_DISCORD_LEAVE),
         AUGHH("aughh", ModSounds.HORN_AUGHH),
         RIZZ("rizz", ModSounds.HORN_RIZZ),
-        LEGO_YODA("lego_yoda", ModSounds.HORN_YODA);
+        YODA("yoda", ModSounds.HORN_YODA);
 
 
         private final String name;
@@ -591,11 +623,22 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         }
 
         public static KartEntity.HornSounds getHornSound(String name) {
-            return CODEC.byId(name, CIVIC);
+            return CODEC.byId(name, HORN1);
         }
 
         public SoundEvent getSoundEvent() {
             return this.soundEvent;
+        }
+
+        // next and previous select logic
+        private static final HornSounds[] vals = values();
+
+        public HornSounds next() {
+            return vals[(this.ordinal() + 1) % vals.length];
+        }
+
+        public HornSounds previous() {
+            return vals[((this.ordinal() + vals.length) - 1) % vals.length];
         }
     }
 }

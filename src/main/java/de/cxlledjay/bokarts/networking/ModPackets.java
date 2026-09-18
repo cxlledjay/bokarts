@@ -2,6 +2,7 @@ package de.cxlledjay.bokarts.networking;
 
 import de.cxlledjay.bokarts.networking.packet.AddFuelPayloadC2S;
 import de.cxlledjay.bokarts.networking.packet.HornPayloadC2S;
+import de.cxlledjay.bokarts.networking.packet.SetHornPayloadC2S;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
@@ -13,6 +14,9 @@ public class ModPackets {
 
         PayloadTypeRegistry.playC2S().register(AddFuelPayloadC2S.ID, AddFuelPayloadC2S.STREAM_CODEC);
         ServerPlayNetworking.registerGlobalReceiver(AddFuelPayloadC2S.ID, AddFuelPayloadC2S::receive);
+
+        PayloadTypeRegistry.playC2S().register(SetHornPayloadC2S.ID, SetHornPayloadC2S.STREAM_CODEC);
+        ServerPlayNetworking.registerGlobalReceiver(SetHornPayloadC2S.ID, SetHornPayloadC2S::receive);
     }
 
 }

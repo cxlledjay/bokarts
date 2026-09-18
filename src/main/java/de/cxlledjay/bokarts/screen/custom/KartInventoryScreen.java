@@ -3,6 +3,7 @@ package de.cxlledjay.bokarts.screen.custom;
 import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.entity.custom.KartEntity;
 import de.cxlledjay.bokarts.networking.packet.AddFuelPayloadC2S;
+import de.cxlledjay.bokarts.networking.packet.SetHornPayloadC2S;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -21,9 +22,17 @@ public class KartInventoryScreen extends HandledScreen<KartInventoryScreenHandle
     private KartEntity kart;
 
     private static final Identifier BACKGROUND_TEXTURE = BoKarts.id("textures/gui/kart_inventory/kart_inventory.png");
-    ButtonTextures MY_BUTTON_TEXTURES = new ButtonTextures(
+    ButtonTextures REFUEL_BUTTON_TEXTURES = new ButtonTextures(
             BoKarts.id("refuel"),
             BoKarts.id("refuel_highlighted")
+    );
+    ButtonTextures HORN_PREVIOUS_TEXTURES = new ButtonTextures(
+            BoKarts.id("horn_prev"),
+            BoKarts.id("horn_prev_highlighted")
+    );
+    ButtonTextures HORN_NEXT_TEXTURES = new ButtonTextures(
+            BoKarts.id("horn_next"),
+            BoKarts.id("horn_next_highlighted")
     );
 
     public KartInventoryScreen(KartInventoryScreenHandler handler, PlayerInventory inventory, Text title) {
@@ -45,17 +54,56 @@ public class KartInventoryScreen extends HandledScreen<KartInventoryScreenHandle
 
         // refuel button
         this.addDrawableChild(new TexturedButtonWidget(
-                this.x + 8, this.y + 31,
+                this.x + 8, this.y + 34,
                 16, 16,
-                MY_BUTTON_TEXTURES,
+                REFUEL_BUTTON_TEXTURES,
                 button -> {
                     // click logic: send packet to add fuel
                     AddFuelPayloadC2S payloadC2S = new AddFuelPayloadC2S();
                     ClientPlayNetworking.send(payloadC2S);
-                    button.setFocused(false);
                 }
-        ));
+        ) {
+            @Override
+            public void setFocused(boolean focused) {
+                // ignore focusing
+                super.setFocused(false);
+            }
+        });
 
+        // horn cycle buttons
+        this.addDrawableChild(new TexturedButtonWidget(
+                this.x + 147, this.y + 57,
+                9, 10,
+                HORN_PREVIOUS_TEXTURES,
+                button -> {
+                    // click logic: send packet server
+                    SetHornPayloadC2S payloadC2S = new SetHornPayloadC2S(-1);
+                    ClientPlayNetworking.send(payloadC2S);
+                }
+        ) {
+            @Override
+            public void setFocused(boolean focused) {
+                // ignore focusing
+                super.setFocused(false);
+            }
+        });
+
+        this.addDrawableChild(new TexturedButtonWidget(
+                this.x + 156, this.y + 57,
+                9, 10,
+                HORN_NEXT_TEXTURES,
+                button -> {
+                    // click logic: send packet server
+                    SetHornPayloadC2S payloadC2S = new SetHornPayloadC2S(1);
+                    ClientPlayNetworking.send(payloadC2S);
+                }
+        ) {
+            @Override
+            public void setFocused(boolean focused) {
+                // ignore focusing
+                super.setFocused(false);
+            }
+        });
     }
 
     @Override
@@ -67,17 +115,24 @@ public class KartInventoryScreen extends HandledScreen<KartInventoryScreenHandle
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        // render stuff like normal inventory
         this.renderBackground(context, mouseX, mouseY, delta);
         super.render(context, mouseX, mouseY, delta);
         this.drawMouseoverTooltip(context, mouseX, mouseY);
 
         // read from tracked data
         String rangeString = "";
-        if(this.kart != null) rangeString = this.kart.getFuelRangeString();
+        String odoString = "";
+        String hornString = "";
+        if(this.kart != null){
+            rangeString = this.kart.getFormattedDistanceString(this.kart.getFuelRange());
+            odoString = this.kart.getFormattedDistanceString(this.kart.getOdometer());
+            hornString = "[" + (this.kart.getHornSound().ordinal()+1) + "/10]";
+        }
 
-
-
-        // TODO: fixme
-        context.drawText(this.textRenderer, "Range: " + rangeString, this.x + 20, this.y + 70, 0x404040, false);
+        // display information
+        context.drawText(this.textRenderer, rangeString  , this.x + 102, this.y + 23,        0xB71C1C, false);
+        context.drawText(this.textRenderer, odoString    , this.x + 102, this.y + 23 + 18,   0xE29700, false);
+        context.drawText(this.textRenderer, hornString   , this.x + 102, this.y + 23 + 36,   0x3E349E, false);
     }
 }
