@@ -3,8 +3,10 @@ package de.cxlledjay.bokarts.entity.custom;
 import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.entity.ModEntities;
 import de.cxlledjay.bokarts.item.ModItems;
+import de.cxlledjay.bokarts.screen.custom.KartInventoryScreenHandler;
 import de.cxlledjay.bokarts.sound.KartEngineSound;
 import de.cxlledjay.bokarts.sound.ModSounds;
+import de.cxlledjay.bokarts.util.KartFuelItems;
 import de.cxlledjay.bokarts.util.ModTags;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -17,11 +19,14 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -29,9 +34,10 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
+import java.text.DecimalFormat;
 import java.util.Objects;
 
-public class KartEntity extends BoatEntity {
+public class KartEntity extends BoatEntity implements RideableInventory{
 
     // input tracking
     public boolean pressingLeft, pressingRight, pressingForward, pressingBack, pressingSpace;
@@ -48,6 +54,7 @@ public class KartEntity extends BoatEntity {
     // attributes tracking
     private static final TrackedData<String> PAINT_COLOR = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<String> HORN_SOUND = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.STRING);
+    private static final TrackedData<Float> FUEL_RANGE = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
 
     private static final TrackedData<Float> ENGINE_REVS = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
     private static final TrackedData<Float> WHEEL_ROTATION = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
@@ -312,12 +319,55 @@ public class KartEntity extends BoatEntity {
 
 
 
+    // ---------------- fuel ----------------
+
+    @Override
+    public void openInventory(PlayerEntity player) {
+        if(!this.getWorld().isClient) {
+            player.openHandledScreen(new SimpleNamedScreenHandlerFactory(
+                    (syncId, playerInventory, player1) ->
+                            new KartInventoryScreenHandler(syncId, playerInventory), Text.translatable(this.asItem().getTranslationKey())
+            ));
+        }
+    }
+
+    public void addFuelFromItem(ItemStack fuel) {
+        if(!fuel.isEmpty()) {
+            float currentRange = this.getFuelRange();
+            float newRange = currentRange + (KartFuelItems.getFuelRange(fuel) * fuel.getCount());
+            this.setFuelRange(newRange);
+
+            fuel.decrement(fuel.getCount());
+        }
+    }
+
+    public String getFuelRangeString() {
+        String  rangeString = "";
+        DecimalFormat decimalFormat = new DecimalFormat("0.0");
+
+        float currentRange = this.getFuelRange();
+        if(currentRange < 1000) {
+            // less than 1km
+            rangeString = decimalFormat.format(currentRange) + " m";
+        } else {
+            // 1km or more
+            rangeString = decimalFormat.format(currentRange / 1000.0f) + " km";
+        }
+
+        return rangeString;
+    }
+
+
+
+
     // attributes
     @Override
     protected void initDataTracker(DataTracker.Builder builder) {
         super.initDataTracker(builder);
         builder.add(PAINT_COLOR, "default");
         builder.add(HORN_SOUND, "civic");
+
+        builder.add(FUEL_RANGE, 0.0f);
 
         builder.add(ENGINE_REVS, 0.0f);
         builder.add(WHEEL_ROTATION, 0.0f);
@@ -334,6 +384,8 @@ public class KartEntity extends BoatEntity {
         nbt.putString("PaintColor", this.getPaintColor().toString());
         nbt.putString("HornSound", this.getHornSound().toString());
 
+        nbt.putFloat("FuelRange", this.getFuelRange());
+
         nbt.putFloat("EngineRevs", this.getEngineRevs());
         nbt.putFloat("WheelRotation", this.getWheelRotation());
         nbt.putFloat("WheelRotationPrev", this.getWheelRotationPrev());
@@ -348,6 +400,9 @@ public class KartEntity extends BoatEntity {
         // customization
         this.dataTracker.set(PAINT_COLOR, nbt.getString("PaintColor"));
         this.dataTracker.set(HORN_SOUND, nbt.getString("HornSound"));
+
+        // fuel
+        this.dataTracker.set(FUEL_RANGE, nbt.getFloat("FuelRange"));
 
         // animations
         this.dataTracker.set(ENGINE_REVS, nbt.getFloat("EngineRevs"));
@@ -375,6 +430,21 @@ public class KartEntity extends BoatEntity {
     public void setHornSound(HornSounds hornSounds) {
         this.dataTracker.set(HORN_SOUND, hornSounds.toString());
     }
+
+
+
+
+
+    private Float getFuelRange() {
+        return this.dataTracker.get(FUEL_RANGE);
+    }
+
+    private void setFuelRange(Float range) {
+        if(range < 0.0f) range = 0.0f;
+        this.dataTracker.set(FUEL_RANGE, range);
+    }
+
+
 
 
 
@@ -437,6 +507,7 @@ public class KartEntity extends BoatEntity {
     public void setSoundScaling(float soundScaling) {
         this.soundScaling = soundScaling;
     }
+
 
 
     // variants

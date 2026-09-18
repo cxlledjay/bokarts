@@ -4,7 +4,9 @@ import de.cxlledjay.bokarts.entity.ModEntities;
 import de.cxlledjay.bokarts.item.ModItemGroups;
 import de.cxlledjay.bokarts.item.ModItems;
 import de.cxlledjay.bokarts.networking.ModPackets;
+import de.cxlledjay.bokarts.screen.ModScreenHandlers;
 import de.cxlledjay.bokarts.sound.ModSounds;
+import de.cxlledjay.bokarts.util.KartFuelItems;
 import net.fabricmc.api.ModInitializer;
 
 import net.minecraft.util.Identifier;
@@ -24,6 +26,7 @@ public class BoKarts implements ModInitializer {
 		ModEntities.registerModEntities();
 		ModSounds.registerSounds();
 		ModPackets.registerC2SPackets();
+		ModScreenHandlers.register();
 	}
 
 	public static Identifier id(String path) {
