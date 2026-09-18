@@ -3,7 +3,7 @@
 	"package": "de.cxlledjay.bokarts.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"ExampleMixin",
+		"KartStatMixin",
 		"ServerPlayNetworkHandlerMixin"
 	],
 	"injectors": {

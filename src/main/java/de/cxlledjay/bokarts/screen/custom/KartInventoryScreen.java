@@ -125,8 +125,8 @@ public class KartInventoryScreen extends HandledScreen<KartInventoryScreenHandle
         String odoString = "";
         String hornString = "";
         if(this.kart != null){
-            rangeString = this.kart.getFormattedDistanceString(this.kart.getFuelRange());
-            odoString = this.kart.getFormattedDistanceString(this.kart.getOdometer());
+            rangeString = this.kart.getFormattedDistanceString(this.kart.clientTrackedFuelRange);
+            odoString = this.kart.getFormattedDistanceString(this.kart.clientTrackedOdometer);
             hornString = "[" + (this.kart.getHornSound().ordinal()+1) + "/10]";
         }
 

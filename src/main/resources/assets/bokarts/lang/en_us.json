@@ -10,5 +10,7 @@
   "sounds.bokarts.horn": "Kart Horn",
 
   "key.category.bokarts.controls" : "BoKarts Controls",
-  "key.bokarts.horn": "Horn"
+  "key.bokarts.horn": "Horn",
+
+  "stat.bokarts.kart_one_cm": "Distance by Kart"
 }

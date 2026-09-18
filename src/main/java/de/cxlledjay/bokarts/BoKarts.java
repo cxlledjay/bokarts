@@ -6,6 +6,7 @@ import de.cxlledjay.bokarts.item.ModItems;
 import de.cxlledjay.bokarts.networking.ModPackets;
 import de.cxlledjay.bokarts.screen.ModScreenHandlers;
 import de.cxlledjay.bokarts.sound.ModSounds;
+import de.cxlledjay.bokarts.stats.ModStats;
 import de.cxlledjay.bokarts.util.KartFuelItems;
 import net.fabricmc.api.ModInitializer;
 
@@ -27,6 +28,7 @@ public class BoKarts implements ModInitializer {
 		ModSounds.registerSounds();
 		ModPackets.registerC2SPackets();
 		ModScreenHandlers.register();
+		ModStats.register();
 	}
 
 	public static Identifier id(String path) {
