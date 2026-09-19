@@ -130,7 +130,7 @@ public class KartInventoryScreen extends HandledScreen<KartInventoryScreenHandle
             odoString = this.kart.getFormattedDistanceString(this.kart.currentOdometer);
             hornString = "[" + (this.kart.getHornSound().ordinal()+1) + "/10]";
 
-            float fuelCapacityPercentage = this.kart.currentFuel / KartEntity.fuelTankMaxCapacity;
+            float fuelCapacityPercentage = this.kart.currentFuel / KartEntity.FUEL_TANK_MAX_CAPACITY;
             if(fuelCapacityPercentage > 0.5) {
                 fuelColor = 0x0E6B1F; //green
             } else if(fuelCapacityPercentage > 0.2) {

@@ -40,11 +40,15 @@ import java.text.DecimalFormat;
 public class KartEntity extends BoatEntity implements RideableInventory{
 
     // -------------------- constants --------------------
-    private static final float steeringSpeed = 20.0f;
-    private static final float steeringCenter = 0.0f;
-    private static final float engineAcceleration = 0.1f;
-    public static final float fuelTankMaxCapacity = 12800.0f; // in ml
-    private static final float fuelConsumptionPerTick = 0.7625f; // in ml
+    private static final float STEERING_SPEED = 20.0f;
+    private static final float STEERING_CENTER = 0.0f;
+    private static final float ENGINE_ACCELERATION = 0.1f;
+    public static final float FUEL_TANK_MAX_CAPACITY = 12800.0f; // in ml
+    private static final float FUEL_CONSUMPTION_PER_TICK = 0.7625f; // in ml
+    private static final float SLIPPERINESS_DRIVEABLE = 0.98f;
+    private static final float SLIPPERINESS_NON_DRIVEABLE = 0.9f;
+    private static final float SLIPPERINESS_SLOWED = 0.75f;
+    private static final float SLIPPERINESS_NO_PASSENGER = 0.6f;
 
     // -------------------- tracked data --------------------
     private static final TrackedData<String> PAINT_COLOR = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.STRING);
@@ -79,8 +83,8 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     public float frontAxleRotationPrev = 0.0f;
     public float rearAxleRotation = 0.0f;
     public float rearAxleRotationPrev = 0.0f;
-    public float steeringAngle = steeringCenter;
-    public float steeringAnglePrev = steeringCenter;
+    public float steeringAngle = STEERING_CENTER;
+    public float steeringAnglePrev = STEERING_CENTER;
     private float engineRevs = 0.0f;
 
 
@@ -149,15 +153,26 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     @Override
     public float getNearbySlipperiness() {
 
-        float slipperiness = 0.6f; //< default boat
+        // get block below kart
         BlockState groundBlock = this.getWorld().getBlockState(this.getSteppingPos());
 
+        // calculated ice boat slipperiness
+        float slipperiness = SLIPPERINESS_NO_PASSENGER; //< default: no passenger
+
+        // check if a player is controlling it
         if(hasControllingPassenger() && getControllingPassenger() instanceof PlayerEntity) {
-            if(isDrivableBlock(groundBlock)) {
-                // is on road => go brr
-                slipperiness = 0.98f;
+            if(pressingSlow) {
+                // player wants to go slow (maneuvering)
+                slipperiness = SLIPPERINESS_SLOWED;
             } else {
-                slipperiness = 0.9f;
+                // normal driving => check block
+                if(isDrivableBlock(groundBlock)) {
+                    // on a road
+                    slipperiness = SLIPPERINESS_DRIVEABLE;
+                } else {
+                    // off-road
+                    slipperiness = SLIPPERINESS_NON_DRIVEABLE;
+                }
             }
         }
 
@@ -211,8 +226,13 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
     @Override
     public void setInputs(boolean left, boolean right, boolean forward, boolean back) {
-        // handle inputs in super class
-        super.setInputs(left, right, forward, back);
+
+        // manipulate reverse physics
+        boolean manipulatedLeft = back ? right : left;
+        boolean manipulatedRight = back ? left : right;
+
+        // handle inputs in BoatEntity
+        super.setInputs(manipulatedLeft, manipulatedRight, forward, back);
 
         if (this.getWorld().isClient()) {
 
@@ -273,7 +293,8 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         super.tick();
 
 
-        // positon tracking on both client and server
+        // ---------------- position tracking (client + server) ----------------
+
         if (!this.hasTrackedPosition) {
             this.lastTickX = this.getX();
             this.lastTickY = this.getY();
@@ -297,7 +318,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         // update server tracking variables
         if(this.pressingForward || this.pressingBack) {
             // we are accelerating: consume fuel!
-            this.currentFuel = Math.max(0, this.currentFuel - fuelConsumptionPerTick); // prevent going under 0
+            this.currentFuel = Math.max(0, this.currentFuel - FUEL_CONSUMPTION_PER_TICK); // prevent going under 0
         }
         this.currentOdometer += (float) distanceThisTick;
 
@@ -309,6 +330,9 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
         // ==================== [SERVER SIDED CODE] ====================
         if (!this.getWorld().isClient()) {
+
+            // ---------------- fuel and odo sync ----------------
+
             // sync client data with exact data from server, executed every 10 ticks
             if(this.age % 10 == 0) {
                 this.setFuelSynced(this.currentFuel);
@@ -359,7 +383,14 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
                 // ---------------- wheel spin back ----------------
                 this.rearAxleRotationPrev = this.rearAxleRotation;
-                this.rearAxleRotation = this.rearAxleRotation + backAxleRotationThisTick;
+                if(pressingSlow) {
+                    // no wheelspin => rear = front
+                    this.rearAxleRotation = this.frontAxleRotation;
+                } else {
+                    // added wheelspin
+                    this.rearAxleRotation = this.rearAxleRotation + backAxleRotationThisTick;
+                }
+
 
 
                 // ---------------- sounds ----------------
@@ -393,13 +424,18 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     // ==================== tick() helpers ====================
 
     private void calculateSteeringAngle() {
+
+        // float deltaAngle = (!pressingForward && pressingBack)
+                // ? (-STEERING_SPEED)
+                // : (STEERING_SPEED);
+
         if (!(pressingLeft && pressingRight)) {
             if (pressingLeft) {
                 // steering to the left
-                this.steeringAngle += steeringSpeed;
+                this.steeringAngle += STEERING_SPEED;
             } else if (pressingRight) {
                 // steering to the right
-                this.steeringAngle -= steeringSpeed;
+                this.steeringAngle -= STEERING_SPEED;
             } else {
                 // no button pressed => center spring
                 this.steeringAngle = applySteeringWheelCenterSpring(this.steeringAngle);
@@ -409,16 +445,17 @@ public class KartEntity extends BoatEntity implements RideableInventory{
             this.steeringAngle = applySteeringWheelCenterSpring(this.steeringAngle);
         }
         // clamp steering to 0 - 180 degs
-        this.steeringAngle = MathHelper.clamp(this.steeringAngle, steeringCenter - (steeringSpeed * 5), steeringCenter + (steeringSpeed * 5));
+        this.steeringAngle = MathHelper.clamp(this.steeringAngle, STEERING_CENTER - (STEERING_SPEED * 5), STEERING_CENTER + (STEERING_SPEED * 5));
+
     }
 
     private float applySteeringWheelCenterSpring(float angle) {
-        if(angle < (steeringCenter + steeringSpeed) && angle > (steeringCenter - steeringSpeed)) {
-            angle = steeringCenter;
-        } else if(angle > steeringCenter) {
-            angle -= steeringSpeed;
-        } else if(angle < steeringCenter) {
-            angle += steeringSpeed;
+        if(angle < (STEERING_CENTER + STEERING_SPEED) && angle > (STEERING_CENTER - STEERING_SPEED)) {
+            angle = STEERING_CENTER;
+        } else if(angle > STEERING_CENTER) {
+            angle -= STEERING_SPEED;
+        } else if(angle < STEERING_CENTER) {
+            angle += STEERING_SPEED;
         }
 
         return angle;
@@ -428,24 +465,24 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     private void calculateEngineRevs() {
         if (pressingForward) {
             // positive acceleration
-            this.engineRevs += engineAcceleration;
+            this.engineRevs += ENGINE_ACCELERATION;
         } else if (pressingBack) {
             // negative acceleration
-            this.engineRevs -= engineAcceleration;
+            this.engineRevs -= ENGINE_ACCELERATION;
         } else {
             // no button pressed => slow return to idle
             this.engineRevs = applyEngineFlywheel(this.engineRevs);
         }
-        this.engineRevs = MathHelper.clamp(this.engineRevs, 0 - (engineAcceleration * 25), 0 + (engineAcceleration * 25));
+        this.engineRevs = MathHelper.clamp(this.engineRevs, 0 - (ENGINE_ACCELERATION * 25), 0 + (ENGINE_ACCELERATION * 25));
     }
 
     private float applyEngineFlywheel(float engineRotationDelta) {
-        if(engineRotationDelta < (0 + engineAcceleration * 2) && engineRotationDelta > (0 - engineAcceleration * 2)) {
+        if(engineRotationDelta < (0 + ENGINE_ACCELERATION * 2) && engineRotationDelta > (0 - ENGINE_ACCELERATION * 2)) {
             engineRotationDelta = 0;
         } else if(engineRotationDelta > 0) {
-            engineRotationDelta -= engineAcceleration * 2;
+            engineRotationDelta -= ENGINE_ACCELERATION * 2;
         } else if(engineRotationDelta < 0) {
-            engineRotationDelta += engineAcceleration * 2;
+            engineRotationDelta += ENGINE_ACCELERATION * 2;
         }
 
         return engineRotationDelta;
@@ -534,11 +571,11 @@ public class KartEntity extends BoatEntity implements RideableInventory{
             }
 
             // calculate needed items for refueling
-            int neededItemsUntilFull = (int) Math.ceil((fuelTankMaxCapacity - this.currentFuel) / fuelProItem);
+            int neededItemsUntilFull = (int) Math.ceil((FUEL_TANK_MAX_CAPACITY - this.currentFuel) / fuelProItem);
             int consumedItems = Math.min(neededItemsUntilFull, fuel.getCount());
 
             // refuel the engine and remove items from inventory
-            this.currentFuel = Math.min((this.currentFuel + fuelProItem * consumedItems), fuelTankMaxCapacity);
+            this.currentFuel = Math.min((this.currentFuel + fuelProItem * consumedItems), FUEL_TANK_MAX_CAPACITY);
             fuel.decrement(consumedItems);
 
             // sync with client
@@ -549,7 +586,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
             float pitch = 0.9f;
 
             if(consumedItems > 0) {
-                if(currentFuel >= fuelTankMaxCapacity) {
+                if(currentFuel >= FUEL_TANK_MAX_CAPACITY) {
                     // refilled to max capacity
                     refillSound = SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP;
                     pitch = 1.1f;
@@ -591,7 +628,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
     public String getFormattedFuelCapacityString(Float fuelCapacity) {
         DecimalFormat decimalFormat1 = new DecimalFormat("0.0");
-        return decimalFormat1.format(fuelCapacity / 1000.0f) + "L/" + decimalFormat1.format(fuelTankMaxCapacity / 1000.0f) + "L";
+        return decimalFormat1.format(fuelCapacity / 1000.0f) + "L/" + decimalFormat1.format(FUEL_TANK_MAX_CAPACITY / 1000.0f) + "L";
     }
 
 
@@ -612,7 +649,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
         // animations
         builder.add(ENGINE_REVS, 0.0f);
-        builder.add(STEERING_ANGLE, steeringCenter);
+        builder.add(STEERING_ANGLE, STEERING_CENTER);
     }
 
     @Override
