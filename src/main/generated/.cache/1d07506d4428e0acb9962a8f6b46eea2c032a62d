@@ -1,5 +1,23 @@
-// 1.21.1	2026-09-15T12:40:53.8511902	BoKarts/Model Definitions
+// 1.21.1	2026-09-20T00:55:27.6913033	BoKarts/Model Definitions
+d5521416cc89a40442b4f54e181f7bf0a672e428 assets\bokarts\models\item\kart\blue.json
+554e8610620e4d5bc8bbc70a092d3fd738c68f11 assets\bokarts\models\item\kart\green.json
+364d766270772d41133da161e6cdbdf55b7533f0 assets\bokarts\models\item\kart\black.json
+8e8faf97784006488cf576315229faa209b16ae2 assets\bokarts\models\item\kart\brown.json
 aa4cd92bf30c42abb245b952ab33ebc45dd3a73f assets\bokarts\models\item\kart_wheel.json
 d57abe9e815cd30c26d3474af74550f1b124b410 assets\bokarts\models\item\kart_steering_wheel.json
-0d80c5ccc470744a0305e921732f0549249ac199 assets\bokarts\models\item\kart_default.json
+b3f5fd6389a7dba8a716364d66fb4bd69ddd1427 assets\bokarts\models\item\kart\magenta.json
+cbcc0916bcc7590cf75541ecf118eb2d01b9c8f1 assets\bokarts\models\item\kart\pink.json
 9f2b3d93353c82a3f8ca78800879af7856854ace assets\bokarts\models\item\kart_seat.json
+eac2a9a12e3626dfb7800e3fb29290098ee52c2e assets\bokarts\models\item\kart\cyan.json
+2ca8d462546b67b58817594946f606024226b56d assets\bokarts\models\item\kart\red.json
+51815b688c531a7313e1f528b9b258d96037b173 assets\bokarts\models\item\kart\default.json
+7dc2d6dee89647f56309086824ca49c30d9af100 assets\bokarts\models\item\kart\purple_gold.json
+4f389963d53f3c451efe314728b0ac964e941a41 assets\bokarts\models\item\kart\yellow.json
+48322ed39e721a49c4c93e17954e4f309b6a3c97 assets\bokarts\models\item\kart\light_gray.json
+6e9054b8d2c7e9932a1e3895917a8791fed8bf31 assets\bokarts\models\item\kart\white.json
+86259a0384e5bc8b20849c9d97794dbcd752d255 assets\bokarts\models\item\kart\light_blue.json
+334b89a92fddff4a077e9d3a6f79100ceb6a791a assets\bokarts\models\item\kart\gray.json
+54fb2c9626392192a3c4fb357eaa77bcfeba355f assets\bokarts\models\item\kart\fade.json
+ce2ac346b50eee2e5d3a991d3f5483d65d93c309 assets\bokarts\models\item\kart\lime.json
+8003320563958f50cac69f60df0ba1f56f196270 assets\bokarts\models\item\kart\purple.json
+06ac56cbb92c87ef52433dc8869d7c9172c79462 assets\bokarts\models\item\kart\orange.json

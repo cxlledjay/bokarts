@@ -28,10 +28,27 @@ public class ModItems {
 
 
 
-
-    public static final Item KART_DEFAULT = registerItem("kart_default", new KartItem(KartEntity.PaintColor.DEFAULT, new Item.Settings().maxCount(1)));
-
-
+    public static final Item KART_DEFAULT    = registerItem("kart/default",    new KartItem(KartEntity.PaintColor.DEFAULT,    new Item.Settings().maxCount(1)));
+    // Vanilla dye colors
+    public static final Item KART_WHITE      = registerItem("kart/white",      new KartItem(KartEntity.PaintColor.WHITE,      new Item.Settings().maxCount(1)));
+    public static final Item KART_ORANGE     = registerItem("kart/orange",     new KartItem(KartEntity.PaintColor.ORANGE,     new Item.Settings().maxCount(1)));
+    public static final Item KART_MAGENTA    = registerItem("kart/magenta",    new KartItem(KartEntity.PaintColor.MAGENTA,    new Item.Settings().maxCount(1)));
+    public static final Item KART_LIGHT_BLUE = registerItem("kart/light_blue", new KartItem(KartEntity.PaintColor.LIGHT_BLUE, new Item.Settings().maxCount(1)));
+    public static final Item KART_YELLOW     = registerItem("kart/yellow",     new KartItem(KartEntity.PaintColor.YELLOW,     new Item.Settings().maxCount(1)));
+    public static final Item KART_LIME       = registerItem("kart/lime",       new KartItem(KartEntity.PaintColor.LIME,       new Item.Settings().maxCount(1)));
+    public static final Item KART_PINK       = registerItem("kart/pink",       new KartItem(KartEntity.PaintColor.PINK,       new Item.Settings().maxCount(1)));
+    public static final Item KART_GRAY       = registerItem("kart/gray",       new KartItem(KartEntity.PaintColor.GRAY,       new Item.Settings().maxCount(1)));
+    public static final Item KART_LIGHT_GRAY = registerItem("kart/light_gray", new KartItem(KartEntity.PaintColor.LIGHT_GRAY, new Item.Settings().maxCount(1)));
+    public static final Item KART_CYAN       = registerItem("kart/cyan",       new KartItem(KartEntity.PaintColor.CYAN,       new Item.Settings().maxCount(1)));
+    public static final Item KART_PURPLE     = registerItem("kart/purple",     new KartItem(KartEntity.PaintColor.PURPLE,     new Item.Settings().maxCount(1)));
+    public static final Item KART_BLUE       = registerItem("kart/blue",       new KartItem(KartEntity.PaintColor.BLUE,       new Item.Settings().maxCount(1)));
+    public static final Item KART_BROWN      = registerItem("kart/brown",      new KartItem(KartEntity.PaintColor.BROWN,      new Item.Settings().maxCount(1)));
+    public static final Item KART_GREEN      = registerItem("kart/green",      new KartItem(KartEntity.PaintColor.GREEN,      new Item.Settings().maxCount(1)));
+    public static final Item KART_RED        = registerItem("kart/red",        new KartItem(KartEntity.PaintColor.RED,        new Item.Settings().maxCount(1)));
+    public static final Item KART_BLACK      = registerItem("kart/black",      new KartItem(KartEntity.PaintColor.BLACK,      new Item.Settings().maxCount(1)));
+    // special variants
+    public static final Item KART_PURPLE_GOLD = registerItem("kart/purple_gold",      new KartItem(KartEntity.PaintColor.PURPLE_GOLD,      new Item.Settings().maxCount(1)));
+    public static final Item KART_FADE        = registerItem("kart/fade",      new KartItem(KartEntity.PaintColor.FADE,      new Item.Settings().maxCount(1)));
 
 
 

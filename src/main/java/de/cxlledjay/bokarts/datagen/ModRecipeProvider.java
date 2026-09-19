@@ -73,11 +73,5 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .criterion(hasItem(ModItems.KART_CRAFTING_WHEEL), conditionsFromItem( ModItems.KART_CRAFTING_WHEEL))
                 .criterion(hasItem(ModItems.KART_CRAFTING_STEERING_WHEEL), conditionsFromItem( ModItems.KART_CRAFTING_STEERING_WHEEL))
                 .offerTo(exporter);
-
-
-
-        // kart paint colors
-
-
     }
 }

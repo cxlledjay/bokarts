@@ -63,7 +63,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "bokarts:kart_default"
+        "recipe": "bokarts:kart/default"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -81,7 +81,7 @@
   ],
   "rewards": {
     "recipes": [
-      "bokarts:kart_default"
+      "bokarts:kart/default"
     ]
   }
 }

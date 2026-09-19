@@ -17,10 +17,31 @@ public class ModItemGroups {
                     .icon(() -> new ItemStack(ModItems.KART_CRAFTING_WHEEL))
                     .displayName(Text.translatable("itemgroup.bokarts.bokart_items"))
                     .entries((displayContext, entries) -> {
+                        // crafting ingredients
                         entries.add(new ItemStack(ModItems.KART_CRAFTING_SEAT));
                         entries.add(new ItemStack(ModItems.KART_CRAFTING_WHEEL));
                         entries.add(new ItemStack(ModItems.KART_CRAFTING_STEERING_WHEEL));
+                        // vanilla dye colors
+                        entries.add(new ItemStack(ModItems.KART_WHITE));
+                        entries.add(new ItemStack(ModItems.KART_LIGHT_GRAY));
+                        entries.add(new ItemStack(ModItems.KART_GRAY));
+                        entries.add(new ItemStack(ModItems.KART_BLACK));
+                        entries.add(new ItemStack(ModItems.KART_BROWN));
+                        entries.add(new ItemStack(ModItems.KART_RED));
+                        entries.add(new ItemStack(ModItems.KART_ORANGE));
+                        entries.add(new ItemStack(ModItems.KART_YELLOW));
+                        entries.add(new ItemStack(ModItems.KART_LIME));
+                        entries.add(new ItemStack(ModItems.KART_GREEN));
+                        entries.add(new ItemStack(ModItems.KART_CYAN));
+                        entries.add(new ItemStack(ModItems.KART_LIGHT_BLUE));
+                        entries.add(new ItemStack(ModItems.KART_BLUE));
+                        entries.add(new ItemStack(ModItems.KART_PURPLE));
+                        entries.add(new ItemStack(ModItems.KART_MAGENTA));
+                        entries.add(new ItemStack(ModItems.KART_PINK));
+                        // special variants
                         entries.add(new ItemStack(ModItems.KART_DEFAULT));
+                        entries.add(new ItemStack(ModItems.KART_PURPLE_GOLD));
+                        entries.add(new ItemStack(ModItems.KART_FADE));
                     }).build());
 
     public static void registerItemGroups() {

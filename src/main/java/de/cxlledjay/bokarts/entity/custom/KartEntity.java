@@ -18,9 +18,7 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.StopSoundS2CPacket;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
@@ -211,15 +209,25 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
     @Override
     public Item asItem() {
-        Item dropItem = ModItems.KART_DEFAULT;
-
-        switch(this.getPaintColor()) {
-            case GREEN:
-                dropItem = ModItems.KART_DEFAULT;
-                break;
-        }
-
-        return dropItem;
+        return switch (this.getPaintColor()) {
+            case WHITE -> ModItems.KART_WHITE;
+            case ORANGE -> ModItems.KART_ORANGE;
+            case MAGENTA -> ModItems.KART_MAGENTA;
+            case LIGHT_BLUE -> ModItems.KART_LIGHT_BLUE;
+            case YELLOW -> ModItems.KART_YELLOW;
+            case LIME -> ModItems.KART_LIME;
+            case PINK -> ModItems.KART_PINK;
+            case GRAY -> ModItems.KART_GRAY;
+            case LIGHT_GRAY -> ModItems.KART_LIGHT_GRAY;
+            case CYAN -> ModItems.KART_CYAN;
+            case PURPLE -> ModItems.KART_PURPLE;
+            case BLUE -> ModItems.KART_BLUE;
+            case BROWN -> ModItems.KART_BROWN;
+            case GREEN -> ModItems.KART_GREEN;
+            case RED -> ModItems.KART_RED;
+            case BLACK -> ModItems.KART_BLACK;
+            default -> ModItems.KART_DEFAULT;
+        };
     }
 
     // set data component types of ItemStack to tracked data
@@ -464,10 +472,6 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
     private void calculateSteeringAngle() {
 
-        // float deltaAngle = (!pressingForward && pressingBack)
-                // ? (-STEERING_SPEED)
-                // : (STEERING_SPEED);
-
         if (!(pressingLeft && pressingRight)) {
             if (pressingLeft) {
                 // steering to the left
@@ -651,7 +655,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     }
 
     public static String getFormattedDistanceString(Float distance) {
-        String  rangeString = "";
+        String  rangeString;
         DecimalFormat decimalFormat = new DecimalFormat("0.0");
 
         if(distance < 1000) {
@@ -814,7 +818,11 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         BROWN       ("brown"),
         GREEN       ("green"),
         RED         ("red"),
-        BLACK       ("black");
+        BLACK       ("black"),
+
+        // custom variants
+        PURPLE_GOLD("purple_gold"),
+        FADE("fade");
 
         private final String name;
 
