@@ -1,6 +1,5 @@
 package de.cxlledjay.bokarts.entity.custom;
 
-import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.entity.ModEntities;
 import de.cxlledjay.bokarts.item.ModItems;
 import de.cxlledjay.bokarts.networking.packet.KartInputPayloadC2S;
@@ -37,56 +36,57 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.DecimalFormat;
-import java.util.Objects;
 
 public class KartEntity extends BoatEntity implements RideableInventory{
+
+    // -------------------- constants --------------------
+    private static final float steeringSpeed = 20.0f;
+    private static final float steeringCenter = 0.0f;
+    private static final float engineAcceleration = 0.1f;
+    public static final float fuelTankMaxCapacity = 10000.0f; // in ml
+    private static final float fuelConsumptionPerTick = 10.5625f; // in ml
+
+    // -------------------- tracked data --------------------
+    private static final TrackedData<String> PAINT_COLOR = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.STRING);
+    private static final TrackedData<String> HORN_SOUND = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.STRING);
+    private static final TrackedData<Float> FUEL = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
+    private static final TrackedData<Float> ODO = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
+    private static final TrackedData<Float> ENGINE_REVS = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
+    private static final TrackedData<Float> STEERING_ANGLE = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
+
+    // -------------------- attributes --------------------
 
     // input tracking
     public boolean  pressingLeft, pressingRight, pressingForward, pressingBack, pressingSlow;
     private boolean lastSentLeft, lastSentRight, lastSentForward, lastSentBack, lastSentSlow;
 
-    // animation stuff
-    private static final float steeringSpeed = 20.0f;
-    private static final float steeringCenter = 0.0f;
-    private static final float engineAcceleration = 0.1f;
-
-    // sound stuff
+    // sound tracking
     private boolean engineSoundStarted = false;
     private float soundScaling = 0.0f;
 
-    // range stuff
-    public static final float fuelTankMaxCapacity = 10000.0f; // in ml
-    private static final float fuelConsumptionPerTick = 10.5625f; // in ml
-    private float serverTrackedFuel = -1;
-    private float serverTrackedOdometer = -1;
-    public float clientTrackedFuel = -1;
-    public float clientTrackedOdometer = -1;
+    // range tracking
+    public float currentFuel = -1;
+    public float currentOdometer = -1;
 
-    // position tracking helper
+    // position tracking
     private boolean hasTrackedPosition = false;
     private double lastTickX;
     private double lastTickY;
     private double lastTickZ;
 
-    // attributes
-    private static final TrackedData<String> PAINT_COLOR = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.STRING);
-    private static final TrackedData<String> HORN_SOUND = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.STRING);
-
-    private static final TrackedData<Float> FUEL = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
-    private static final TrackedData<Float> ODO = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
-
     // animation tracking
-    public float clientTrackedWheelRotation = 0.0f;
-    public float clientTrackedWheelRotationPrev = 0.0f;
-    public float clientTrackedEngineRotation = 0.0f;
-    public float clientTrackedEngineRotationPrev = 0.0f;
-    public float clientTrackedSteeringAngle = steeringCenter;
-    public float clientTrackedSteeringAnglePrev = steeringCenter;
-    private float serverTrackedEngineRevs = 0.0f;
-    private float serverTrackedSteeringAngle = steeringCenter;
-    private static final TrackedData<Float> ENGINE_REVS = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
-    private static final TrackedData<Float> STEERING_ANGLE = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
+    public float frontAxleRotation = 0.0f;
+    public float frontAxleRotationPrev = 0.0f;
+    public float rearAxleRotation = 0.0f;
+    public float rearAxleRotationPrev = 0.0f;
+    public float steeringAngle = steeringCenter;
+    public float steeringAnglePrev = steeringCenter;
+    private float engineRevs = 0.0f;
 
+
+
+
+    // ==================== the kart ====================
 
     public KartEntity(EntityType<? extends BoatEntity> entityType, World world) {
         super(entityType, world);
@@ -99,6 +99,9 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         this.prevY = y;
         this.prevZ = z;
     }
+
+
+    // ==================== fixing BoatEntity behaviour ====================
 
     // fix driver position and number
     @Override
@@ -141,8 +144,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     }
 
 
-
-    // kart physics
+    // ==================== kart driving behaviour ====================
 
     @Override
     public float getNearbySlipperiness() {
@@ -188,7 +190,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
 
 
-    // item stuff
+    // ==================== KartEntity <-> KartItem ====================
 
     @Override
     public Item asItem() {
@@ -205,7 +207,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
 
 
-    // animations
+    // ==================== input handling ====================
 
     @Override
     public void setInputs(boolean left, boolean right, boolean forward, boolean back) {
@@ -256,24 +258,19 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     }
 
 
+    // ==================== tick() ====================
 
     @Override
     public void tick() {
 
         // no fuel = no drive
-        boolean isOutOfFuel = this.getWorld().isClient()
-                ? (this.clientTrackedFuel <= 0)
-                : (this.serverTrackedFuel <= 0);
+        boolean isOutOfFuel = this.currentFuel <= 0.0f;
         if (isOutOfFuel) {
             super.setInputs(false, false, false, false);
         }
 
-
-
         // tick the boat parent
         super.tick();
-
-
 
 
         // positon tracking on both client and server
@@ -294,34 +291,17 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         this.lastTickZ = this.getZ();
 
         // position tracking code
-        if(!this.getWorld().isClient()) {
-            // on server...
+        if (this.currentFuel == -1) this.currentFuel = this.getFuelSynced();
+        if (this.currentOdometer == -1) this.currentOdometer = this.getOdometerSynced();
 
-            // init server tracking
-            if (this.serverTrackedFuel == -1) this.serverTrackedFuel = this.getFuelSynced();
-            if (this.serverTrackedOdometer == -1) this.serverTrackedOdometer = this.getOdometerSynced();
-
-            // update server tracking variables
-            if(this.pressingForward || this.pressingBack) {
-                // we are accelerating: consume fuel!
-                this.serverTrackedFuel = Math.max(0, this.serverTrackedFuel - fuelConsumptionPerTick); // prevent going under 0
-            }
-            this.serverTrackedOdometer += (float) distanceThisTick;
+        // update server tracking variables
+        if(this.pressingForward || this.pressingBack) {
+            // we are accelerating: consume fuel!
+            this.currentFuel = Math.max(0, this.currentFuel - fuelConsumptionPerTick); // prevent going under 0
         }
-        else {
-            // on client...
+        this.currentOdometer += (float) distanceThisTick;
 
-            // init client tracking
-            if (this.clientTrackedFuel == -1) this.clientTrackedFuel = this.getFuelSynced();
-            if (this.clientTrackedOdometer == -1) this.clientTrackedOdometer = this.getOdometerSynced();
 
-            // update client tracking variables
-            if(this.pressingForward || this.pressingBack) {
-                // we are accelerating: consume fuel!
-                this.clientTrackedFuel = Math.max(0, this.clientTrackedFuel - fuelConsumptionPerTick); // prevent going under 0
-            }
-            this.clientTrackedOdometer += (float) distanceThisTick;
-        }
 
 
 
@@ -331,8 +311,8 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         if (!this.getWorld().isClient()) {
             // sync client data with exact data from server, executed every 10 ticks
             if(this.age % 10 == 0) {
-                this.setFuelSynced(this.serverTrackedFuel);
-                this.setOdometerSynced(this.serverTrackedOdometer);
+                this.setFuelSynced(this.currentFuel);
+                this.setOdometerSynced(this.currentOdometer);
             }
 
             // ---------------- calculate values for animation ----------------
@@ -344,16 +324,16 @@ public class KartEntity extends BoatEntity implements RideableInventory{
             calculateSteeringAngle();
 
             // update client
-            this.setEngineRevs(this.serverTrackedEngineRevs);
-            this.setSteeringAngle(this.serverTrackedSteeringAngle);
+            this.setEngineRevs(this.engineRevs);
+            this.setSteeringAngle(this.steeringAngle);
         }
 
         // ==================== [CLIENT SIDED CODE] ====================
         else {
 
             // for lerping steering angle (still able steer when no fuel!)
-            this.clientTrackedSteeringAngle = this.getSteeringAngle();
-            this.clientTrackedSteeringAnglePrev = this.clientTrackedSteeringAngle;
+            this.steeringAngle = this.getSteeringAngle();
+            this.steeringAnglePrev = this.steeringAngle;
 
 
             // do no animations or sound when out of fuel!
@@ -373,13 +353,13 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
 
                 // ---------------- wheel spin front ----------------
-                this.clientTrackedWheelRotationPrev = this.clientTrackedWheelRotation;
-                this.clientTrackedWheelRotation = this.clientTrackedWheelRotation + frontAxleRotationThisTick;
+                this.frontAxleRotationPrev = this.frontAxleRotation;
+                this.frontAxleRotation = this.frontAxleRotation + frontAxleRotationThisTick;
 
 
                 // ---------------- wheel spin back ----------------
-                this.clientTrackedEngineRotationPrev = this.clientTrackedEngineRotation;
-                this.clientTrackedEngineRotation = this.clientTrackedEngineRotation + backAxleRotationThisTick;
+                this.rearAxleRotationPrev = this.rearAxleRotation;
+                this.rearAxleRotation = this.rearAxleRotation + backAxleRotationThisTick;
 
 
                 // ---------------- sounds ----------------
@@ -396,10 +376,10 @@ public class KartEntity extends BoatEntity implements RideableInventory{
                 }
             } else {
                 // wheels not moving
-                clientTrackedWheelRotation = 0.0f;
-                clientTrackedWheelRotationPrev = 0.0f;
-                clientTrackedEngineRotation = 0.0f;
-                clientTrackedEngineRotationPrev = 0.0f;
+                frontAxleRotation = 0.0f;
+                frontAxleRotationPrev = 0.0f;
+                rearAxleRotation = 0.0f;
+                rearAxleRotationPrev = 0.0f;
 
                 // reset engine sound
                 this.engineSoundStarted = false;
@@ -410,25 +390,26 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
 
 
+    // ==================== tick() helpers ====================
 
     private void calculateSteeringAngle() {
         if (!(pressingLeft && pressingRight)) {
             if (pressingLeft) {
                 // steering to the left
-                this.serverTrackedSteeringAngle += steeringSpeed;
+                this.steeringAngle += steeringSpeed;
             } else if (pressingRight) {
                 // steering to the right
-                this.serverTrackedSteeringAngle -= steeringSpeed;
+                this.steeringAngle -= steeringSpeed;
             } else {
                 // no button pressed => center spring
-                this.serverTrackedSteeringAngle = applySteeringWheelCenterSpring(this.serverTrackedSteeringAngle);
+                this.steeringAngle = applySteeringWheelCenterSpring(this.steeringAngle);
             }
         } else {
             // pressing left & right => center spring
-            this.serverTrackedSteeringAngle = applySteeringWheelCenterSpring(this.serverTrackedSteeringAngle);
+            this.steeringAngle = applySteeringWheelCenterSpring(this.steeringAngle);
         }
         // clamp steering to 0 - 180 degs
-        this.serverTrackedSteeringAngle = MathHelper.clamp(this.serverTrackedSteeringAngle, steeringCenter - (steeringSpeed * 5), steeringCenter + (steeringSpeed * 5));
+        this.steeringAngle = MathHelper.clamp(this.steeringAngle, steeringCenter - (steeringSpeed * 5), steeringCenter + (steeringSpeed * 5));
     }
 
     private float applySteeringWheelCenterSpring(float angle) {
@@ -447,15 +428,15 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     private void calculateEngineRevs() {
         if (pressingForward) {
             // positive acceleration
-            this.serverTrackedEngineRevs += engineAcceleration;
+            this.engineRevs += engineAcceleration;
         } else if (pressingBack) {
             // negative acceleration
-            this.serverTrackedEngineRevs -= engineAcceleration;
+            this.engineRevs -= engineAcceleration;
         } else {
             // no button pressed => slow return to idle
-            this.serverTrackedEngineRevs = applyEngineFlywheel(this.serverTrackedEngineRevs);
+            this.engineRevs = applyEngineFlywheel(this.engineRevs);
         }
-        this.serverTrackedEngineRevs = MathHelper.clamp(this.serverTrackedEngineRevs, 0 - (engineAcceleration * 25), 0 + (engineAcceleration * 25));
+        this.engineRevs = MathHelper.clamp(this.engineRevs, 0 - (engineAcceleration * 25), 0 + (engineAcceleration * 25));
     }
 
     private float applyEngineFlywheel(float engineRotationDelta) {
@@ -471,7 +452,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     }
 
 
-    // ---------------- sounds ----------------
+    // ==================== sounds ====================
 
     @Override
     @Nullable
@@ -525,7 +506,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
 
 
-    // ---------------- fuel ----------------
+    // ==================== fuel and odometer ====================
 
     @Override
     public void openInventory(PlayerEntity player) {
@@ -546,15 +527,15 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
                 // calculate fuel consumption
                 float fuelProItem = KartFuelItems.getFuelAmountFromItemStack(fuel);
-                int neededItemsUntilFull = (int) Math.floor((fuelTankMaxCapacity - this.serverTrackedFuel) / fuelProItem);
+                int neededItemsUntilFull = (int) Math.floor((fuelTankMaxCapacity - this.currentFuel) / fuelProItem);
                 int consumedItems = Math.min(neededItemsUntilFull, fuel.getCount());
 
                 // refuel the engine and remove items from inventory
-                this.serverTrackedFuel += fuelProItem * consumedItems;
+                this.currentFuel += fuelProItem * consumedItems;
                 fuel.decrement(consumedItems);
 
                 // sync with client
-                this.setFuelSynced(this.serverTrackedFuel);
+                this.setFuelSynced(this.currentFuel);
             }
         }
     }
@@ -582,7 +563,8 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
 
 
-    // attributes
+    // ==================== data tracking ====================
+
     @Override
     protected void initDataTracker(DataTracker.Builder builder) {
         super.initDataTracker(builder);
@@ -632,15 +614,17 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         // sync client tracked values with server values
         if (this.getWorld().isClient()) {
             if (FUEL.equals(data)) {
-                this.clientTrackedFuel = this.getFuelSynced();
+                this.currentFuel = this.getFuelSynced();
             }
             if (ODO.equals(data)) {
-                this.clientTrackedOdometer = this.getOdometerSynced();
+                this.currentOdometer = this.getOdometerSynced();
             }
         }
     }
 
-    // getter and setter for attributes
+
+
+    // ==================== getter and setter related to data tracking ====================
 
     public PaintColor getPaintColor() {
         return PaintColor.getColor(this.dataTracker.get(PAINT_COLOR));
@@ -657,8 +641,6 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     public void setHornSound(HornSounds hornSounds) {
         this.dataTracker.set(HORN_SOUND, hornSounds.toString());
     }
-
-
 
 
 
@@ -682,9 +664,6 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
 
 
-
-
-
     public Float getEngineRevs() {
         return this.dataTracker.get(ENGINE_REVS);
     }
@@ -692,7 +671,6 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     private void setEngineRevs(Float acceleration) {
         this.dataTracker.set(ENGINE_REVS, acceleration);
     }
-
 
     public Float getSteeringAngle() {
         return this.dataTracker.get(STEERING_ANGLE);
@@ -704,7 +682,9 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
 
 
-    // variants
+
+    // ==================== customization ====================
+
     public enum PaintColor implements StringIdentifiable {
         DEFAULT     ("default"),
 

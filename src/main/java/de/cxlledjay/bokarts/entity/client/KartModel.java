@@ -366,7 +366,7 @@ public class KartModel<T extends KartEntity> extends SinglePartEntityModel<T> {
 
 
         // ---------------- steering ----------------
-        float smoothSteeringAngle = MathHelper.lerp(tickDelta, entity.clientTrackedSteeringAnglePrev, entity.clientTrackedSteeringAngle);
+        float smoothSteeringAngle = MathHelper.lerp(tickDelta, entity.steeringAnglePrev, entity.steeringAngle);
 
         float angle_steering_wheel = (float) Math.toRadians((smoothSteeringAngle + 90.0f));
         float angle_front_wheels = (float) (-Math.toRadians((smoothSteeringAngle / 3.25f)));
@@ -380,12 +380,12 @@ public class KartModel<T extends KartEntity> extends SinglePartEntityModel<T> {
 
 
         // ---------------- wheels ----------------
-        float smoothRotationFront = MathHelper.lerp(tickDelta, entity.clientTrackedWheelRotationPrev, entity.clientTrackedWheelRotation);
+        float smoothRotationFront = MathHelper.lerp(tickDelta, entity.frontAxleRotationPrev, entity.frontAxleRotation);
         this.axle.pitch = smoothRotationFront;
         this.front_left.pitch = smoothRotationFront;
         this.front_right.pitch = smoothRotationFront;
 
-        float smoothRotationBack = MathHelper.lerp(tickDelta, entity.clientTrackedEngineRotationPrev, entity.clientTrackedEngineRotation);
+        float smoothRotationBack = MathHelper.lerp(tickDelta, entity.rearAxleRotationPrev, entity.rearAxleRotation);
         this.rear_axle.pitch = smoothRotationBack;
         this.drive_gear.pitch = -smoothRotationBack;
 
