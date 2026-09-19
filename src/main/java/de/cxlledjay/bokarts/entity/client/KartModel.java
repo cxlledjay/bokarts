@@ -361,10 +361,16 @@ public class KartModel<T extends KartEntity> extends SinglePartEntityModel<T> {
     @Override
     public void setAngles(KartEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
 
+        // lerps
+        float tickDelta = MinecraftClient.getInstance().getRenderTickCounter().getTickDelta(true);
+
+
         // ---------------- steering ----------------
-        float angle_steering_wheel = (float) Math.toRadians((entity.getSteeringAngle() + 90));
-        float angle_front_wheels = (float) (- Math.toRadians((entity.getSteeringAngle() / 3.25)));
-        float position_steering_column = entity.getSteeringAngle() / 106;
+        float smoothSteeringAngle = MathHelper.lerp(tickDelta, entity.clientTrackedSteeringAnglePrev, entity.clientTrackedSteeringAngle);
+
+        float angle_steering_wheel = (float) Math.toRadians((smoothSteeringAngle + 90.0f));
+        float angle_front_wheels = (float) (-Math.toRadians((smoothSteeringAngle / 3.25f)));
+        float position_steering_column = smoothSteeringAngle / 106.0f;
 
         this.steering_wheel.pitch = angle_steering_wheel;
         this.front_left.yaw = angle_front_wheels;
@@ -372,16 +378,14 @@ public class KartModel<T extends KartEntity> extends SinglePartEntityModel<T> {
         this.steering_column.pivotX = position_steering_column;
 
 
-        // lerps
-        float tickDelta = MinecraftClient.getInstance().getRenderTickCounter().getTickDelta(true);
 
         // ---------------- wheels ----------------
-        float smoothRotationFront = MathHelper.lerp(tickDelta, entity.getWheelRotationPrev(), entity.getWheelRotation());
+        float smoothRotationFront = MathHelper.lerp(tickDelta, entity.clientTrackedWheelRotationPrev, entity.clientTrackedWheelRotation);
         this.axle.pitch = smoothRotationFront;
         this.front_left.pitch = smoothRotationFront;
         this.front_right.pitch = smoothRotationFront;
 
-        float smoothRotationBack = MathHelper.lerp(tickDelta, entity.getEngineRotationPrev(), entity.getEngineRotation());
+        float smoothRotationBack = MathHelper.lerp(tickDelta, entity.clientTrackedEngineRotationPrev, entity.clientTrackedEngineRotation);
         this.rear_axle.pitch = smoothRotationBack;
         this.drive_gear.pitch = -smoothRotationBack;
 

@@ -74,21 +74,17 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
     private static final TrackedData<Float> FUEL = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
     private static final TrackedData<Float> ODO = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
-    private static final TrackedData<Boolean> PRESSING_FORWARDS = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    // private static final TrackedData<Boolean> PRESSING_BACKWARDS = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
 
-    // animation tracking TODO: revert data tracker and do client only + steering via BoatEntity tracked data
-    private static final float clientTrackingEngineRevs = 0.0f;
-    private static final float clientTrackingWheelRotation = 0.0f;
-    private static final float clientTrackingWheelRotationPrev = 0.0f;
-    private static final float clientTrackingEngineRotation = 0.0f;
-    private static final float clientTrackingEngineRotationPrev = 0.0f;
-    private static final float clientTrackingSteeringAngle = 0.0f;
+    // animation tracking
+    public float clientTrackedWheelRotation = 0.0f;
+    public float clientTrackedWheelRotationPrev = 0.0f;
+    public float clientTrackedEngineRotation = 0.0f;
+    public float clientTrackedEngineRotationPrev = 0.0f;
+    public float clientTrackedSteeringAngle = steeringCenter;
+    public float clientTrackedSteeringAnglePrev = steeringCenter;
+    private float serverTrackedEngineRevs = 0.0f;
+    private float serverTrackedSteeringAngle = steeringCenter;
     private static final TrackedData<Float> ENGINE_REVS = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
-    private static final TrackedData<Float> WHEEL_ROTATION = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
-    private static final TrackedData<Float> WHEEL_ROTATION_PREV = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
-    private static final TrackedData<Float> ENGINE_ROTATION = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
-    private static final TrackedData<Float> ENGINE_ROTATION_PREV = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
     private static final TrackedData<Float> STEERING_ANGLE = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
 
 
@@ -261,30 +257,6 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
 
 
-    private float applySteeringWheelCenterSpring(float angle) {
-        if(angle < (steeringCenter + steeringSpeed) && angle > (steeringCenter - steeringSpeed)) {
-            angle = steeringCenter;
-        } else if(angle > steeringCenter) {
-            angle -= steeringSpeed;
-        } else if(angle < steeringCenter) {
-            angle += steeringSpeed;
-        }
-
-        return angle;
-    }
-
-    private float applyEngineFlywheel(float engineRotationDelta) {
-        if(engineRotationDelta < (0 + engineAcceleration * 2) && engineRotationDelta > (0 - engineAcceleration * 2)) {
-            engineRotationDelta = 0;
-        } else if(engineRotationDelta > 0) {
-            engineRotationDelta -= engineAcceleration * 2;
-        } else if(engineRotationDelta < 0) {
-            engineRotationDelta += engineAcceleration * 2;
-        }
-
-        return engineRotationDelta;
-    }
-
     @Override
     public void tick() {
 
@@ -296,8 +268,13 @@ public class KartEntity extends BoatEntity implements RideableInventory{
             super.setInputs(false, false, false, false);
         }
 
+
+
         // tick the boat parent
         super.tick();
+
+
+
 
         // positon tracking on both client and server
         if (!this.hasTrackedPosition) {
@@ -325,12 +302,13 @@ public class KartEntity extends BoatEntity implements RideableInventory{
             if (this.serverTrackedOdometer == -1) this.serverTrackedOdometer = this.getOdometerSynced();
 
             // update server tracking variables
-            if(getPressingForwardsSynced()) {
+            if(this.pressingForward || this.pressingBack) {
                 // we are accelerating: consume fuel!
                 this.serverTrackedFuel = Math.max(0, this.serverTrackedFuel - fuelConsumptionPerTick); // prevent going under 0
             }
             this.serverTrackedOdometer += (float) distanceThisTick;
-        } else {
+        }
+        else {
             // on client...
 
             // init client tracking
@@ -338,12 +316,15 @@ public class KartEntity extends BoatEntity implements RideableInventory{
             if (this.clientTrackedOdometer == -1) this.clientTrackedOdometer = this.getOdometerSynced();
 
             // update client tracking variables
-            if(getPressingForwardsSynced()) {
+            if(this.pressingForward || this.pressingBack) {
                 // we are accelerating: consume fuel!
                 this.clientTrackedFuel = Math.max(0, this.clientTrackedFuel - fuelConsumptionPerTick); // prevent going under 0
             }
             this.clientTrackedOdometer += (float) distanceThisTick;
         }
+
+
+
 
 
         // ==================== [SERVER SIDED CODE] ====================
@@ -354,87 +335,140 @@ public class KartEntity extends BoatEntity implements RideableInventory{
                 this.setOdometerSynced(this.serverTrackedOdometer);
             }
 
-            // input handling
-            if(this.hasControllingPassenger()) {
-                setPressingForwardSynced(pressingForward);
-                // set backwards movement too!
-            }
+            // ---------------- calculate values for animation ----------------
+
+            // engine revs
+            calculateEngineRevs();
+
+            // steering angle
+            calculateSteeringAngle();
+
+            // update client
+            this.setEngineRevs(this.serverTrackedEngineRevs);
+            this.setSteeringAngle(this.serverTrackedSteeringAngle);
         }
 
         // ==================== [CLIENT SIDED CODE] ====================
         else {
-            // handle animations
 
-            // ---------------- steering ----------------
-            float newAngle = this.getSteeringAngle();
-            if (!(pressingLeft && pressingRight)) {
-                if (pressingLeft) {
-                    // steering to the left
-                    newAngle += steeringSpeed;
-                } else if (pressingRight) {
-                    // steering to the right
-                    newAngle -= steeringSpeed;
-                } else {
-                    // no button pressed => center spring
-                    newAngle = applySteeringWheelCenterSpring(newAngle);
+            // for lerping steering angle (still able steer when no fuel!)
+            this.clientTrackedSteeringAngle = this.getSteeringAngle();
+            this.clientTrackedSteeringAnglePrev = this.clientTrackedSteeringAngle;
+
+
+            // do no animations or sound when out of fuel!
+
+            if(!isOutOfFuel) {
+                // kart speed calculation
+                Vec3d velocity = this.getVelocity();
+                double yawRad = Math.toRadians(this.getYaw());
+                double forwardX = -Math.sin(yawRad);
+                double forwardZ = Math.cos(yawRad);
+                double forwardSpeed = (velocity.x * forwardX) + (velocity.z * forwardZ);
+
+                // resulting rotation
+                float frontAxleRotationThisTick = (float) (forwardSpeed * 5.34);
+                float backAxleRotationThisTick = frontAxleRotationThisTick + this.getEngineRevs();
+
+
+
+                // ---------------- wheel spin front ----------------
+                this.clientTrackedWheelRotationPrev = this.clientTrackedWheelRotation;
+                this.clientTrackedWheelRotation = this.clientTrackedWheelRotation + frontAxleRotationThisTick;
+
+
+                // ---------------- wheel spin back ----------------
+                this.clientTrackedEngineRotationPrev = this.clientTrackedEngineRotation;
+                this.clientTrackedEngineRotation = this.clientTrackedEngineRotation + backAxleRotationThisTick;
+
+
+                // ---------------- sounds ----------------
+
+                this.setSoundScaling(((float) forwardSpeed * 5) + (Math.abs(this.getEngineRevs()) * 10));
+
+                if (this.getWorld().isClient) {
+                    if (this.hasPassengers() && !this.engineSoundStarted) {
+                        KartEngineSound.playEngineSound(this);
+                        this.engineSoundStarted = true;
+                    } else if (!this.hasPassengers() && this.engineSoundStarted) {
+                        this.engineSoundStarted = false;
+                    }
                 }
             } else {
-                // pressing left & right => center spring
-                newAngle = applySteeringWheelCenterSpring(newAngle);
-            }
-            // clamp steering to 0 - 180 degs
-            newAngle = MathHelper.clamp(newAngle, steeringCenter - (steeringSpeed * 5), steeringCenter + (steeringSpeed * 5));
-            // write to data tracker
-            this.setSteeringAngle(newAngle);
+                // wheels not moving
+                clientTrackedWheelRotation = 0.0f;
+                clientTrackedWheelRotationPrev = 0.0f;
+                clientTrackedEngineRotation = 0.0f;
+                clientTrackedEngineRotationPrev = 0.0f;
 
-            // ---------------- wheel spin front ----------------
-            this.setWheelRotationPrev(this.getWheelRotation());
-
-            Vec3d velocity = this.getVelocity();
-            double yawRad = Math.toRadians(this.getYaw());
-            double forwardX = -Math.sin(yawRad);
-            double forwardZ = Math.cos(yawRad);
-            double forwardSpeed = (velocity.x * forwardX) + (velocity.z * forwardZ);
-            float radiansThisTick = (float) (forwardSpeed * 5.34);
-            this.setWheelRotation(this.getWheelRotation() + radiansThisTick);
-
-            // ---------------- engine revs ----------------
-            float currentRevs = this.getEngineRevs();
-            if (pressingForward) {
-                // positive acceleration
-                currentRevs += engineAcceleration;
-            } else if (pressingBack) {
-                // negative acceleration
-                currentRevs -= engineAcceleration;
-            } else {
-                // no button pressed => slow return to idle
-                currentRevs = applyEngineFlywheel(currentRevs);
-            }
-            currentRevs = MathHelper.clamp(currentRevs, 0 - (engineAcceleration * 25), 0 + (engineAcceleration * 25));
-            this.setEngineRevs(currentRevs);
-
-            // ---------------- wheel spin back ----------------
-            this.setEngineRotationPrev(this.getEngineRotation());
-            float backAxleRotationThisTick = radiansThisTick + currentRevs;
-            this.setEngineRotation(this.getEngineRotation() + backAxleRotationThisTick);
-
-
-            // ---------------- sounds ----------------
-            this.setSoundScaling(((float) forwardSpeed * 5) + (Math.abs(currentRevs) * 10));
-
-            if (this.getWorld().isClient) {
-                if (this.hasPassengers() && !this.engineSoundStarted) {
-                    KartEngineSound.playEngineSound(this);
-                    this.engineSoundStarted = true;
-                } else if (!this.hasPassengers() && this.engineSoundStarted) {
-                    this.engineSoundStarted = false;
-                }
+                // reset engine sound
+                this.engineSoundStarted = false;
             }
 
         }
-
     }
 
+
+
+
+    private void calculateSteeringAngle() {
+        if (!(pressingLeft && pressingRight)) {
+            if (pressingLeft) {
+                // steering to the left
+                this.serverTrackedSteeringAngle += steeringSpeed;
+            } else if (pressingRight) {
+                // steering to the right
+                this.serverTrackedSteeringAngle -= steeringSpeed;
+            } else {
+                // no button pressed => center spring
+                this.serverTrackedSteeringAngle = applySteeringWheelCenterSpring(this.serverTrackedSteeringAngle);
+            }
+        } else {
+            // pressing left & right => center spring
+            this.serverTrackedSteeringAngle = applySteeringWheelCenterSpring(this.serverTrackedSteeringAngle);
+        }
+        // clamp steering to 0 - 180 degs
+        this.serverTrackedSteeringAngle = MathHelper.clamp(this.serverTrackedSteeringAngle, steeringCenter - (steeringSpeed * 5), steeringCenter + (steeringSpeed * 5));
+    }
+
+    private float applySteeringWheelCenterSpring(float angle) {
+        if(angle < (steeringCenter + steeringSpeed) && angle > (steeringCenter - steeringSpeed)) {
+            angle = steeringCenter;
+        } else if(angle > steeringCenter) {
+            angle -= steeringSpeed;
+        } else if(angle < steeringCenter) {
+            angle += steeringSpeed;
+        }
+
+        return angle;
+    }
+
+
+    private void calculateEngineRevs() {
+        if (pressingForward) {
+            // positive acceleration
+            this.serverTrackedEngineRevs += engineAcceleration;
+        } else if (pressingBack) {
+            // negative acceleration
+            this.serverTrackedEngineRevs -= engineAcceleration;
+        } else {
+            // no button pressed => slow return to idle
+            this.serverTrackedEngineRevs = applyEngineFlywheel(this.serverTrackedEngineRevs);
+        }
+        this.serverTrackedEngineRevs = MathHelper.clamp(this.serverTrackedEngineRevs, 0 - (engineAcceleration * 25), 0 + (engineAcceleration * 25));
+    }
+
+    private float applyEngineFlywheel(float engineRotationDelta) {
+        if(engineRotationDelta < (0 + engineAcceleration * 2) && engineRotationDelta > (0 - engineAcceleration * 2)) {
+            engineRotationDelta = 0;
+        } else if(engineRotationDelta > 0) {
+            engineRotationDelta -= engineAcceleration * 2;
+        } else if(engineRotationDelta < 0) {
+            engineRotationDelta += engineAcceleration * 2;
+        }
+
+        return engineRotationDelta;
+    }
 
 
     // ---------------- sounds ----------------
@@ -445,6 +479,14 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         return null;
     }
 
+
+    public float getSoundScaling() {
+        return soundScaling;
+    }
+
+    private void setSoundScaling(float soundScaling) {
+        this.soundScaling = soundScaling;
+    }
 
     // horn
     public void playHornSound() {
@@ -551,33 +593,22 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         // fuel and distance
         builder.add(FUEL, 0.0f);
         builder.add(ODO, 0.0f);
-        builder.add(PRESSING_FORWARDS, false);
 
         // animations
         builder.add(ENGINE_REVS, 0.0f);
-        builder.add(WHEEL_ROTATION, 0.0f);
-        builder.add(WHEEL_ROTATION_PREV, 0.0f);
-        builder.add(ENGINE_ROTATION, 0.0f);
-        builder.add(ENGINE_ROTATION_PREV, 0.0f);
         builder.add(STEERING_ANGLE, steeringCenter);
     }
 
     @Override
     protected void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
-
         nbt.putString("PaintColor", this.getPaintColor().toString());
         nbt.putString("HornSound", this.getHornSound().toString());
 
         nbt.putFloat("Fuel", this.getFuelSynced());
         nbt.putFloat("Odo", this.getOdometerSynced());
-        nbt.putBoolean("PressingForwards", this.getPressingForwardsSynced());
 
         nbt.putFloat("EngineRevs", this.getEngineRevs());
-        nbt.putFloat("WheelRotation", this.getWheelRotation());
-        nbt.putFloat("WheelRotationPrev", this.getWheelRotationPrev());
-        nbt.putFloat("EngineRotation", this.getEngineRotation());
-        nbt.putFloat("EngineRotationPrev", this.getEngineRotationPrev());
         nbt.putFloat("SteeringAngle", this.getSteeringAngle());
     }
 
@@ -589,13 +620,8 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
         this.dataTracker.set(FUEL, nbt.getFloat("Fuel"));
         this.dataTracker.set(ODO, nbt.getFloat("Odo"));
-        this.dataTracker.set(PRESSING_FORWARDS, nbt.getBoolean("PressingForwards"));
 
         this.dataTracker.set(ENGINE_REVS, nbt.getFloat("EngineRevs"));
-        this.dataTracker.set(WHEEL_ROTATION, nbt.getFloat("WheelRotation"));
-        this.dataTracker.set(WHEEL_ROTATION_PREV, nbt.getFloat("WheelRotationPrev"));
-        this.dataTracker.set(ENGINE_ROTATION, nbt.getFloat("EngineRotation"));
-        this.dataTracker.set(ENGINE_ROTATION_PREV, nbt.getFloat("EngineRotationPrev"));
         this.dataTracker.set(STEERING_ANGLE, nbt.getFloat("SteeringAngle"));
     }
 
@@ -654,14 +680,6 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         this.dataTracker.set(ODO, odometer);
     }
 
-    public boolean getPressingForwardsSynced() {
-        return this.dataTracker.get(PRESSING_FORWARDS);
-    }
-
-    private void setPressingForwardSynced(boolean pressingForwards) {
-        this.dataTracker.set(PRESSING_FORWARDS, pressingForwards);
-    }
-
 
 
 
@@ -676,54 +694,12 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     }
 
 
-    public Float getWheelRotation() {
-        return this.dataTracker.get(WHEEL_ROTATION);
-    }
-
-    private void setWheelRotation(Float rotation) {
-        this.dataTracker.set(WHEEL_ROTATION, rotation);
-    }
-
-    public Float getWheelRotationPrev() {
-        return this.dataTracker.get(WHEEL_ROTATION_PREV);
-    }
-
-    private void setWheelRotationPrev(Float rotation) {
-        this.dataTracker.set(WHEEL_ROTATION_PREV, rotation);
-    }
-
-
-    public Float getEngineRotation() {
-        return this.dataTracker.get(ENGINE_ROTATION);
-    }
-
-    private void setEngineRotation(Float rotation) {
-        this.dataTracker.set(ENGINE_ROTATION, rotation);
-    }
-
-    public Float getEngineRotationPrev() {
-        return this.dataTracker.get(ENGINE_ROTATION_PREV);
-    }
-
-    private void setEngineRotationPrev(Float rotation) {
-        this.dataTracker.set(ENGINE_ROTATION_PREV, rotation);
-    }
-
-
     public Float getSteeringAngle() {
         return this.dataTracker.get(STEERING_ANGLE);
     }
 
     private void setSteeringAngle(Float speed) {
         this.dataTracker.set(STEERING_ANGLE, speed);
-    }
-
-    public float getSoundScaling() {
-        return soundScaling;
-    }
-
-    private void setSoundScaling(float soundScaling) {
-        this.soundScaling = soundScaling;
     }
 
 
