@@ -43,8 +43,8 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     private static final float steeringSpeed = 20.0f;
     private static final float steeringCenter = 0.0f;
     private static final float engineAcceleration = 0.1f;
-    public static final float fuelTankMaxCapacity = 10000.0f; // in ml
-    private static final float fuelConsumptionPerTick = 10.5625f; // in ml
+    public static final float fuelTankMaxCapacity = 12800.0f; // in ml
+    private static final float fuelConsumptionPerTick = 0.7625f; // in ml
 
     // -------------------- tracked data --------------------
     private static final TrackedData<String> PAINT_COLOR = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.STRING);
@@ -520,23 +520,57 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
     public void addFuelFromItem(ItemStack fuel) {
 
-        // we are on the server here. the if-clause is just for making sure...
-        if(!this.getWorld().isClient()) {
+        if(!this.getWorld().isClient() && !fuel.isEmpty()) {
 
-            if(!fuel.isEmpty()) {
+            // edge case: fuel not yet initialized
+            if(this.currentFuel == -1) this.currentFuel = this.getFuelSynced();
 
-                // calculate fuel consumption
-                float fuelProItem = KartFuelItems.getFuelAmountFromItemStack(fuel);
-                int neededItemsUntilFull = (int) Math.floor((fuelTankMaxCapacity - this.currentFuel) / fuelProItem);
-                int consumedItems = Math.min(neededItemsUntilFull, fuel.getCount());
+            // get fuel consumption per item
+            float fuelProItem = KartFuelItems.getFuelAmountFromItemStack(fuel);
 
-                // refuel the engine and remove items from inventory
-                this.currentFuel += fuelProItem * consumedItems;
-                fuel.decrement(consumedItems);
-
-                // sync with client
-                this.setFuelSynced(this.currentFuel);
+            // if somehow the screen handler did give us a non fuel block
+            if (fuelProItem <= 0.0f) {
+                return;
             }
+
+            // calculate needed items for refueling
+            int neededItemsUntilFull = (int) Math.ceil((fuelTankMaxCapacity - this.currentFuel) / fuelProItem);
+            int consumedItems = Math.min(neededItemsUntilFull, fuel.getCount());
+
+            // refuel the engine and remove items from inventory
+            this.currentFuel = Math.min((this.currentFuel + fuelProItem * consumedItems), fuelTankMaxCapacity);
+            fuel.decrement(consumedItems);
+
+            // sync with client
+            this.setFuelSynced(this.currentFuel);
+
+            //play sound depending on fuel level and consumed items
+            SoundEvent refillSound = SoundEvents.BLOCK_NOTE_BLOCK_BASS.value();
+            float pitch = 0.9f;
+
+            if(consumedItems > 0) {
+                if(currentFuel >= fuelTankMaxCapacity) {
+                    // refilled to max capacity
+                    refillSound = SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP;
+                    pitch = 1.1f;
+                } else {
+                    // refilled but not yet max capacity
+                    refillSound = SoundEvents.ITEM_BOTTLE_FILL;
+                    pitch = 0.6f;
+                }
+            }
+
+            // broadcast sound
+            this.getWorld().playSound(
+                    null,
+                    this.getX(),
+                    this.getY(),
+                    this.getZ(),
+                    refillSound,
+                    SoundCategory.PLAYERS,
+                    1.0f,
+                    pitch
+            );
         }
     }
 

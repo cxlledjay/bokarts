@@ -10,7 +10,7 @@ import java.util.Map;
 public class KartFuelItems {
 
     private static Map<Item, Float> fuelRangeMap = null;
-    private static final float fuelTimeToRangeConversion = 2.5f;
+    private static final float fuelTimeToRangeConversion = 1f;
 
 
     public static Map<Item, Float> createFuelRangeMap() {
