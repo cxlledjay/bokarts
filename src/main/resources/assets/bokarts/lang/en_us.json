@@ -3,6 +3,13 @@
   "item.bokarts.kart_seat" : "Kart Seat",
   "item.bokarts.kart_wheel" : "Kart Wheel",
   "item.bokarts.kart_steering_wheel" : "Kart Steering Wheel",
+
+  "tooltip.bokarts.kart_item.shift":        "§7Press §f[SHIFT] §7to expand details",
+  "tooltip.bokarts.kart_item.details":      "§3=== §bKart Specs §3===",
+  "tooltip.bokarts.kart_item.horn":         " §8» §fHorn",
+  "tooltip.bokarts.kart_item.fuel":         " §8» §fFuel",
+  "tooltip.bokarts.kart_item.odometer":     " §8» §fOdometer",
+
   "item.bokarts.kart_default" : "Kart (default)",
 
   "entity.bokarts.kart" : "BoKart",

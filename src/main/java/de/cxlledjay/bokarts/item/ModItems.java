@@ -44,13 +44,6 @@ public class ModItems {
 
     public static void registerModItems() {
         BoKarts.LOGGER.info("Registering Mod Items for " + BoKarts.MOD_ID);
-
-        ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(entries -> {
-            entries.add(KART_DEFAULT);
-            entries.add(KART_CRAFTING_WHEEL);
-            entries.add(KART_CRAFTING_STEERING_WHEEL);
-            entries.add(KART_CRAFTING_SEAT);
-        });
     }
 
 }

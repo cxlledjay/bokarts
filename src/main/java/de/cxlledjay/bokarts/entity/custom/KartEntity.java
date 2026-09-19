@@ -1,5 +1,6 @@
 package de.cxlledjay.bokarts.entity.custom;
 
+import de.cxlledjay.bokarts.component.ModDataComponentTypes;
 import de.cxlledjay.bokarts.entity.ModEntities;
 import de.cxlledjay.bokarts.item.ModItems;
 import de.cxlledjay.bokarts.networking.packet.KartInputPayloadC2S;
@@ -17,6 +18,7 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
@@ -213,11 +215,48 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
         switch(this.getPaintColor()) {
             case GREEN:
-                dropItem = Items.FURNACE;
+                dropItem = ModItems.KART_DEFAULT;
                 break;
         }
 
         return dropItem;
+    }
+
+    // set data component types of ItemStack to tracked data
+    public ItemStack getKartAsCustomStack() {
+
+        // get correct variant
+        ItemStack stack = new ItemStack(this.asItem());
+
+        // sync values
+        this.setFuelSynced(this.currentFuel);
+        this.setOdometerSynced(this.currentOdometer);
+
+        // set DataComponentTypes
+        stack.set(ModDataComponentTypes.KART_ITEM_HORN_SOUND, this.getHornSound().asString());
+        stack.set(ModDataComponentTypes.KART_ITEM_FUEL, this.getFuelSynced());
+        stack.set(ModDataComponentTypes.KART_ITEM_ODOMETER, this.getOdometerSynced());
+
+        return stack;
+    }
+
+    // override creative middle click
+    @Override
+    public ItemStack getPickBlockStack() {
+        return this.getKartAsCustomStack();
+    }
+
+    // override dropped item on destroy
+    @Override
+    public ItemEntity dropStack(ItemStack stack, float yOffset) {
+        // Check if the game is trying to drop our base Kart item
+        if (stack.isOf(this.asItem())) {
+            // Swap out the blank vanilla stack with our custom Component stack!
+            stack = this.getKartAsCustomStack();
+        }
+
+        // Let the game spawn the item into the world
+        return super.dropStack(stack, yOffset);
     }
 
 
@@ -611,7 +650,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         }
     }
 
-    public String getFormattedDistanceString(Float distance) {
+    public static String getFormattedDistanceString(Float distance) {
         String  rangeString = "";
         DecimalFormat decimalFormat = new DecimalFormat("0.0");
 
@@ -626,7 +665,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         return rangeString;
     }
 
-    public String getFormattedFuelCapacityString(Float fuelCapacity) {
+    public static String getFormattedFuelCapacityString(Float fuelCapacity) {
         DecimalFormat decimalFormat1 = new DecimalFormat("0.0");
         return decimalFormat1.format(fuelCapacity / 1000.0f) + "L/" + decimalFormat1.format(FUEL_TANK_MAX_CAPACITY / 1000.0f) + "L";
     }
@@ -719,7 +758,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         return this.dataTracker.get(FUEL);
     }
 
-    private void setFuelSynced(Float range) {
+    public void setFuelSynced(Float range) {
         if(range < 0.0f) range = 0.0f;
         this.dataTracker.set(FUEL, range);
     }
@@ -728,7 +767,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         return this.dataTracker.get(ODO);
     }
 
-    private void setOdometerSynced(Float odometer) {
+    public void setOdometerSynced(Float odometer) {
         if(odometer < 0.0f) odometer = 0.0f;
         this.dataTracker.set(ODO, odometer);
     }

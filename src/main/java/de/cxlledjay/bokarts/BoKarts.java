@@ -1,5 +1,6 @@
 package de.cxlledjay.bokarts;
 
+import de.cxlledjay.bokarts.component.ModDataComponentTypes;
 import de.cxlledjay.bokarts.entity.ModEntities;
 import de.cxlledjay.bokarts.item.ModItemGroups;
 import de.cxlledjay.bokarts.item.ModItems;
@@ -29,6 +30,7 @@ public class BoKarts implements ModInitializer {
 		ModPackets.registerC2SPackets();
 		ModScreenHandlers.register();
 		ModStats.register();
+		ModDataComponentTypes.register();
 	}
 
 	public static Identifier id(String path) {
