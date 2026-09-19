@@ -32,7 +32,7 @@ public class KartFuelItems {
         return createFuelRangeMap().containsKey(stack.getItem());
     }
 
-    public static Float getFuelRange(ItemStack stack) {
+    public static Float getFuelAmountFromItemStack(ItemStack stack) {
         if (stack.isEmpty()) {
             return 0.0f;
         }

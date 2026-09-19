@@ -9,6 +9,8 @@ import org.lwjgl.glfw.GLFW;
 public class ModKeyMappings {
 
     public static final String KART_KEY_CATEGORY = "key.category.bokarts.controls";
+
+
     public static final KeyBinding KART_HORN_KEYBINDING = KeyBindingHelper.registerKeyBinding(new KeyBinding(
             "key.bokarts.horn",
             InputUtil.Type.KEYSYM,

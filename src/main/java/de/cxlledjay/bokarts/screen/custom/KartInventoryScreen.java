@@ -121,18 +121,26 @@ public class KartInventoryScreen extends HandledScreen<KartInventoryScreenHandle
         this.drawMouseoverTooltip(context, mouseX, mouseY);
 
         // read from tracked data
-        String rangeString = "";
+        String fuelCapacityString = "";
         String odoString = "";
         String hornString = "";
+        int fuelColor = 0xB71C1C; //red
         if(this.kart != null){
-            rangeString = this.kart.getFormattedDistanceString(this.kart.clientTrackedFuelRange);
+            fuelCapacityString = this.kart.getFormattedFuelCapacityString(this.kart.clientTrackedFuel);
             odoString = this.kart.getFormattedDistanceString(this.kart.clientTrackedOdometer);
             hornString = "[" + (this.kart.getHornSound().ordinal()+1) + "/10]";
+
+            float fuelCapacityPercentage = this.kart.clientTrackedFuel / KartEntity.fuelTankMaxCapacity;
+            if(fuelCapacityPercentage > 0.5) {
+                fuelColor = 0x0E6B1F; //green
+            } else if(fuelCapacityPercentage > 0.2) {
+                fuelColor = 0xD35B1B; //orange
+            }
         }
 
         // display information
-        context.drawText(this.textRenderer, rangeString  , this.x + 102, this.y + 23,        0xB71C1C, false);
-        context.drawText(this.textRenderer, odoString    , this.x + 102, this.y + 23 + 18,   0xE29700, false);
-        context.drawText(this.textRenderer, hornString   , this.x + 102, this.y + 23 + 36,   0x3E349E, false);
+        context.drawText(this.textRenderer, fuelCapacityString  , this.x + 102, this.y + 23,        fuelColor, false);
+        context.drawText(this.textRenderer, odoString           , this.x + 102, this.y + 23 + 18,   0xE29700, false);
+        context.drawText(this.textRenderer, hornString   ,       this.x + 102, this.y + 23 + 36,    0x3E349E, false);
     }
 }
