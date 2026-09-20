@@ -6,11 +6,14 @@
       "tag": "bokarts:karts"
     },
     {
-      "item": "minecraft:water_bucket"
+      "item": "minecraft:purple_dye"
+    },
+    {
+      "item": "minecraft:gold_ingot"
     }
   ],
   "result": {
     "count": 1,
-    "id": "bokarts:kart/default"
+    "id": "bokarts:kart/purple_gold"
   }
 }

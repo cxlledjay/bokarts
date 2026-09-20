@@ -11,6 +11,7 @@
   "tooltip.bokarts.kart_item.odometer":     " §8» §fOdometer",
 
   "item.bokarts.kart.default": "Kart (Default)",
+
   "item.bokarts.kart.white": "Kart (White)",
   "item.bokarts.kart.orange": "Kart (Orange)",
   "item.bokarts.kart.magenta": "Kart (Magenta)",
@@ -28,6 +29,9 @@
   "item.bokarts.kart.red": "Kart (Red)",
   "item.bokarts.kart.black": "Kart (Black)",
 
+  "item.bokarts.kart.purple_gold": "Kart (Purple Gold)",
+  "item.bokarts.kart.fade": "Kart (Fade)",
+
   "entity.bokarts.kart" : "BoKart",
   "sounds.bokarts.kart_engine": "Kart Engine",
   "sounds.bokarts.horn": "Kart Horn",
@@ -35,5 +39,7 @@
   "key.category.bokarts.controls" : "BoKarts Controls",
   "key.bokarts.horn": "Horn",
 
-  "stat.bokarts.kart_one_cm": "Distance by Kart"
+  "stat.bokarts.kart_one_cm": "Distance by Kart",
+
+  "tag.item.bokarts.karts": "Any Kart"
 }

@@ -6,11 +6,17 @@
       "tag": "bokarts:karts"
     },
     {
-      "item": "minecraft:water_bucket"
+      "item": "minecraft:orange_dye"
+    },
+    {
+      "item": "minecraft:magenta_dye"
+    },
+    {
+      "item": "minecraft:blue_dye"
     }
   ],
   "result": {
     "count": 1,
-    "id": "bokarts:kart/default"
+    "id": "bokarts:kart/fade"
   }
 }

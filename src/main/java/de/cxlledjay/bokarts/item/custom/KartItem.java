@@ -42,6 +42,16 @@ public class KartItem extends Item {
 
     // ==================== item appearance ====================
 
+    public static Item.Settings defaultKartSettings() {
+        return new Item.Settings()
+                .maxCount(1)
+                // Initialize default stats directly onto the base item
+                .component(ModDataComponentTypes.KART_ITEM_FUEL, 0.0f)
+                .component(ModDataComponentTypes.KART_ITEM_ODOMETER, 0.0f)
+                .component(ModDataComponentTypes.KART_ITEM_HORN_SOUND, "horn_1"); // Adjust type/value to match your horn component
+    }
+
+
     @Override
     public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
 

@@ -1,0 +1,26 @@
+{
+  "replace": false,
+  "values": [
+    "bokarts:kart/default",
+
+    "bokarts:kart/white",
+    "bokarts:kart/orange",
+    "bokarts:kart/magenta",
+    "bokarts:kart/light_blue",
+    "bokarts:kart/yellow",
+    "bokarts:kart/lime",
+    "bokarts:kart/pink",
+    "bokarts:kart/gray",
+    "bokarts:kart/light_gray",
+    "bokarts:kart/cyan",
+    "bokarts:kart/purple",
+    "bokarts:kart/blue",
+    "bokarts:kart/brown",
+    "bokarts:kart/green",
+    "bokarts:kart/red",
+    "bokarts:kart/black",
+
+    "bokarts:kart/purple_gold",
+    "bokarts:kart/fade"
+  ]
+}
