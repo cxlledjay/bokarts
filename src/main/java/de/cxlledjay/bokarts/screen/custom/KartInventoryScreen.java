@@ -2,6 +2,7 @@ package de.cxlledjay.bokarts.screen.custom;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import de.cxlledjay.bokarts.BoKarts;
+import de.cxlledjay.bokarts.config.BoKartsConfig;
 import de.cxlledjay.bokarts.entity.custom.KartEntity;
 import de.cxlledjay.bokarts.networking.packet.AddFuelPayloadC2S;
 import de.cxlledjay.bokarts.networking.packet.SetHornPayloadC2S;
@@ -140,7 +141,7 @@ public class KartInventoryScreen extends HandledScreen<KartInventoryScreenHandle
             odoString = KartEntity.getFormattedDistanceString(this.kart.currentOdometer);
             hornString = "[" + (this.kart.getHornSound().ordinal()+1) + "/10]";
 
-            float fuelCapacityPercentage = this.kart.currentFuel / KartEntity.FUEL_TANK_MAX_CAPACITY;
+            float fuelCapacityPercentage = this.kart.currentFuel / BoKartsConfig.maxFuelCapacity;
             if(fuelCapacityPercentage > 0.5) {
                 fuelColor = 0x0E6B1F; //green
             } else if(fuelCapacityPercentage > 0.2) {

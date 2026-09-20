@@ -1,6 +1,7 @@
 package de.cxlledjay.bokarts.item.custom;
 
 import de.cxlledjay.bokarts.component.ModDataComponentTypes;
+import de.cxlledjay.bokarts.config.BoKartsConfig;
 import de.cxlledjay.bokarts.entity.custom.KartEntity;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.Entity;
@@ -63,7 +64,7 @@ public class KartItem extends Item {
                 tooltip.add(Text.literal(s));
             }
             if(stack.get(ModDataComponentTypes.KART_ITEM_FUEL) != null) {
-                float percentage = stack.get(ModDataComponentTypes.KART_ITEM_FUEL) / KartEntity.FUEL_TANK_MAX_CAPACITY;
+                float percentage = stack.get(ModDataComponentTypes.KART_ITEM_FUEL) / BoKartsConfig.maxFuelCapacity;
                 String color = "§c"; //< empty color
                 if(percentage > 0.5f) {
                     // full color
