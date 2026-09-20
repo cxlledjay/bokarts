@@ -34,6 +34,8 @@ public class KartInventoryScreen extends HandledScreen<KartInventoryScreenHandle
             BoKarts.id("refuel"),
             BoKarts.id("refuel_highlighted")
     );
+    private static final Identifier FURNACE_UNLIT = Identifier.of("minecraft", "textures/block/furnace_front.png");
+    private static final Identifier FURNACE_LIT = Identifier.of("minecraft", "textures/block/furnace_front_on.png");
     ButtonTextures HORN_PREVIOUS_TEXTURES = new ButtonTextures(
             BoKarts.id("horn_prev"),
             BoKarts.id("horn_prev_highlighted")
@@ -120,7 +122,15 @@ public class KartInventoryScreen extends HandledScreen<KartInventoryScreenHandle
         int j = (this.height - this.backgroundHeight) / 2;
         context.drawTexture(BACKGROUND_TEXTURE, i, j, 0, 0, this.backgroundWidth, this.backgroundHeight);
 
-        // TODO: render kart like horses
+        // render furnace unlit or lit, depending on fuel level
+        boolean isBurning = this.kart != null && this.kart.currentFuel > 0;
+        Identifier furnaceTexture = isBurning ? FURNACE_LIT : FURNACE_UNLIT;
+
+        int furnaceX = this.x + 8;
+        int furnaceY = this.y + 54;
+        context.drawTexture(furnaceTexture, furnaceX, furnaceY, 0, 0, 16, 16, 16, 16);
+
+        // render kart like horses
         this.drawKart(context, i + 52, j + 52, 21, mouseX, mouseY, this.kart);
     }
 

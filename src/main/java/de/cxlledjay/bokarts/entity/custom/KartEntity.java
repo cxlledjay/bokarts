@@ -221,6 +221,8 @@ public class KartEntity extends BoatEntity implements RideableInventory{
             case GREEN -> ModItems.KART_GREEN;
             case RED -> ModItems.KART_RED;
             case BLACK -> ModItems.KART_BLACK;
+            case PURPLE_GOLD -> ModItems.KART_PURPLE_GOLD;
+            case FADE -> ModItems.KART_FADE;
             default -> ModItems.KART_DEFAULT;
         };
     }
