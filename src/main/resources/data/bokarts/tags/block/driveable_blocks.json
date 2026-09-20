@@ -2,15 +2,40 @@
   "replace": false,
   "values": [
     "minecraft:air",
-    "minecraft:cobbled_deepslate_slab",
+
     "minecraft:gray_concrete_powder",
+
     "minecraft:blackstone",
     "minecraft:deepslate_tiles",
     "minecraft:mud",
     "minecraft:deepslate_bricks",
     "minecraft:deepslate",
+
+    "minecraft:andesite",
+    "minecraft:stone",
+    "minecraft:coal_ore",
+    "minecraft:polished_basalt",
+    "minecraft:basalt",
+
+    "minecraft:cobbled_deepslate_slab",
+    "minecraft:andesite_slab",
+    "minecraft:stone_slab",
+
     "minecraft:diorite",
     "minecraft:diorite_slab",
-    "minecraft:diorite_stairs"
+    "minecraft:diorite_stairs",
+
+    {
+      "id": "stoneworks:cobbled_calcite",
+      "required": false
+    },
+    {
+      "id": "stoneworks:cobbled_calcite_slab",
+      "required": false
+    },
+    {
+      "id": "stoneworks:cobbled_calcite_stairs",
+      "required": false
+    }
   ]
 }
