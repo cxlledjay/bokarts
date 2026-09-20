@@ -1,6 +1,7 @@
 package de.cxlledjay.bokarts;
 
 import de.cxlledjay.bokarts.component.ModDataComponentTypes;
+import de.cxlledjay.bokarts.config.BoKartsConfig;
 import de.cxlledjay.bokarts.entity.ModEntities;
 import de.cxlledjay.bokarts.item.ModItemGroups;
 import de.cxlledjay.bokarts.item.ModItems;
@@ -10,6 +11,7 @@ import de.cxlledjay.bokarts.screen.ModScreenHandlers;
 import de.cxlledjay.bokarts.sound.ModSounds;
 import de.cxlledjay.bokarts.stats.ModStats;
 import de.cxlledjay.bokarts.util.KartFuelItems;
+import eu.midnightdust.lib.config.MidnightConfig;
 import net.fabricmc.api.ModInitializer;
 
 import net.minecraft.util.Identifier;
@@ -24,6 +26,7 @@ public class BoKarts implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+
 		ModItems.registerModItems();
 		ModItemGroups.registerItemGroups();
 		ModEntities.registerModEntities();
@@ -33,6 +36,9 @@ public class BoKarts implements ModInitializer {
 		ModStats.register();
 		ModDataComponentTypes.register();
 		ModRecipes.register();
+
+		// init MidnightLib config
+		MidnightConfig.init(MOD_ID, BoKartsConfig.class);
 	}
 
 	public static Identifier id(String path) {

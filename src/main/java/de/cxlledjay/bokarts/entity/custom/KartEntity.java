@@ -1,6 +1,7 @@
 package de.cxlledjay.bokarts.entity.custom;
 
 import de.cxlledjay.bokarts.component.ModDataComponentTypes;
+import de.cxlledjay.bokarts.config.BoKartsConfig;
 import de.cxlledjay.bokarts.entity.ModEntities;
 import de.cxlledjay.bokarts.item.ModItems;
 import de.cxlledjay.bokarts.networking.packet.KartInputPayloadC2S;
@@ -43,12 +44,6 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     private static final float STEERING_SPEED = 20.0f;
     private static final float STEERING_CENTER = 0.0f;
     private static final float ENGINE_ACCELERATION = 0.1f;
-    public static final float FUEL_TANK_MAX_CAPACITY = 12800.0f; // in ml
-    private static final float FUEL_CONSUMPTION_PER_TICK = 0.7625f; // in ml
-    private static final float SLIPPERINESS_DRIVEABLE = 0.98f;
-    private static final float SLIPPERINESS_NON_DRIVEABLE = 0.9f;
-    private static final float SLIPPERINESS_SLOWED = 0.75f;
-    private static final float SLIPPERINESS_NO_PASSENGER = 0.6f;
 
     // -------------------- tracked data --------------------
     private static final TrackedData<String> PAINT_COLOR = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.STRING);
@@ -157,21 +152,21 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         BlockState groundBlock = this.getWorld().getBlockState(this.getSteppingPos());
 
         // calculated ice boat slipperiness
-        float slipperiness = SLIPPERINESS_NO_PASSENGER; //< default: no passenger
+        float slipperiness = BoKartsConfig.slipperinessNoPassenger; //< default: no passenger
 
         // check if a player is controlling it
         if(hasControllingPassenger() && getControllingPassenger() instanceof PlayerEntity) {
             if(pressingSlow) {
                 // player wants to go slow (maneuvering)
-                slipperiness = SLIPPERINESS_SLOWED;
+                slipperiness = BoKartsConfig.slipperinessSlowed;
             } else {
                 // normal driving => check block
                 if(isDrivableBlock(groundBlock)) {
                     // on a road
-                    slipperiness = SLIPPERINESS_DRIVEABLE;
+                    slipperiness = BoKartsConfig.slipperinessDriveable;
                 } else {
                     // off-road
-                    slipperiness = SLIPPERINESS_NON_DRIVEABLE;
+                    slipperiness = BoKartsConfig.slipperinessNonDriveable;
                 }
             }
         }
@@ -365,7 +360,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         // update server tracking variables
         if(this.pressingForward || this.pressingBack) {
             // we are accelerating: consume fuel!
-            this.currentFuel = Math.max(0, this.currentFuel - FUEL_CONSUMPTION_PER_TICK); // prevent going under 0
+            this.currentFuel = Math.max(0, this.currentFuel - BoKartsConfig.fuelConsumptionPerTick); // prevent going under 0
         }
         this.currentOdometer += (float) distanceThisTick;
 
@@ -614,11 +609,11 @@ public class KartEntity extends BoatEntity implements RideableInventory{
             }
 
             // calculate needed items for refueling
-            int neededItemsUntilFull = (int) Math.ceil((FUEL_TANK_MAX_CAPACITY - this.currentFuel) / fuelProItem);
+            int neededItemsUntilFull = (int) Math.ceil((BoKartsConfig.maxFuelCapacity - this.currentFuel) / fuelProItem);
             int consumedItems = Math.min(neededItemsUntilFull, fuel.getCount());
 
             // refuel the engine and remove items from inventory
-            this.currentFuel = Math.min((this.currentFuel + fuelProItem * consumedItems), FUEL_TANK_MAX_CAPACITY);
+            this.currentFuel = Math.min((this.currentFuel + fuelProItem * consumedItems), BoKartsConfig.maxFuelCapacity);
             fuel.decrement(consumedItems);
 
             // sync with client
@@ -629,7 +624,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
             float pitch = 0.9f;
 
             if(consumedItems > 0) {
-                if(currentFuel >= FUEL_TANK_MAX_CAPACITY) {
+                if(currentFuel >= BoKartsConfig.maxFuelCapacity) {
                     // refilled to max capacity
                     refillSound = SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP;
                     pitch = 1.1f;
@@ -671,7 +666,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
     public static String getFormattedFuelCapacityString(Float fuelCapacity) {
         DecimalFormat decimalFormat1 = new DecimalFormat("0.0");
-        return decimalFormat1.format(fuelCapacity / 1000.0f) + "L/" + decimalFormat1.format(FUEL_TANK_MAX_CAPACITY / 1000.0f) + "L";
+        return decimalFormat1.format(fuelCapacity / 1000.0f) + "L/" + decimalFormat1.format(BoKartsConfig.maxFuelCapacity / 1000.0f) + "L";
     }
 
 

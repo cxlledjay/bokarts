@@ -41,5 +41,41 @@
 
   "stat.bokarts.kart_one_cm": "Distance by Kart",
 
-  "tag.item.bokarts.karts": "Any Kart"
+  "tag.item.bokarts.karts": "Any Kart",
+
+
+
+
+
+
+
+
+
+  "bokarts.midnightconfig.title": "BoKart Settings",
+
+  "bokarts.midnightconfig.category.fuel": "Fuel",
+  "bokarts.midnightconfig.category.physics": "Physics",
+
+  "bokarts.midnightconfig.maxFuelCapacity": "Maximum Fuel Capacity (mL)",
+  "bokarts.midnightconfig.maxFuelCapacity.tooltip": "The maximum amount of fuel a Kart can carry",
+
+  "bokarts.midnightconfig.fuelConsumptionPerTick": "Fuel Consumption Per Tick (mL)",
+  "bokarts.midnightconfig.fuelConsumptionPerTick.tooltip": "The amount of fuel consumed when accelerating (per Tick)",
+
+  "bokarts.midnightconfig.fuelTimeToRangeConversion": "Furnace Burn Time Multiplier",
+  "bokarts.midnightconfig.fuelTimeToRangeConversion.tooltip": "Multiplier for converting vanilla furnace burn time into fuel amount in mL (e.g. Coal burns for 1600 ticks --> fuel = multiplier * 1600; e.g. with multiplier = 0.5: fuel = 0.5 * 1600 = 800 (mL))",
+
+  "bokarts.midnightconfig.physicsWarning": "§cExpert only Settings",
+
+  "bokarts.midnightconfig.slipperinessDriveable": "Slipperiness Constant (Driveable Blocks)",
+  "bokarts.midnightconfig.slipperinessDriveable.tooltip": "Applied when Kart is on blocks marked with tag #bokarts:driveable_block. To mimic Packed Ice: 0.98; To mimic Blue Ice: 0.989",
+
+  "bokarts.midnightconfig.slipperinessNonDriveable": "Slipperiness Constant (Off-Road)",
+  "bokarts.midnightconfig.slipperinessNonDriveable.tooltip": "Applied when Kart is on blocks NOT marked with tag #bokarts:driveable_block",
+
+  "bokarts.midnightconfig.slipperinessSlowed": "Slipperiness Constant (Slowed)",
+  "bokarts.midnightconfig.slipperinessSlowed.tooltip": "Applied when Kart is actively slowed by the player (via the jump key)",
+
+  "bokarts.midnightconfig.slipperinessNoPassenger": "Slipperiness Constant (Empty Kart)",
+  "bokarts.midnightconfig.slipperinessNoPassenger.tooltip": "Applied when Kart has no driver"
 }
