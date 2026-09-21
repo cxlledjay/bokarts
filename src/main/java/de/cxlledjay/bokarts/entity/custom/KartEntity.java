@@ -1,5 +1,6 @@
 package de.cxlledjay.bokarts.entity.custom;
 
+import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.component.ModDataComponentTypes;
 import de.cxlledjay.bokarts.config.BoKartsConfig;
 import de.cxlledjay.bokarts.entity.ModEntities;
@@ -18,6 +19,7 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.vehicle.BoatEntity;
+import net.minecraft.entity.vehicle.VehicleEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -37,6 +39,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.DecimalFormat;
+import java.util.List;
 
 public class KartEntity extends BoatEntity implements RideableInventory{
 
@@ -192,6 +195,11 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     }
 
     @Override
+    public boolean isCollidable() {
+        return false;
+    }
+
+    @Override
     public void move(MovementType movementType, Vec3d movement) {
 
         super.move(movementType, movement);
@@ -230,6 +238,48 @@ public class KartEntity extends BoatEntity implements RideableInventory{
                 this.ticksInWater = 0;
             }
         }
+    }
+
+    private void handleKartCollisions(Vec3d velocityDirection, double distanceThisTick) {
+
+        // handle collisions only from a certain speed upwards
+        if(distanceThisTick > 0.1) {
+
+            List<Entity> possibleHitEntities = this.getWorld().getOtherEntities(
+                    this,
+                    this.getBoundingBox().expand(0.25),
+                    entity -> !this.hasPassenger(entity) && entity instanceof LivingEntity);
+
+            for(Entity entity : possibleHitEntities) {
+
+                if(entity instanceof LivingEntity livingEntity) {
+
+                    // no knockback if entity is riding something
+                    if(livingEntity.hasVehicle()) return;
+
+                    // deal damage
+                    float inflictedDamage = (float) (distanceThisTick * 3.5);
+                    livingEntity.damage(this.getDamageSources().generic(), inflictedDamage);
+
+                    // yeet them
+                    Vec3d knockback = velocityDirection.multiply(distanceThisTick * 4.2).add(0, 0.5 + (distanceThisTick/ 4), 0);
+                    livingEntity.addVelocity(knockback.x, knockback.y, knockback.z);
+                    livingEntity.velocityModified = true; // send update to client!
+
+                    // play sound
+                    this.getWorld().playSound(null, this.getX(), this.getY(), this.getZ(),
+                            net.minecraft.sound.SoundEvents.ENTITY_GENERIC_EXPLODE,
+                            SoundCategory.PLAYERS,
+                            0.6f,
+                            2.0f
+                            //1.0f + ((float) distanceThisTick * 0.2f)
+                    );
+                }
+            }
+
+        }
+
+
     }
 
     @Override
@@ -417,6 +467,10 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
         // ==================== [SERVER SIDED CODE] ====================
         if (!this.getWorld().isClient()) {
+
+            // ---------------- collisions ----------------
+            this.handleKartCollisions(new Vec3d(dx, dy, dz).normalize(), distanceThisTick);
+
 
             // ---------------- fuel and odo sync ----------------
 

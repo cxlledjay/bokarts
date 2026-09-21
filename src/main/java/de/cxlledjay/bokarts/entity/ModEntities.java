@@ -13,7 +13,7 @@ public class ModEntities {
             Registries.ENTITY_TYPE,
             BoKarts.id("kart"),
             EntityType.Builder.<KartEntity>create(KartEntity::new, SpawnGroup.MISC)
-                    .dimensions(1.25f, 0.8f)
+                    .dimensions(1.2f, 0.8f)
                     .eyeHeight(0.5625F)
                     .maxTrackingRange(10)
                     .build());
