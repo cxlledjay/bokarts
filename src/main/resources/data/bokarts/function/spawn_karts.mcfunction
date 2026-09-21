@@ -1,4 +1,4 @@
-summon bokarts:kart ~ ~ ~ {PaintColor:"default",Fuel:12800}
+
 summon bokarts:kart ~2 ~ ~ {PaintColor:"white",Fuel:12800}
 summon bokarts:kart ~4 ~ ~ {PaintColor:"light_gray",Fuel:12800}
 summon bokarts:kart ~6 ~ ~ {PaintColor:"gray",Fuel:12800}
@@ -15,3 +15,7 @@ summon bokarts:kart ~26 ~ ~ {PaintColor:"blue",Fuel:12800}
 summon bokarts:kart ~28 ~ ~ {PaintColor:"purple",Fuel:12800}
 summon bokarts:kart ~30 ~ ~ {PaintColor:"magenta",Fuel:12800}
 summon bokarts:kart ~32 ~ ~ {PaintColor:"pink",Fuel:12800}
+
+summon bokarts:kart ~2 ~ ~-3 {PaintColor:"default",Fuel:12800}
+summon bokarts:kart ~4 ~ ~-3 {PaintColor:"purple_gold",Fuel:12800}
+summon bokarts:kart ~6 ~ ~-3 {PaintColor:"fade",Fuel:12800}
