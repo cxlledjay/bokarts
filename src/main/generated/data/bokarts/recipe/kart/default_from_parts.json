@@ -2,8 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "B": {
-      "item": "minecraft:cyan_terracotta"
+    "C": {
+      "item": "minecraft:copper_ingot"
     },
     "F": {
       "item": "minecraft:furnace"
@@ -14,6 +14,9 @@
     "L": {
       "item": "bokarts:kart_steering_wheel"
     },
+    "R": {
+      "item": "minecraft:lever"
+    },
     "S": {
       "item": "bokarts:kart_seat"
     },
@@ -22,9 +25,9 @@
     }
   },
   "pattern": [
-    "  H",
+    " RH",
     "LSF",
-    "WBW"
+    "WCW"
   ],
   "result": {
     "count": 1,

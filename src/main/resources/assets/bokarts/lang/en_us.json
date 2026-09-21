@@ -65,6 +65,9 @@
   "bokarts.midnightconfig.fuelTimeToRangeConversion": "Furnace Burn Time Multiplier",
   "bokarts.midnightconfig.fuelTimeToRangeConversion.tooltip": "Multiplier for converting vanilla furnace burn time into fuel amount in mL (e.g. Coal burns for 1600 ticks --> fuel = multiplier * 1600; e.g. with multiplier = 0.5: fuel = 0.5 * 1600 = 800 (mL))",
 
+  "bokarts.midnightconfig.maxTicksInWater": "Maximum Time allowed in Water",
+  "bokarts.midnightconfig.maxTicksInWater.tooltip": "Time (in Ticks) until Kart is destroyed in Water",
+
   "bokarts.midnightconfig.physicsWarning": "§cExpert only Settings",
 
   "bokarts.midnightconfig.slipperinessDriveable": "Slipperiness Constant (Driveable Blocks)",

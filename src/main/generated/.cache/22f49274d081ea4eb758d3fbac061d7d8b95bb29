@@ -1,4 +1,4 @@
-// 1.21.1	2026-09-20T13:43:12.0194146	BoKarts/Recipes
+// 1.21.1	2026-09-21T15:19:50.6439561	BoKarts/Recipes
 2a7ade753da5bb765126a00e939598d1ff5b5770 data\bokarts\recipe\kart\blue.json
 bcfcf7e5b28232c7ab8e794b040d69dbcbc602ed data\bokarts\recipe\kart\green.json
 b5b5542cdbba00f8da72f7b930e2a27ab4e22f2d data\bokarts\advancement\recipes\transportation\kart\brown.json
@@ -22,7 +22,7 @@ d48b580d1794ade795a25c1ad17da59a20ce58b1 data\bokarts\recipe\kart_seat.json
 b043fdef387160b8369bcacc2d18a821ae7848e0 data\bokarts\advancement\recipes\transportation\kart\light_blue.json
 c4f1055b0de5b0be8b5c9f2877eb1c9720d0337b data\bokarts\advancement\recipes\transportation\kart\gray.json
 c0e906895cb8e7a8bbaa0f51439df04b1b4ff78d data\bokarts\recipe\kart\cyan.json
-2e44bf25bbabdd1d141fb81b159cb9465e349e44 data\bokarts\advancement\recipes\transportation\kart\default_from_parts.json
+f910b050c09d124513c4541a38c29f29c0bdd203 data\bokarts\advancement\recipes\transportation\kart\default_from_parts.json
 4066599f897d0f938173a2e9c904526f7503e935 data\bokarts\recipe\kart\brown.json
 26f9aef796a2f2423af1223d874d610920914dec data\bokarts\advancement\recipes\transportation\kart\green.json
 d08342c30267b48a3a83852f7b3ccff7c164a946 data\bokarts\advancement\recipes\transportation\kart_wheel.json
@@ -34,7 +34,7 @@ aff4ca5e2734bc519e70b282edc3a67f5738a411 data\bokarts\advancement\recipes\transp
 a805a00970424e4e48baf88ca152419649d07377 data\bokarts\recipe\kart\gray.json
 012c1d4ec68c11446e7752f4e16adebeb91daa6e data\bokarts\recipe\kart\orange.json
 babf2383a1c1788bde3314e3f19db6ea2dd34de8 data\bokarts\advancement\recipes\transportation\kart\cyan.json
-a5197c204fa07c4649216ef138a9cf2228f322f0 data\bokarts\recipe\kart\default_from_parts.json
+ad101108a2974b2092a926396332f6eeac1f9fb8 data\bokarts\recipe\kart\default_from_parts.json
 95c8efcac5fc68bcaadd59c5a4bcf3dca8446d1b data\bokarts\recipe\kart\light_blue.json
 1e91f04dad955111b7a19e1285b3304f57f3fc13 data\bokarts\advancement\recipes\transportation\kart\orange.json
 1c38ddd92f860b5012a30de68edb344d3ce0dddb data\bokarts\advancement\recipes\transportation\kart\blue.json

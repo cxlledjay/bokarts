@@ -21,6 +21,10 @@ public class BoKartsConfig extends MidnightConfig {
     // ========================================
     // PHYSICS SETTINGS
     // ========================================
+
+    @Entry(category = "physics")
+    public static int maxTicksInWater = 100;
+
     @Comment(category = "physics", centered = true)
     public static Comment physicsWarning;
 

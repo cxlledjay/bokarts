@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_cyan_terracotta": {
+    "has_copper_ingot": {
       "conditions": {
         "items": [
           {
-            "items": "minecraft:cyan_terracotta"
+            "items": "minecraft:copper_ingot"
           }
         ]
       },
@@ -61,6 +61,16 @@
       },
       "trigger": "minecraft:inventory_changed"
     },
+    "has_lever": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:lever"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
     "has_the_recipe": {
       "conditions": {
         "recipe": "bokarts:kart/default_from_parts"
@@ -73,7 +83,8 @@
       "has_the_recipe",
       "has_hopper",
       "has_furnace",
-      "has_cyan_terracotta",
+      "has_copper_ingot",
+      "has_lever",
       "has_kart_seat",
       "has_kart_wheel",
       "has_kart_steering_wheel"

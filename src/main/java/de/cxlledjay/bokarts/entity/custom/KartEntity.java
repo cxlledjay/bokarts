@@ -59,6 +59,9 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     public boolean  pressingLeft, pressingRight, pressingForward, pressingBack, pressingSlow;
     private boolean lastSentLeft, lastSentRight, lastSentForward, lastSentBack, lastSentSlow;
 
+    // physics tracking
+    private int ticksInWater = 0;
+
     // sound tracking
     private boolean engineSoundStarted = false;
     private float soundScaling = 0.0f;
@@ -188,6 +191,46 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         return false;
     }
 
+    @Override
+    public void move(MovementType movementType, Vec3d movement) {
+
+        super.move(movementType, movement);
+
+        // physics logic on server!
+        if(!this.getWorld().isClient()) {
+
+            if(this.isTouchingWater() || this.isSubmergedInWater()) {
+                // touching water!
+                if(++this.ticksInWater >= BoKartsConfig.maxTicksInWater) {
+                    // spend too long in water => kaboom
+
+                    // spawn explosion
+                    this.getWorld().createExplosion(
+                            this,     // The entity causing the explosion
+                            this.getX(),    // X coordinate
+                            this.getY(),    // Y coordinate
+                            this.getZ(),    // Z coordinate
+                            1.5f,           // Power (TNT is 4.0f, Creeper is 3.0f)
+                            World.ExplosionSourceType.NONE // NONE = damages players/entities, but DOES NOT break blocks!
+                    );
+
+                    // eject passengers
+                    if (this.hasPassengers()) {
+                        this.removeAllPassengers();
+                    }
+
+                    // kill kart and drop it
+                    this.killAndDropItem(this.asItem());
+
+                    // despawn it
+                    this.discard();
+                }
+            } else {
+                // not touching water (anymore!)
+                this.ticksInWater = 0;
+            }
+        }
+    }
 
     @Override
     public void fall(double heightDifference, boolean onGround, BlockState state, BlockPos pos) {
