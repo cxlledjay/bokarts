@@ -248,14 +248,19 @@ public class KartEntity extends BoatEntity implements RideableInventory{
             List<Entity> possibleHitEntities = this.getWorld().getOtherEntities(
                     this,
                     this.getBoundingBox().expand(0.25),
-                    entity -> !this.hasPassenger(entity) && entity instanceof LivingEntity);
+                    entity -> !this.hasPassenger(entity) && entity instanceof LivingEntity && !entity.isSpectator());
 
             for(Entity entity : possibleHitEntities) {
 
                 if(entity instanceof LivingEntity livingEntity) {
 
                     // no knockback if entity is riding something
-                    if(livingEntity.hasVehicle()) return;
+                    if(livingEntity.hasVehicle()) continue;
+
+                    // no knockback if entity is player in spectator or creative
+                    if(livingEntity instanceof ServerPlayerEntity player) {
+                        if(player.isSpectator() || player.isCreative()) continue;
+                    }
 
                     // deal damage
                     float inflictedDamage = (float) (distanceThisTick * 3.5);
