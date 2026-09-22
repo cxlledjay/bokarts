@@ -1,9 +1,9 @@
-// 1.21.1	2026-09-21T15:19:50.6429591	BoKarts/Model Definitions
+// 1.21.1	2026-09-22T14:14:15.1767035	BoKarts/Model Definitions
 d5521416cc89a40442b4f54e181f7bf0a672e428 assets\bokarts\models\item\kart\blue.json
 554e8610620e4d5bc8bbc70a092d3fd738c68f11 assets\bokarts\models\item\kart\green.json
 364d766270772d41133da161e6cdbdf55b7533f0 assets\bokarts\models\item\kart\black.json
-aa4cd92bf30c42abb245b952ab33ebc45dd3a73f assets\bokarts\models\item\kart_wheel.json
 8e8faf97784006488cf576315229faa209b16ae2 assets\bokarts\models\item\kart\brown.json
+aa4cd92bf30c42abb245b952ab33ebc45dd3a73f assets\bokarts\models\item\kart_wheel.json
 d57abe9e815cd30c26d3474af74550f1b124b410 assets\bokarts\models\item\kart_steering_wheel.json
 b3f5fd6389a7dba8a716364d66fb4bd69ddd1427 assets\bokarts\models\item\kart\magenta.json
 cbcc0916bcc7590cf75541ecf118eb2d01b9c8f1 assets\bokarts\models\item\kart\pink.json
@@ -19,5 +19,6 @@ eac2a9a12e3626dfb7800e3fb29290098ee52c2e assets\bokarts\models\item\kart\cyan.js
 86259a0384e5bc8b20849c9d97794dbcd752d255 assets\bokarts\models\item\kart\light_blue.json
 54fb2c9626392192a3c4fb357eaa77bcfeba355f assets\bokarts\models\item\kart\fade.json
 ce2ac346b50eee2e5d3a991d3f5483d65d93c309 assets\bokarts\models\item\kart\lime.json
+d828ee0f0a09f8822be2fafa84e27683daa23a2f assets\bokarts\models\item\kart_key.json
 8003320563958f50cac69f60df0ba1f56f196270 assets\bokarts\models\item\kart\purple.json
 06ac56cbb92c87ef52433dc8869d7c9172c79462 assets\bokarts\models\item\kart\orange.json

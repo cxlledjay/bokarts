@@ -129,7 +129,7 @@ public class KartInventoryScreen extends HandledScreen<KartInventoryScreenHandle
         context.drawTexture(furnaceTexture, furnaceX, furnaceY, 0, 0, 16, 16, 16, 16);
 
         // render kart like horses
-        this.drawKart(context, i + 52, j + 52, 21, mouseX, mouseY, this.kart);
+        this.drawKart(context, i + 52, j + 42, 21, mouseX, mouseY, this.kart);
     }
 
     @Override

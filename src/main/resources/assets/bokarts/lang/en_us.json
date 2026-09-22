@@ -3,6 +3,7 @@
   "item.bokarts.kart_seat" : "Kart Seat",
   "item.bokarts.kart_wheel" : "Kart Wheel",
   "item.bokarts.kart_steering_wheel" : "Kart Steering Wheel",
+  "item.bokarts.kart_key" : "Kart Key",
 
   "tooltip.bokarts.kart_item.shift":        "§7Press §f[SHIFT] §7to expand details",
   "tooltip.bokarts.kart_item.details":      "§3=== §bKart Specs §3===",

@@ -21,6 +21,7 @@ public class ModItemGroups {
                         entries.add(new ItemStack(ModItems.KART_CRAFTING_SEAT));
                         entries.add(new ItemStack(ModItems.KART_CRAFTING_WHEEL));
                         entries.add(new ItemStack(ModItems.KART_CRAFTING_STEERING_WHEEL));
+                        entries.add(new ItemStack(ModItems.KART_KEY));
                         // vanilla dye colors
                         entries.add(new ItemStack(ModItems.KART_WHITE));
                         entries.add(new ItemStack(ModItems.KART_LIGHT_GRAY));

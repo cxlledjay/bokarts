@@ -23,6 +23,7 @@ public class ModModelProvider extends FabricModelProvider {
         itemModelGenerator.register(ModItems.KART_CRAFTING_WHEEL, Models.GENERATED);
         itemModelGenerator.register(ModItems.KART_CRAFTING_STEERING_WHEEL, Models.GENERATED);
         itemModelGenerator.register(ModItems.KART_CRAFTING_SEAT, Models.GENERATED);
+        itemModelGenerator.register(ModItems.KART_KEY, Models.GENERATED);
 
         // Vanilla dye colors
         itemModelGenerator.register(ModItems.KART_WHITE, Models.GENERATED);

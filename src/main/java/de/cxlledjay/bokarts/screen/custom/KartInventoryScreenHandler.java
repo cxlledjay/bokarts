@@ -13,7 +13,7 @@ import net.minecraft.screen.slot.Slot;
 
 public class KartInventoryScreenHandler extends ScreenHandler {
 
-    private final Inventory fuelInventory = new SimpleInventory(1);
+    private final Inventory fuelInventory = new SimpleInventory(2);
 
     public KartInventoryScreenHandler(int syncId, PlayerInventory playerInventory) {
         super(ModScreenHandlers.KART_INVENTORY_SCREEN_HANDLER, syncId);
@@ -24,6 +24,16 @@ public class KartInventoryScreenHandler extends ScreenHandler {
                     @Override
                     public boolean canInsert(ItemStack stack) {
                         return KartFuelItems.isFuelItem(stack);
+                    }
+                }
+        );
+
+        // ignition
+        this.addSlot(
+                new Slot(this.fuelInventory, 1, 26, 54) {
+                    @Override
+                    public boolean canInsert(ItemStack stack) {
+                        return false;
                     }
                 }
         );

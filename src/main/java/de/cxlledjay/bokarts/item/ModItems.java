@@ -14,9 +14,6 @@ import static de.cxlledjay.bokarts.item.custom.KartItem.defaultKartSettings;
 
 public class ModItems {
 
-
-
-
     // kart crafting ingredients
 
     public static final Item KART_CRAFTING_WHEEL = registerItem("kart_wheel", new Item(new Item.Settings()));
@@ -25,8 +22,8 @@ public class ModItems {
 
 
 
-
-
+    // accessories
+    public static final Item KART_KEY = registerItem("kart_key", new Item(new Item.Settings()));
 
 
 
