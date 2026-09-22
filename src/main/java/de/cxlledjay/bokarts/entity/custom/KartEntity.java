@@ -443,21 +443,23 @@ public class KartEntity extends BoatEntity implements RideableInventory{
             this.lastTickZ = this.getZ();
             this.hasTrackedPosition = true;
         }
-        double dx = this.getX() - this.lastTickX;
-        double dy = this.getY() - this.lastTickY;
-        double dz = this.getZ() - this.lastTickZ;
-        double distanceThisTick = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+        // calculate movement for this tick
+        Vec3d movementThisTick = new Vec3d(
+                this.getX() - this.lastTickX,
+                this.getY() - this.lastTickY,
+                this.getZ() - this.lastTickZ);
+        double distanceThisTick = movementThisTick.length();
 
         // update position tracking
         this.lastTickX = this.getX();
         this.lastTickY = this.getY();
         this.lastTickZ = this.getZ();
 
-        // position tracking code
+        // fuel + odo tracking code
         if (this.currentFuel == -1) this.currentFuel = this.getFuelSynced();
         if (this.currentOdometer == -1) this.currentOdometer = this.getOdometerSynced();
 
-        // update server tracking variables
         if(this.pressingForward || this.pressingBack) {
             // we are accelerating: consume fuel!
             this.currentFuel = Math.max(0, this.currentFuel - ClientSyncedConfig.getFuelConsumptionPerTick()); // prevent going under 0
@@ -474,7 +476,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         if (!this.getWorld().isClient()) {
 
             // ---------------- collisions ----------------
-            this.handleKartCollisions(new Vec3d(dx, dy, dz).normalize(), distanceThisTick);
+            this.handleKartCollisions(movementThisTick.normalize(), distanceThisTick);
 
 
             // ---------------- fuel and odo sync ----------------
@@ -510,11 +512,10 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
             if(!isOutOfFuel) {
                 // kart speed calculation
-                Vec3d velocity = this.getVelocity();
                 double yawRad = Math.toRadians(this.getYaw());
                 double forwardX = -Math.sin(yawRad);
                 double forwardZ = Math.cos(yawRad);
-                double forwardSpeed = (velocity.x * forwardX) + (velocity.z * forwardZ);
+                double forwardSpeed = (movementThisTick.x * forwardX) + (movementThisTick.z * forwardZ);
 
                 // resulting rotation
                 float frontAxleRotationThisTick = (float) (forwardSpeed * 5.34);
