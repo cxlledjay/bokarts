@@ -3,14 +3,14 @@
 	"id": "bokarts",
 	"version": "${version}",
 	"name": "BoKarts",
-	"description": "GoKarts but like Ice Boats",
+	"description": "Overengineered boats for roads",
 	"authors": [
 		"cxlledjay"
 	],
 	"contact": {
 		"sources": "https://github.com/cxlledjay/bokarts"
 	},
-	"license": "MIT",
+	"license": "Apache-2.0",
 	"icon": "assets/bokarts/icon.png",
 	"environment": "*",
 	"entrypoints": {
