@@ -53,8 +53,7 @@
 
   "bokarts.midnightconfig.title": "BoKart Settings",
 
-  "bokarts.midnightconfig.category.fuel": "Fuel",
-  "bokarts.midnightconfig.category.physics": "Physics",
+  "bokarts.midnightconfig.category.server": "Server Settings",
 
   "bokarts.midnightconfig.maxFuelCapacity": "Maximum Fuel Capacity (mL)",
   "bokarts.midnightconfig.maxFuelCapacity.tooltip": "The maximum amount of fuel a Kart can carry",

@@ -2,7 +2,7 @@ package de.cxlledjay.bokarts.entity.custom;
 
 import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.component.ModDataComponentTypes;
-import de.cxlledjay.bokarts.config.BoKartsConfig;
+import de.cxlledjay.bokarts.config.ClientSyncedConfig;
 import de.cxlledjay.bokarts.entity.ModEntities;
 import de.cxlledjay.bokarts.item.ModItems;
 import de.cxlledjay.bokarts.networking.packet.KartInputPayloadC2S;
@@ -158,21 +158,21 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         BlockState groundBlock = this.getWorld().getBlockState(this.getSteppingPos());
 
         // calculated ice boat slipperiness
-        float slipperiness = BoKartsConfig.slipperinessNoPassenger; //< default: no passenger
+        float slipperiness = ClientSyncedConfig.getSlipperinessNoPassenger(); //< default: no passenger
 
         // check if a player is controlling it
         if(hasControllingPassenger() && getControllingPassenger() instanceof PlayerEntity) {
             if(pressingSlow) {
                 // player wants to go slow (maneuvering)
-                slipperiness = BoKartsConfig.slipperinessSlowed;
+                slipperiness = ClientSyncedConfig.getSlipperinessSlowed();
             } else {
                 // normal driving => check block
                 if(isDrivableBlock(groundBlock)) {
                     // on a road
-                    slipperiness = BoKartsConfig.slipperinessDriveable;
+                    slipperiness = ClientSyncedConfig.getSlipperinessDriveable();
                 } else {
                     // off-road
-                    slipperiness = BoKartsConfig.slipperinessNonDriveable;
+                    slipperiness = ClientSyncedConfig.getSlipperinessNonDriveable();
                 }
             }
         }
@@ -209,7 +209,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
             if(this.isTouchingWater() || this.isSubmergedInWater()) {
                 // touching water!
-                if(++this.ticksInWater >= BoKartsConfig.maxTicksInWater) {
+                if(++this.ticksInWater >= ClientSyncedConfig.getMaxTicksInWater()) {
                     // spend too long in water => kaboom
 
                     // spawn explosion
@@ -455,7 +455,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         // update server tracking variables
         if(this.pressingForward || this.pressingBack) {
             // we are accelerating: consume fuel!
-            this.currentFuel = Math.max(0, this.currentFuel - BoKartsConfig.fuelConsumptionPerTick); // prevent going under 0
+            this.currentFuel = Math.max(0, this.currentFuel - ClientSyncedConfig.getFuelConsumptionPerTick()); // prevent going under 0
         }
         this.currentOdometer += (float) distanceThisTick;
 
@@ -708,11 +708,11 @@ public class KartEntity extends BoatEntity implements RideableInventory{
             }
 
             // calculate needed items for refueling
-            int neededItemsUntilFull = (int) Math.ceil((BoKartsConfig.maxFuelCapacity - this.currentFuel) / fuelProItem);
+            int neededItemsUntilFull = (int) Math.ceil((ClientSyncedConfig.getMaxFuelCapacity() - this.currentFuel) / fuelProItem);
             int consumedItems = Math.min(neededItemsUntilFull, fuel.getCount());
 
             // refuel the engine and remove items from inventory
-            this.currentFuel = Math.min((this.currentFuel + fuelProItem * consumedItems), BoKartsConfig.maxFuelCapacity);
+            this.currentFuel = Math.min((this.currentFuel + fuelProItem * consumedItems), ClientSyncedConfig.getMaxFuelCapacity());
             fuel.decrement(consumedItems);
 
             // sync with client
@@ -723,7 +723,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
             float pitch = 0.9f;
 
             if(consumedItems > 0) {
-                if(currentFuel >= BoKartsConfig.maxFuelCapacity) {
+                if(currentFuel >= ClientSyncedConfig.getMaxFuelCapacity()) {
                     // refilled to max capacity
                     refillSound = SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP;
                     pitch = 1.1f;
@@ -765,7 +765,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
     public static String getFormattedFuelCapacityString(Float fuelCapacity) {
         DecimalFormat decimalFormat1 = new DecimalFormat("0.0");
-        return decimalFormat1.format(fuelCapacity / 1000.0f) + "L/" + decimalFormat1.format(BoKartsConfig.maxFuelCapacity / 1000.0f) + "L";
+        return decimalFormat1.format(fuelCapacity / 1000.0f) + "L/" + decimalFormat1.format(ClientSyncedConfig.getMaxFuelCapacity() / 1000.0f) + "L";
     }
 
 

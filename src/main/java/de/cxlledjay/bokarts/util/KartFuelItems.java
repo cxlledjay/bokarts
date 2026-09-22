@@ -1,7 +1,7 @@
 package de.cxlledjay.bokarts.util;
 
 import com.google.common.collect.Maps;
-import de.cxlledjay.bokarts.config.BoKartsConfig;
+import de.cxlledjay.bokarts.config.ClientSyncedConfig;
 import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -21,7 +21,7 @@ public class KartFuelItems {
             // convert to ranges map
             fuelRangeMap = Maps.newLinkedHashMap();
             map.forEach( (item, value) -> {
-                fuelRangeMap.put(item, value * BoKartsConfig.fuelTimeToRangeConversion);
+                fuelRangeMap.put(item, value * ClientSyncedConfig.getFuelTimeToRangeConversion());
             } );
         }
 

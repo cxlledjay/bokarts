@@ -2,7 +2,7 @@ package de.cxlledjay.bokarts.screen.custom;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import de.cxlledjay.bokarts.BoKarts;
-import de.cxlledjay.bokarts.config.BoKartsConfig;
+import de.cxlledjay.bokarts.config.ClientSyncedConfig;
 import de.cxlledjay.bokarts.entity.custom.KartEntity;
 import de.cxlledjay.bokarts.networking.packet.AddFuelPayloadC2S;
 import de.cxlledjay.bokarts.networking.packet.SetHornPayloadC2S;
@@ -13,11 +13,9 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ButtonTextures;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.gui.widget.TexturedButtonWidget;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -151,7 +149,7 @@ public class KartInventoryScreen extends HandledScreen<KartInventoryScreenHandle
             odoString = KartEntity.getFormattedDistanceString(this.kart.currentOdometer);
             hornString = "[" + (this.kart.getHornSound().ordinal()+1) + "/10]";
 
-            float fuelCapacityPercentage = this.kart.currentFuel / BoKartsConfig.maxFuelCapacity;
+            float fuelCapacityPercentage = this.kart.currentFuel / ClientSyncedConfig.getMaxFuelCapacity();
             if(fuelCapacityPercentage > 0.5) {
                 fuelColor = 0x0E6B1F; //green
             } else if(fuelCapacityPercentage > 0.2) {
