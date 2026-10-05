@@ -1,6 +1,7 @@
 package de.cxlledjay.bokarts.item;
 
 import de.cxlledjay.bokarts.BoKarts;
+import de.cxlledjay.bokarts.block.ModBlocks;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
@@ -43,6 +44,9 @@ public class ModItemGroups {
                         entries.add(new ItemStack(ModItems.KART_DEFAULT));
                         entries.add(new ItemStack(ModItems.KART_PURPLE_GOLD));
                         entries.add(new ItemStack(ModItems.KART_FADE));
+
+                        // v1.1.0 stuff
+                        entries.add(new ItemStack(ModBlocks.KART_LIFT));
                     }).build());
 
     public static void registerItemGroups() {

@@ -1,5 +1,6 @@
 package de.cxlledjay.bokarts.datagen;
 
+import de.cxlledjay.bokarts.block.ModBlocks;
 import de.cxlledjay.bokarts.item.ModItems;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;

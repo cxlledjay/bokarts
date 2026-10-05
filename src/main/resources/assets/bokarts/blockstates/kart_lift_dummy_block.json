@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "bokarts:block/kart_lift_dummy_block" },
+    "facing=east":  { "model": "bokarts:block/kart_lift_dummy_block", "y": 90 },
+    "facing=south": { "model": "bokarts:block/kart_lift_dummy_block", "y": 180 },
+    "facing=west":  { "model": "bokarts:block/kart_lift_dummy_block", "y": 270 }
+  }
+}
