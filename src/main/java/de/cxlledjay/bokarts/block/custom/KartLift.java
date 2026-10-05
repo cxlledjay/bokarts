@@ -70,14 +70,17 @@ public abstract class KartLift extends Block {
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+
+        // find core
+        BlockPos corePos = findCorePos(world, pos);
+        if(corePos == null) return ActionResult.PASS;
+
+        // check for control
+        if(world.getBlockState(corePos).get(KartLiftBlock.IS_CONTROL) == false) return ActionResult.PASS;
+
+
         // We only want to run this on the Server side
         if (!world.isClient) {
-
-            // find core
-            BlockPos corePos = findCorePos(world, pos);
-
-            // safeguard
-            if(corePos == null) return ActionResult.PASS;
 
             // get block entity
             BlockEntity lift_be = world.getBlockEntity(corePos);
@@ -88,6 +91,8 @@ public abstract class KartLift extends Block {
                 BoKarts.LOGGER.info("SUCCESS: Found KartLiftBlockEntity at {}", corePos.toShortString());
                 // Send a message directly to the player's chat so you don't have to tab out!
                 player.sendMessage(Text.literal("§aSUCCESS: Block Entity is alive and linked!"), false);
+                // log is_control
+                BoKarts.LOGGER.info("IS_CONTROL = {}", world.getBlockState(corePos).get(KartLiftBlock.IS_CONTROL).booleanValue());
             } else {
                 BoKarts.LOGGER.info("ERROR: No BlockEntity found at {}", corePos.toShortString());
                 player.sendMessage(Text.literal("§cERROR: Block Entity is missing!"), false);

@@ -1,4 +1,6 @@
 {
-  "textures": {},
+  "textures": {
+    "particle": "bokarts:block/kart_lift_particle"
+  },
   "elements": []
 }

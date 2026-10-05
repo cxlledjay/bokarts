@@ -1,8 +1,13 @@
 {
   "variants": {
-    "facing=north": { "model": "bokarts:block/kart_lift_block" },
-    "facing=east":  { "model": "bokarts:block/kart_lift_block", "y": 90 },
-    "facing=south": { "model": "bokarts:block/kart_lift_block", "y": 180 },
-    "facing=west":  { "model": "bokarts:block/kart_lift_block", "y": 270 }
+    "facing=north,is_control=false": { "model": "bokarts:block/kart_lift_block" },
+    "facing=east,is_control=false":  { "model": "bokarts:block/kart_lift_block", "y": 90 },
+    "facing=south,is_control=false": { "model": "bokarts:block/kart_lift_block", "y": 180 },
+    "facing=west,is_control=false":  { "model": "bokarts:block/kart_lift_block", "y": 270 },
+
+    "facing=north,is_control=true":  { "model": "bokarts:block/kart_lift_block_console" },
+    "facing=east,is_control=true":   { "model": "bokarts:block/kart_lift_block_console", "y": 90 },
+    "facing=south,is_control=true":  { "model": "bokarts:block/kart_lift_block_console", "y": 180 },
+    "facing=west,is_control=true":   { "model": "bokarts:block/kart_lift_block_console", "y": 270 }
   }
 }
