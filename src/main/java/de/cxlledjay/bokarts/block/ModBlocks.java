@@ -1,10 +1,11 @@
 package de.cxlledjay.bokarts.block;
 
 import de.cxlledjay.bokarts.BoKarts;
-import de.cxlledjay.bokarts.block.custom.KartLiftBlock;
+import de.cxlledjay.bokarts.block.custom.KartLiftCoreBlock;
 import de.cxlledjay.bokarts.block.custom.KartLiftDummyBlock;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
+import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
@@ -13,8 +14,8 @@ import net.minecraft.registry.Registry;
 public class ModBlocks {
 
     // 1. Register Blocks
-    public static final Block KART_LIFT = registerBlock("kart_lift_block", new KartLiftBlock(AbstractBlock.Settings.create().strength(3.0f).requiresTool().nonOpaque()));
-    public static final Block KART_LIFT_DUMMY = registerBlockWithoutBlockItem("kart_lift_dummy_block", new KartLiftDummyBlock(AbstractBlock.Settings.create().strength(3.0f).requiresTool().nonOpaque()));
+    public static final Block KART_LIFT = registerBlock("kart_lift_block", new KartLiftCoreBlock(AbstractBlock.Settings.create().strength(3.0f).requiresTool().nonOpaque().pistonBehavior(PistonBehavior.BLOCK)));
+    public static final Block KART_LIFT_DUMMY = registerBlockWithoutBlockItem("kart_lift_dummy_block", new KartLiftDummyBlock(AbstractBlock.Settings.create().strength(3.0f).requiresTool().nonOpaque().pistonBehavior(PistonBehavior.BLOCK)));
 
 
 

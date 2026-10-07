@@ -9,6 +9,7 @@ import net.minecraft.block.HorizontalFacingBlock;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.text.Text;
@@ -20,8 +21,8 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
-
-public abstract class KartLift extends Block {
+// base class for the KartLiftBlock and KartLiftDummyBlock
+public abstract class KartLiftBaseClass extends Block {
 
 
     // rotation
@@ -32,7 +33,7 @@ public abstract class KartLift extends Block {
     protected static final VoxelShape SHAPE_WEST = Block.createCuboidShape(5, 0, 2, 13, 16, 14);
 
 
-    public KartLift(Settings settings) {
+    public KartLiftBaseClass(Settings settings) {
         super(settings);
         this.setDefaultState(this.stateManager.getDefaultState().with(FACING, Direction.NORTH));
     }
@@ -56,6 +57,9 @@ public abstract class KartLift extends Block {
 
 
 
+
+
+
     // -------------------- multiblock helpers --------------------
     public static BlockPos findCorePos(World world, BlockPos pos) {
         return world.getBlockState(pos).isOf(ModBlocks.KART_LIFT) ? pos
@@ -76,7 +80,7 @@ public abstract class KartLift extends Block {
         if(corePos == null) return ActionResult.PASS;
 
         // check for control
-        if(world.getBlockState(corePos).get(KartLiftBlock.IS_CONTROL) == false) return ActionResult.PASS;
+        if(world.getBlockState(corePos).get(KartLiftCoreBlock.IS_CONTROL) == false) return ActionResult.PASS;
 
 
         // We only want to run this on the Server side
@@ -92,7 +96,7 @@ public abstract class KartLift extends Block {
                 // Send a message directly to the player's chat so you don't have to tab out!
                 player.sendMessage(Text.literal("§aSUCCESS: Block Entity is alive and linked!"), false);
                 // log is_control
-                BoKarts.LOGGER.info("IS_CONTROL = {}", world.getBlockState(corePos).get(KartLiftBlock.IS_CONTROL).booleanValue());
+                BoKarts.LOGGER.info("IS_CONTROL = {}", world.getBlockState(corePos).get(KartLiftCoreBlock.IS_CONTROL).booleanValue());
             } else {
                 BoKarts.LOGGER.info("ERROR: No BlockEntity found at {}", corePos.toShortString());
                 player.sendMessage(Text.literal("§cERROR: Block Entity is missing!"), false);

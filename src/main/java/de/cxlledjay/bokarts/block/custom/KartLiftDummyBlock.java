@@ -5,10 +5,14 @@ import de.cxlledjay.bokarts.block.ModBlocks;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldView;
+import org.jetbrains.annotations.Nullable;
 
-public class KartLiftDummyBlock extends KartLift {
+public class KartLiftDummyBlock extends KartLiftBaseClass {
 
     public static final MapCodec<KartLiftDummyBlock> CODEC = createCodec(KartLiftDummyBlock::new);
 
@@ -21,42 +25,51 @@ public class KartLiftDummyBlock extends KartLift {
         return CODEC;
     }
 
+// -------------------- vanilla block handling --------------------
 
-
-
-
-
-
+    @Override
+    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state) {
+        return new ItemStack(ModBlocks.KART_LIFT);
+    }
 
 
     // -------------------- multiblock breaking --------------------
 
-    @Override
-    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
-        // find core block
+    private void breakCoreBlock(World world, BlockPos pos, boolean drop, @Nullable PlayerEntity player) {
         BlockPos corePos = findCorePos(world, pos);
 
         if (corePos != null) {
             // break core block
-            world.breakBlock(corePos, !player.isCreative(), player);
+            if(player == null) world.breakBlock(corePos, drop);
+            else world.breakBlock(corePos, drop, player);
         }
+    }
+
+    @Override
+    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+
+        // propagate breaking to core block
+        breakCoreBlock(world, pos, !player.isCreative(), player);
 
         return super.onBreak(world, pos, state, player);
     }
 
     @Override
     public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        // This catches explosions (Creepers, TNT) or water washing the dummy away
+
+        // if block is broken (=replaced by another block)
         if (!state.isOf(newState.getBlock())) {
 
-            // find core pos
-            BlockPos corePos = findCorePos(world, pos);
+            // propagate breaking to core block
+            breakCoreBlock(world, pos, true, null);
 
-            if (corePos != null) {
-                // Explosions should always drop the item
-                world.breakBlock(corePos, true);
-            }
             super.onStateReplaced(state, world, pos, newState, moved);
         }
     }
+
+
+
+
+
+
 }

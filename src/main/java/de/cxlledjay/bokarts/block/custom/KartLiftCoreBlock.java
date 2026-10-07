@@ -11,24 +11,25 @@ import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public class KartLiftBlock extends KartLift implements BlockEntityProvider {
+public class KartLiftCoreBlock extends KartLiftBaseClass implements BlockEntityProvider {
 
     // codec
-    public static final MapCodec<KartLiftBlock> CODEC = KartLiftBlock.createCodec(KartLiftBlock::new);
+    public static final MapCodec<KartLiftCoreBlock> CODEC = KartLiftCoreBlock.createCodec(KartLiftCoreBlock::new);
 
     // core lift
     public static final BooleanProperty IS_CONTROL = BooleanProperty.of("is_control");
     public static final BooleanProperty ASSEMBLED = BooleanProperty.of("is_assembled");
 
-    public KartLiftBlock(Settings settings) {
+    public KartLiftCoreBlock(Settings settings) {
         super(settings);
         this.setDefaultState(this.getDefaultState()
-                .with(KartLift.FACING, Direction.NORTH)
+                .with(KartLiftBaseClass.FACING, Direction.NORTH)
                 .with(IS_CONTROL, false)
                 .with(ASSEMBLED, false));
     }
@@ -51,8 +52,7 @@ public class KartLiftBlock extends KartLift implements BlockEntityProvider {
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         super.appendProperties(builder);
-        builder.add(IS_CONTROL);
-        builder.add(ASSEMBLED);
+        builder.add(IS_CONTROL, ASSEMBLED);
     }
 
 
@@ -85,6 +85,7 @@ public class KartLiftBlock extends KartLift implements BlockEntityProvider {
 
 
 
+
     @Override
     public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
         super.onPlaced(world, pos, state, placer, itemStack);
@@ -94,7 +95,7 @@ public class KartLiftBlock extends KartLift implements BlockEntityProvider {
             Direction facing = state.get(FACING);
 
             // create dummy blocks
-            BlockState dummyState = ModBlocks.KART_LIFT_DUMMY.getDefaultState().with(KartLift.FACING, facing);
+            BlockState dummyState = ModBlocks.KART_LIFT_DUMMY.getDefaultState().with(KartLiftBaseClass.FACING, facing);
 
             // get position of possible second lift
             BlockPos secondLiftPos = pos.offset(facing, 3).offset(Direction.UP, 1);
@@ -102,16 +103,15 @@ public class KartLiftBlock extends KartLift implements BlockEntityProvider {
 
             // check if there is a lift
             if(secondLiftState.getBlock() == ModBlocks.KART_LIFT) {
-                // and it is facing us and unassembled
-                if(secondLiftState.get(KartLift.FACING) == state.get(KartLift.FACING).getOpposite()
-                    && secondLiftState.get(ASSEMBLED) == false) {
+                // and it is facing us and unassembled (w/o control bugged somehow to true)
+                if(secondLiftState.get(KartLiftBaseClass.FACING) == state.get(KartLiftBaseClass.FACING).getOpposite() &&
+                    !secondLiftState.get(ASSEMBLED) &&
+                    !secondLiftState.get(IS_CONTROL)) {
 
-                    // we got a match!
+                    // update states
                     state = state.with(IS_CONTROL, true).with(ASSEMBLED, true);
                     secondLiftState = secondLiftState.with(ASSEMBLED, true);
-
-                    // update second lift one as well
-                    world.setBlockState(secondLiftPos, secondLiftState, 3);
+                    world.setBlockState(secondLiftPos, secondLiftState, 35);
                 }
             }
 
@@ -133,57 +133,56 @@ public class KartLiftBlock extends KartLift implements BlockEntityProvider {
     // -------------------- multiblock breaking --------------------
     @Override
     public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        // Check if the block is actually being destroyed (not just updated)
-        if (!state.isOf(newState.getBlock())) {
 
-            // 1. Quietly delete the Bottom Dummy (if it exists)
+        // block is broken (=replaced by another block which is not the dummy from the placing)
+        if (!state.isOf(newState.getBlock()) && !newState.isOf(ModBlocks.KART_LIFT_DUMMY)) {
+
+            // --- delete this multiblock
+            // delete bottom
             if (world.getBlockState(pos.down()).isOf(ModBlocks.KART_LIFT_DUMMY)) {
-                // The '35' flag quietly updates the world without triggering infinite loops
-                world.setBlockState(pos.down(), Blocks.AIR.getDefaultState(), 3);
+                world.setBlockState(pos.down(), Blocks.AIR.getDefaultState(), 35);
             }
 
-            // 2. Quietly delete the Top Dummy (if it exists)
+            // delete top
             if (world.getBlockState(pos.up()).isOf(ModBlocks.KART_LIFT_DUMMY)) {
-                world.setBlockState(pos.up(), Blocks.AIR.getDefaultState(), 3);
+                world.setBlockState(pos.up(), Blocks.AIR.getDefaultState(), 35);
             }
 
 
-
-            // if assembled -> disassemble
+            // --- delete assembly, if there is any
             if (state.contains(ASSEMBLED) && state.get(ASSEMBLED)) {
 
                 // get position of second lift
                 BlockPos secondLiftPos = pos.offset(state.get(FACING), 3);
                 BlockState secondLiftState = world.getBlockState(secondLiftPos);
 
-                // check if there is a lift there
-                if (secondLiftState.isOf(ModBlocks.KART_LIFT)) {
-                    // and it is facing us and assembled
-                    if (secondLiftState.get(KartLift.FACING) == state.get(KartLift.FACING).getOpposite()
-                            && secondLiftState.get(ASSEMBLED) == true) {
+                // check if there is a lift there, which is facing us and is assembled
+                if (secondLiftState.isOf(ModBlocks.KART_LIFT) &&
+                    secondLiftState.get(KartLiftBaseClass.FACING) == state.get(KartLiftBaseClass.FACING).getOpposite() &&
+                    secondLiftState.get(ASSEMBLED)) {
 
-                        // we got a match!
+                    // delete this one too
+                    world.breakBlock(secondLiftPos, true);
+                }
+            }
 
-                        if (state.get(IS_CONTROL) == true) {
-                            // DROP ITEM LOGIC
-                        } else if (secondLiftState.get(IS_CONTROL) == true) {
-                            // DROP ITEMS FROM HERE
-                        }
 
-                        // reset second lift
-                        secondLiftState = secondLiftState.with(ASSEMBLED, false).with(IS_CONTROL, false);
-
-                        // and update second lift
-                        world.setBlockState(secondLiftPos, secondLiftState, 3);
-                    }
+            // --- drop inventory (only control lift will drop!)
+            if (state.contains(IS_CONTROL) && state.get(IS_CONTROL)) {
+                BlockEntity be = world.getBlockEntity(pos);
+                if (be instanceof KartLiftBlockEntity liftBE) {
+                    // drop inventory logic => propagate to be class!
+                    BoKarts.LOGGER.info("dropping inv at {}", be.getPos().toShortString());
                 }
             }
 
             super.onStateReplaced(state, world, pos, newState, moved);
         }
-
-
     }
+
+
+
+
 
 
 
