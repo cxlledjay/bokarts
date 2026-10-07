@@ -3,9 +3,13 @@ package de.cxlledjay.bokarts.block.custom;
 import com.mojang.serialization.MapCodec;
 import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.block.ModBlocks;
+import de.cxlledjay.bokarts.block.entity.ModBlockEntities;
 import de.cxlledjay.bokarts.block.entity.custom.KartLiftBlockEntity;
 import net.minecraft.block.*;
+import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
@@ -16,6 +20,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.logging.Level;
 
 public class KartLiftCoreBlock extends KartLiftBaseClass implements BlockEntityProvider {
 
@@ -54,7 +60,6 @@ public class KartLiftCoreBlock extends KartLiftBaseClass implements BlockEntityP
         super.appendProperties(builder);
         builder.add(IS_CONTROL, ASSEMBLED);
     }
-
 
 
 
@@ -115,7 +120,8 @@ public class KartLiftCoreBlock extends KartLiftBaseClass implements BlockEntityP
                 }
             }
 
-
+            // remove block entity at initial placement
+            world.removeBlockEntity(pos);
 
             // build the 1x1x3 multiblock
             world.setBlockState(pos, dummyState, 3);
@@ -184,6 +190,26 @@ public class KartLiftCoreBlock extends KartLiftBaseClass implements BlockEntityP
 
 
 
+
+
+
+    // -------------------- block entity --------------------
+
+
+    @Override
+    public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+        // 1. Check if the game is asking to tick OUR specific block entity
+        if (type == ModBlockEntities.KART_LIFT_BE) {
+
+            // 2. Return the lambda that casts the generic blockEntity to your KartLiftBlockEntity and ticks it
+            return (world1, pos, state1, blockEntity) -> {
+                KartLiftBlockEntity.tick(world1, pos, state1, (KartLiftBlockEntity) blockEntity);
+            };
+        }
+
+        // If it's not our block entity, return null so it doesn't tick
+        return null;
+    }
 
 
 }

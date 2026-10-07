@@ -9,7 +9,6 @@ import net.minecraft.block.HorizontalFacingBlock;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.text.Text;
@@ -90,13 +89,12 @@ public abstract class KartLiftBaseClass extends Block {
             BlockEntity lift_be = world.getBlockEntity(corePos);
 
             // test if it exists and is the correct type
-            if (lift_be instanceof KartLiftBlockEntity) {
-                // Print to your IDE console
-                BoKarts.LOGGER.info("SUCCESS: Found KartLiftBlockEntity at {}", corePos.toShortString());
-                // Send a message directly to the player's chat so you don't have to tab out!
-                player.sendMessage(Text.literal("§aSUCCESS: Block Entity is alive and linked!"), false);
-                // log is_control
-                BoKarts.LOGGER.info("IS_CONTROL = {}", world.getBlockState(corePos).get(KartLiftCoreBlock.IS_CONTROL).booleanValue());
+            if (lift_be instanceof KartLiftBlockEntity lift) {
+
+                if(lift.animationState == KartLiftBlockEntity.LiftState.EMPTY) lift.animationState = KartLiftBlockEntity.LiftState.ANIMATION_UP;
+                else if(lift.animationState == KartLiftBlockEntity.LiftState.ACTIVE) lift.animationState = KartLiftBlockEntity.LiftState.ANIMATION_DOWN;
+                world.updateListeners(corePos, state, state, 3);
+
             } else {
                 BoKarts.LOGGER.info("ERROR: No BlockEntity found at {}", corePos.toShortString());
                 player.sendMessage(Text.literal("§cERROR: Block Entity is missing!"), false);
