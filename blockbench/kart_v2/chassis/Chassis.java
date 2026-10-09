@@ -134,7 +134,8 @@ public class Chassis extends EntityModel<Entity> {
 		ModelPartData cube_r21 = wheel.addChild("cube_r21", ModelPartBuilder.create().uv(43, 73).cuboid(-0.5F, -1.04F, 0.3522F, 1.0F, 1.0F, 1.0F, new Dilation(-0.15F))
 		.uv(38, 79).cuboid(-0.5F, -1.04F, -0.3478F, 1.0F, 1.0F, 1.0F, new Dilation(-0.15F)), ModelTransform.of(0.0F, -2.2F, 1.4978F, -0.7854F, 0.0F, 0.0F));
 
-		ModelPartData spokes = steering_wheel.addChild("spokes", ModelPartBuilder.create().uv(0, 77).cuboid(-0.5F, -0.137F, -0.4057F, 1.0F, 3.0F, 1.0F, new Dilation(-0.151F)), ModelTransform.pivot(0.0F, 0.1875F, -0.0617F));
+		ModelPartData spokes = steering_wheel.addChild("spokes", ModelPartBuilder.create().uv(0, 77).cuboid(-0.5F, -0.137F, -0.5057F, 1.0F, 3.0F, 1.0F, new Dilation(-0.151F))
+		.uv(5, 77).cuboid(-0.5F, -1.15F, -1.0F, 1.0F, 2.0F, 2.0F, new Dilation(-0.151F)), ModelTransform.pivot(0.0F, 0.1875F, -0.0617F));
 
 		ModelPartData cube_r22 = spokes.addChild("cube_r22", ModelPartBuilder.create().uv(6, 70).cuboid(-0.5F, -41.9F, -24.15F, 1.0F, 4.0F, 1.0F, new Dilation(-0.151F)), ModelTransform.of(0.0F, -1.237F, 44.9943F, 1.0472F, 0.0F, 0.0F));
 
@@ -151,17 +152,17 @@ public class Chassis extends EntityModel<Entity> {
 
 		ModelPartData accessoirs = kart_v2.addChild("accessoirs", ModelPartBuilder.create().uv(77, 80).cuboid(-7.75F, -3.75F, 2.5F, 2.0F, 1.0F, 3.0F, new Dilation(0.0F)), ModelTransform.pivot(0.0F, -1.0F, -1.0F));
 
-		ModelPartData lever = accessoirs.addChild("lever", ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
+		ModelPartData lever = accessoirs.addChild("lever", ModelPartBuilder.create(), ModelTransform.pivot(-6.75F, -3.8566F, 4.0452F));
 
-		ModelPartData cube_r26 = lever.addChild("cube_r26", ModelPartBuilder.create().uv(78, 75).cuboid(-0.5F, -0.25F, -1.5F, 1.0F, 1.0F, 3.0F, new Dilation(0.0F)), ModelTransform.of(-6.75F, -4.25F, 4.0F, -0.9599F, 0.0F, 0.0F));
+		ModelPartData cube_r26 = lever.addChild("cube_r26", ModelPartBuilder.create().uv(78, 75).cuboid(-0.5F, -0.5F, -1.75F, 1.0F, 1.0F, 3.0F, new Dilation(0.0F)), ModelTransform.of(0.0F, -0.0452F, -0.1066F, -0.9599F, 0.0F, 0.0F));
 
-		ModelPartData brake = accessoirs.addChild("brake", ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
+		ModelPartData brake = accessoirs.addChild("brake", ModelPartBuilder.create(), ModelTransform.pivot(2.0F, -2.1464F, -3.6036F));
 
-		ModelPartData cube_r27 = brake.addChild("cube_r27", ModelPartBuilder.create().uv(76, 68).cuboid(3.0F, -1.0F, -1.0F, 2.0F, 2.0F, 1.0F, new Dilation(-0.25F)), ModelTransform.of(-2.0F, -3.0F, -4.0F, 0.7854F, 0.0F, 0.0F));
+		ModelPartData cube_r27 = brake.addChild("cube_r27", ModelPartBuilder.create().uv(76, 68).cuboid(-1.0F, -2.0F, -0.5F, 2.0F, 2.0F, 1.0F, new Dilation(-0.25F)), ModelTransform.of(0.0F, 0.2071F, -0.0429F, 0.7854F, 0.0F, 0.0F));
 
-		ModelPartData gas = accessoirs.addChild("gas", ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
+		ModelPartData gas = accessoirs.addChild("gas", ModelPartBuilder.create(), ModelTransform.pivot(-2.0F, -2.0F, -3.0F));
 
-		ModelPartData cube_r28 = gas.addChild("cube_r28", ModelPartBuilder.create().uv(83, 67).cuboid(-1.0F, -1.5F, -0.5F, 2.0F, 3.0F, 1.0F, new Dilation(-0.25F)), ModelTransform.of(-2.0F, -3.0F, -4.0F, 0.7854F, 0.0F, 0.0F));
+		ModelPartData cube_r28 = gas.addChild("cube_r28", ModelPartBuilder.create().uv(83, 67).cuboid(-1.0F, -3.0F, -0.5F, 2.0F, 3.0F, 1.0F, new Dilation(-0.25F)), ModelTransform.of(0.0F, 0.0607F, 0.0607F, 0.7854F, 0.0F, 0.0F));
 
 		ModelPartData body = kart_v2.addChild("body", ModelPartBuilder.create().uv(0, 0).cuboid(-10.5F, -5.75F, -6.75F, 3.0F, 5.0F, 14.0F, new Dilation(-0.25F))
 		.uv(92, 0).cuboid(7.5F, -5.75F, -6.75F, 3.0F, 5.0F, 14.0F, new Dilation(-0.25F))

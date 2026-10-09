@@ -4,6 +4,7 @@ import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.entity.client.kartv2.ChassisModel;
 import de.cxlledjay.bokarts.entity.client.kartv2.wheels.WheelsModelBase;
 import de.cxlledjay.bokarts.entity.client.kartv2.wheels.WheelsModelNormal;
+import de.cxlledjay.bokarts.entity.client.kartv2.wheels.WheelsModelOffroad;
 import de.cxlledjay.bokarts.entity.custom.kart.KartEntity;
 import de.cxlledjay.bokarts.entity.custom.kart.property.WheelType;
 import net.minecraft.client.render.OverlayTexture;
@@ -43,7 +44,7 @@ public class KartRenderer extends EntityRenderer<KartEntity> {
         // wheels
         this.modelWheels.put(WheelType.STREET, new WheelsModelNormal<>(ctx.getPart(WheelsModelNormal.ENTITY_MODEL_LAYER)));
         this.modelWheels.put(WheelType.DRIFT, new WheelsModelNormal<>(ctx.getPart(WheelsModelNormal.ENTITY_MODEL_LAYER)));
-        this.modelWheels.put(WheelType.OFFROAD, new WheelsModelNormal<>(ctx.getPart(WheelsModelNormal.ENTITY_MODEL_LAYER)));
+        this.modelWheels.put(WheelType.OFFROAD, new WheelsModelOffroad<>(ctx.getPart(WheelsModelOffroad.ENTITY_MODEL_LAYER)));
     }
 
     @Override
