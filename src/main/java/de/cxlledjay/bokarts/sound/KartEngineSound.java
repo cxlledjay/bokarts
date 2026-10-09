@@ -1,7 +1,6 @@
 package de.cxlledjay.bokarts.sound;
 
-import de.cxlledjay.bokarts.BoKarts;
-import de.cxlledjay.bokarts.entity.custom.KartEntity;
+import de.cxlledjay.bokarts.entity.custom.kart.KartEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;

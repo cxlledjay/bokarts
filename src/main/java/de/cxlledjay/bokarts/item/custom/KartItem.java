@@ -2,7 +2,7 @@ package de.cxlledjay.bokarts.item.custom;
 
 import de.cxlledjay.bokarts.component.ModDataComponentTypes;
 import de.cxlledjay.bokarts.config.ClientSyncedConfig;
-import de.cxlledjay.bokarts.entity.custom.KartEntity;
+import de.cxlledjay.bokarts.entity.custom.kart.KartEntity;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;

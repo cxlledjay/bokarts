@@ -1,9 +1,10 @@
-package de.cxlledjay.bokarts.entity.custom;
+package de.cxlledjay.bokarts.entity.custom.kart;
 
-import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.component.ModDataComponentTypes;
 import de.cxlledjay.bokarts.config.ClientSyncedConfig;
 import de.cxlledjay.bokarts.entity.ModEntities;
+import de.cxlledjay.bokarts.entity.custom.kart.property.ModTrackedDataHandlers;
+import de.cxlledjay.bokarts.entity.custom.kart.property.WheelType;
 import de.cxlledjay.bokarts.item.ModItems;
 import de.cxlledjay.bokarts.networking.packet.KartInputPayloadC2S;
 import de.cxlledjay.bokarts.screen.custom.KartInventoryScreenHandler;
@@ -16,10 +17,11 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.*;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.data.TrackedDataHandler;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.passive.ArmadilloEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.vehicle.BoatEntity;
-import net.minecraft.entity.vehicle.VehicleEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -55,6 +57,9 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     private static final TrackedData<Float> ODO = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
     private static final TrackedData<Float> ENGINE_REVS = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
     private static final TrackedData<Float> STEERING_ANGLE = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
+
+    // v2
+    private static final TrackedData<WheelType> WHEEL_TYPE = DataTracker.registerData(KartEntity.class, ModTrackedDataHandlers.TRACKED_HANDLER);
 
     // -------------------- attributes --------------------
 
@@ -186,7 +191,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
     @Override
     public float getStepHeight() {
-        return 0.75F;
+        return this.getWheelType().getStepHeight();
     }
 
     @Override
@@ -793,6 +798,9 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         // animations
         builder.add(ENGINE_REVS, 0.0f);
         builder.add(STEERING_ANGLE, STEERING_CENTER);
+
+        // v2
+        builder.add(WHEEL_TYPE, WheelType.STREET);
     }
 
     @Override
@@ -806,6 +814,9 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
         nbt.putFloat("EngineRevs", this.getEngineRevs());
         nbt.putFloat("SteeringAngle", this.getSteeringAngle());
+
+        // v2
+        nbt.putInt("WheelType", this.getWheelType().getId()); // Enum -> Int
     }
 
     @Override
@@ -819,6 +830,8 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
         this.dataTracker.set(ENGINE_REVS, nbt.getFloat("EngineRevs"));
         this.dataTracker.set(STEERING_ANGLE, nbt.getFloat("SteeringAngle"));
+
+        if (nbt.contains("WheelType")) this.setWheelType(WheelType.fromId(nbt.getInt("WheelType")));
     }
 
     @Override
@@ -894,6 +907,18 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         this.dataTracker.set(STEERING_ANGLE, speed);
     }
 
+
+
+
+    // -------------------- v2 data trackers --------------------
+
+    public WheelType getWheelType() {
+        return this.dataTracker.get(WHEEL_TYPE);
+    }
+
+    public void setWheelType(WheelType type) {
+        this.dataTracker.set(WHEEL_TYPE, type);
+    }
 
 
 

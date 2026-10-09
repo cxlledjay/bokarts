@@ -1,7 +1,7 @@
 package de.cxlledjay.bokarts.networking.packet;
 
 import de.cxlledjay.bokarts.BoKarts;
-import de.cxlledjay.bokarts.entity.custom.KartEntity;
+import de.cxlledjay.bokarts.entity.custom.kart.KartEntity;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;

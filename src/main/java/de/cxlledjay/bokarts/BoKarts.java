@@ -6,6 +6,7 @@ import de.cxlledjay.bokarts.component.ModDataComponentTypes;
 import de.cxlledjay.bokarts.config.BoKartsConfig;
 import de.cxlledjay.bokarts.config.ClientSyncedConfig;
 import de.cxlledjay.bokarts.entity.ModEntities;
+import de.cxlledjay.bokarts.entity.custom.kart.property.ModTrackedDataHandlers;
 import de.cxlledjay.bokarts.item.ModItemGroups;
 import de.cxlledjay.bokarts.item.ModItems;
 import de.cxlledjay.bokarts.networking.ModPackets;
@@ -41,6 +42,7 @@ public class BoKarts implements ModInitializer {
 		ModBlocks.register();
 		ModBlockEntities.registerBlockEntities();
 		ModItemGroups.registerItemGroups();
+		ModTrackedDataHandlers.register();
 
 		// init MidnightLib config
 		MidnightConfig.init(MOD_ID, BoKartsConfig.class);

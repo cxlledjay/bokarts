@@ -1,12 +1,9 @@
 package de.cxlledjay.bokarts.item;
 
 import de.cxlledjay.bokarts.BoKarts;
-import de.cxlledjay.bokarts.entity.custom.KartEntity;
+import de.cxlledjay.bokarts.entity.custom.kart.KartEntity;
 import de.cxlledjay.bokarts.item.custom.KartItem;
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
-import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroups;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 

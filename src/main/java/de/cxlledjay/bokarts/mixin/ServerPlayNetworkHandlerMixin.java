@@ -1,6 +1,6 @@
 package de.cxlledjay.bokarts.mixin;
 
-import de.cxlledjay.bokarts.entity.custom.KartEntity;
+import de.cxlledjay.bokarts.entity.custom.kart.KartEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;

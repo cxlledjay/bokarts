@@ -1,7 +1,7 @@
 package de.cxlledjay.bokarts.entity;
 
 import de.cxlledjay.bokarts.BoKarts;
-import de.cxlledjay.bokarts.entity.custom.KartEntity;
+import de.cxlledjay.bokarts.entity.custom.kart.KartEntity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.registry.Registries;

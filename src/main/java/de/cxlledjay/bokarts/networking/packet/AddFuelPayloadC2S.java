@@ -1,7 +1,7 @@
 package de.cxlledjay.bokarts.networking.packet;
 
 import de.cxlledjay.bokarts.BoKarts;
-import de.cxlledjay.bokarts.entity.custom.KartEntity;
+import de.cxlledjay.bokarts.entity.custom.kart.KartEntity;
 import de.cxlledjay.bokarts.screen.custom.KartInventoryScreenHandler;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.player.PlayerEntity;

@@ -1,6 +1,6 @@
 package de.cxlledjay.bokarts.screen.custom;
 
-import de.cxlledjay.bokarts.entity.custom.KartEntity;
+import de.cxlledjay.bokarts.entity.custom.kart.KartEntity;
 import de.cxlledjay.bokarts.screen.ModScreenHandlers;
 import de.cxlledjay.bokarts.util.KartFuelItems;
 import net.minecraft.entity.player.PlayerEntity;
