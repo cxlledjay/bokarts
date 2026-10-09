@@ -20,7 +20,6 @@ public class ModEntities {
 
     public static void registerModEntities() {
         BoKarts.LOGGER.info("Registering Mod Entities for " + BoKarts.MOD_ID);
-
     }
 
 }

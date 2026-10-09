@@ -509,8 +509,8 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         else {
 
             // for lerping steering angle (still able steer when no fuel!)
-            this.steeringAngle = this.getSteeringAngle();
             this.steeringAnglePrev = this.steeringAngle;
+            this.steeringAngle = this.getSteeringAngle();
 
 
             // do no animations or sound when out of fuel!

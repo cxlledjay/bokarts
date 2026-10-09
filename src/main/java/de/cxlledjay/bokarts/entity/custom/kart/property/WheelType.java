@@ -14,9 +14,8 @@ import java.util.function.IntFunction;
 
 public enum WheelType implements StringIdentifiable {
     STREET(0,"street"),
-    RACE(1,"race"),
-    DRIFT(2,"drift"),
-    OFFROAD(3,"offroad") {
+    DRIFT(1,"drift"),
+    OFFROAD(2,"offroad") {
         @Override
         public float getStepHeight() {
             return 1.05f;
@@ -48,8 +47,8 @@ public enum WheelType implements StringIdentifiable {
         this.name = name;
 
         // create paths for textures
-        this.texture = BoKarts.id("textures/entity/kartv2/wheel/" + name + ".png");
-        this.overlay = BoKarts.id("textures/entity/kartv2/wheel/" + name + "_overlay.png");
+        this.texture = BoKarts.id("textures/entity/kartv2/wheels/" + name + ".png");
+        this.overlay = BoKarts.id("textures/entity/kartv2/wheels/" + name + "_overlay.png");
     }
 
 
