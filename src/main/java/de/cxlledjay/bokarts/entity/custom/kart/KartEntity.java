@@ -9,7 +9,6 @@ import de.cxlledjay.bokarts.item.ModItems;
 import de.cxlledjay.bokarts.networking.packet.KartInputPayloadC2S;
 import de.cxlledjay.bokarts.screen.custom.KartInventoryScreenHandler;
 import de.cxlledjay.bokarts.sound.KartEngineSound;
-import de.cxlledjay.bokarts.sound.ModSounds;
 import de.cxlledjay.bokarts.util.KartFuelItems;
 import de.cxlledjay.bokarts.util.ModTags;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -31,7 +30,6 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -784,7 +782,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         // v2
         builder.add(HORN_TYPE, HornType.HORN1);
         builder.add(WHEEL_TYPE, WheelType.STREET);
-        builder.add(ENGINE_TYPE, EngineType.COPPER);
+        builder.add(ENGINE_TYPE, EngineType.ENGINE_COPPER);
         builder.add(BODY_TYPE, BodyType.SOLID_COLOR_OVERLAY);
         builder.add(SPOILER_TYPE, SpoilerType.NONE);
         builder.add(AERO_TYPE, AeroType.NONE);

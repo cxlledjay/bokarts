@@ -12,10 +12,10 @@ import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.function.ValueLists;
 
 public enum EngineType implements StringIdentifiable {
-    COPPER(0, "copper"),
-    IRON(1, "iron"),
-    GOLD(2, "gold"),
-    DIAMOND(3, "diamond");
+    ENGINE_COPPER(0, "engine_copper"),
+    ENGINE_IRON(1, "engine_iron"),
+    ENGINE_GOLD(2, "engine_gold"),
+    ENGINE_DIAMOND(3, "engine_diamond");
 
     // id to value function
     private static final IntFunction<EngineType> INDEX_TO_VALUE = ValueLists.createIdToValueFunction(

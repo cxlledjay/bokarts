@@ -1,7 +1,7 @@
 package de.cxlledjay.bokarts.entity.client.kartv2;
 
 import de.cxlledjay.bokarts.BoKarts;
-import de.cxlledjay.bokarts.entity.custom.kart.KartEntity;// Made with Blockbench 5.2.2
+import de.cxlledjay.bokarts.entity.custom.kart.KartEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.model.*;
 import net.minecraft.client.render.VertexConsumer;
