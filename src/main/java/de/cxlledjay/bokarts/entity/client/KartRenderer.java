@@ -130,7 +130,7 @@ public class KartRenderer extends EntityRenderer<KartEntity> {
         Identifier wheelOverlayTexture = wheelType.getOverlayTexture();
 
         // rim color
-        int rimColor = 0xFFFF0000; // ARGB integer (e.g. 0xFFFF0000 for red)
+        int rimColor = entity.getWheelColor();
 
         // animate model
         wheelModel.setAngles(entity, tickDelta, 0.0f, -0.1f, 0.0f, 0.0f);
@@ -140,8 +140,8 @@ public class KartRenderer extends EntityRenderer<KartEntity> {
         wheelModel.render(matrices, baseConsumer, light, OverlayTexture.DEFAULT_UV, 0xFFFFFFFF);
 
         // draw overlay texture
-        // VertexConsumer overlayConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityCutoutNoCull(wheelOverlayTexture));
-        // wheelModel.render(matrices, overlayConsumer, light, OverlayTexture.DEFAULT_UV, rimColor);
+        VertexConsumer overlayConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityCutoutNoCull(wheelOverlayTexture));
+        wheelModel.render(matrices, overlayConsumer, light, OverlayTexture.DEFAULT_UV, rimColor);
     }
 
 
