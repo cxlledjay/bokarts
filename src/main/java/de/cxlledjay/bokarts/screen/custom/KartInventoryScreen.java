@@ -147,7 +147,7 @@ public class KartInventoryScreen extends HandledScreen<KartInventoryScreenHandle
         if(this.kart != null){
             fuelCapacityString = KartEntity.getFormattedFuelCapacityString(this.kart.currentFuel);
             odoString = KartEntity.getFormattedDistanceString(this.kart.currentOdometer);
-            hornString = "[" + (this.kart.getHornSound().ordinal()+1) + "/10]";
+            hornString = "[" + (this.kart.getHornType().getId()+1) + "/10]";
 
             float fuelCapacityPercentage = this.kart.currentFuel / ClientSyncedConfig.getMaxFuelCapacity();
             if(fuelCapacityPercentage > 0.5) {

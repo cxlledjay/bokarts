@@ -3,8 +3,8 @@ package de.cxlledjay.bokarts.entity.custom.kart;
 import de.cxlledjay.bokarts.component.ModDataComponentTypes;
 import de.cxlledjay.bokarts.config.ClientSyncedConfig;
 import de.cxlledjay.bokarts.entity.ModEntities;
-import de.cxlledjay.bokarts.entity.custom.kart.property.ModTrackedDataHandlers;
-import de.cxlledjay.bokarts.entity.custom.kart.property.WheelType;
+import de.cxlledjay.bokarts.entity.custom.ModTrackedDataHandlers;
+import de.cxlledjay.bokarts.entity.custom.kart.property.*;
 import de.cxlledjay.bokarts.item.ModItems;
 import de.cxlledjay.bokarts.networking.packet.KartInputPayloadC2S;
 import de.cxlledjay.bokarts.screen.custom.KartInventoryScreenHandler;
@@ -17,9 +17,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.*;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
-import net.minecraft.entity.data.TrackedDataHandler;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
-import net.minecraft.entity.passive.ArmadilloEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.item.Item;
@@ -51,15 +49,22 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     private static final float ENGINE_ACCELERATION = 0.1f;
 
     // -------------------- tracked data --------------------
-    private static final TrackedData<String> PAINT_COLOR = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.STRING);
-    private static final TrackedData<String> HORN_SOUND = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.STRING);
+    private static final TrackedData<HornType> HORN_TYPE = DataTracker.registerData(KartEntity.class, ModTrackedDataHandlers.HORN_TYPE_TRACKED_DATA_HANDLER);
     private static final TrackedData<Float> FUEL = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
     private static final TrackedData<Float> ODO = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
     private static final TrackedData<Float> ENGINE_REVS = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
     private static final TrackedData<Float> STEERING_ANGLE = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
 
     // v2
-    private static final TrackedData<WheelType> WHEEL_TYPE = DataTracker.registerData(KartEntity.class, ModTrackedDataHandlers.TRACKED_HANDLER);
+    private static final TrackedData<WheelType> WHEEL_TYPE = DataTracker.registerData(KartEntity.class, ModTrackedDataHandlers.WHEEL_TYPE_TRACKED_DATA_HANDLER);
+    private static final TrackedData<EngineType> ENGINE_TYPE = DataTracker.registerData(KartEntity.class, ModTrackedDataHandlers.ENGINE_TYPE_TRACKED_DATA_HANDLER);
+    private static final TrackedData<BodyType> BODY_TYPE = DataTracker.registerData(KartEntity.class, ModTrackedDataHandlers.BODY_TYPE_TRACKED_DATA_HANDLER);
+    private static final TrackedData<SpoilerType> SPOILER_TYPE = DataTracker.registerData(KartEntity.class, ModTrackedDataHandlers.SPOILER_TYPE_TRACKED_DATA_HANDLER);
+    private static final TrackedData<AeroType> AERO_TYPE = DataTracker.registerData(KartEntity.class, ModTrackedDataHandlers.AERO_TYPE_TRACKED_DATA_HANDLER);
+
+    private static final TrackedData<Integer> WHEEL_COLOR = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    private static final TrackedData<Integer> BODY_COLOR = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    private static final TrackedData<Integer> RACE_NUMBER = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.INTEGER);
 
     // -------------------- attributes --------------------
 
@@ -307,27 +312,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
     @Override
     public Item asItem() {
-        return switch (this.getPaintColor()) {
-            case WHITE -> ModItems.KART_WHITE;
-            case ORANGE -> ModItems.KART_ORANGE;
-            case MAGENTA -> ModItems.KART_MAGENTA;
-            case LIGHT_BLUE -> ModItems.KART_LIGHT_BLUE;
-            case YELLOW -> ModItems.KART_YELLOW;
-            case LIME -> ModItems.KART_LIME;
-            case PINK -> ModItems.KART_PINK;
-            case GRAY -> ModItems.KART_GRAY;
-            case LIGHT_GRAY -> ModItems.KART_LIGHT_GRAY;
-            case CYAN -> ModItems.KART_CYAN;
-            case PURPLE -> ModItems.KART_PURPLE;
-            case BLUE -> ModItems.KART_BLUE;
-            case BROWN -> ModItems.KART_BROWN;
-            case GREEN -> ModItems.KART_GREEN;
-            case RED -> ModItems.KART_RED;
-            case BLACK -> ModItems.KART_BLACK;
-            case PURPLE_GOLD -> ModItems.KART_PURPLE_GOLD;
-            case FADE -> ModItems.KART_FADE;
-            default -> ModItems.KART_DEFAULT;
-        };
+        return ModItems.KART_DEFAULT;
     }
 
     // set data component types of ItemStack to tracked data
@@ -341,7 +326,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         this.setOdometerSynced(this.currentOdometer);
 
         // set DataComponentTypes
-        stack.set(ModDataComponentTypes.KART_ITEM_HORN_SOUND, this.getHornSound().asString());
+        stack.set(ModDataComponentTypes.KART_ITEM_HORN_TYPE, this.getHornType());
         stack.set(ModDataComponentTypes.KART_ITEM_FUEL, this.getFuelSynced());
         stack.set(ModDataComponentTypes.KART_ITEM_ODOMETER, this.getOdometerSynced());
 
@@ -659,7 +644,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         this.getWorld().playSound(
                 null, // Excluded player (null = everyone hears it)
                 this.getX(), this.getY(), this.getZ(),
-                this.getHornSound().getSoundEvent(),
+                this.getHornType().getSoundEvent(),
                 SoundCategory.PLAYERS,
                 0.8f, // Volume
                 1.0f  // Pitch
@@ -669,22 +654,22 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     public void cycleHornSound(ServerPlayerEntity player, int direction) {
 
         // calculate HornSound
-        KartEntity.HornSounds newSound;
+        HornType newHorn;
         if(direction > 0) {
             // next
-            newSound = this.getHornSound().next();
+            newHorn = this.getHornType().next();
         } else {
             // previous
-            newSound = this.getHornSound().previous();
+            newHorn = this.getHornType().previous();
         }
 
         // preview HornSound
-        Identifier oldSoundId = this.getHornSound().getSoundEvent().getId();
+        Identifier oldSoundId = this.getHornType().getSoundEvent().getId();
         player.networkHandler.sendPacket(new StopSoundS2CPacket(oldSoundId, SoundCategory.PLAYERS));
-        player.playSoundToPlayer(newSound.getSoundEvent(), SoundCategory.PLAYERS, 1.0f, 1.0f);
+        player.playSoundToPlayer(newHorn.getSoundEvent(), SoundCategory.PLAYERS, 1.0f, 1.0f);
 
         // set HornSound for Kart
-        this.setHornSound(newSound);
+        this.setHornType(newHorn);
     }
 
 
@@ -787,9 +772,6 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     @Override
     protected void initDataTracker(DataTracker.Builder builder) {
         super.initDataTracker(builder);
-        // customization
-        builder.add(PAINT_COLOR, "default");
-        builder.add(HORN_SOUND, "horn_1");
 
         // fuel and distance
         builder.add(FUEL, 0.0f);
@@ -800,14 +782,20 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         builder.add(STEERING_ANGLE, STEERING_CENTER);
 
         // v2
+        builder.add(HORN_TYPE, HornType.HORN1);
         builder.add(WHEEL_TYPE, WheelType.STREET);
+        builder.add(ENGINE_TYPE, EngineType.COPPER);
+        builder.add(BODY_TYPE, BodyType.SOLID_COLOR_OVERLAY);
+        builder.add(SPOILER_TYPE, SpoilerType.NONE);
+        builder.add(AERO_TYPE, AeroType.NONE);
+        builder.add(BODY_COLOR, 0xFFFFFFFF);
+        builder.add(WHEEL_COLOR, 0xFFFFFFFF);
+        builder.add(RACE_NUMBER, 0);
     }
 
     @Override
     protected void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
-        nbt.putString("PaintColor", this.getPaintColor().toString());
-        nbt.putString("HornSound", this.getHornSound().toString());
 
         nbt.putFloat("Fuel", this.getFuelSynced());
         nbt.putFloat("Odo", this.getOdometerSynced());
@@ -816,22 +804,79 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         nbt.putFloat("SteeringAngle", this.getSteeringAngle());
 
         // v2
-        nbt.putInt("WheelType", this.getWheelType().getId()); // Enum -> Int
+        nbt.putInt("HornType", this.getHornType().getId());
+        nbt.putInt("WheelType", this.getWheelType().getId());
+        nbt.putInt("EngineType", this.getEngineType().getId());
+        nbt.putInt("BodyType", this.getBodyType().getId());
+        nbt.putInt("SpoilerType", this.getSpoilerType().getId());
+        nbt.putInt("AeroType", this.getAeroType().getId());
+        nbt.putInt("BodyColor", this.getBodyColor());
+        nbt.putInt("WheelColor", this.getWheelColor());
+        nbt.putInt("RaceNumber", this.getRaceNumber());
     }
 
     @Override
     protected void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
-        this.dataTracker.set(PAINT_COLOR, nbt.getString("PaintColor"));
-        this.dataTracker.set(HORN_SOUND, nbt.getString("HornSound"));
 
-        this.dataTracker.set(FUEL, nbt.getFloat("Fuel"));
-        this.dataTracker.set(ODO, nbt.getFloat("Odo"));
+        // convert old paints
+        if (nbt.contains("PaintColor")) {
 
-        this.dataTracker.set(ENGINE_REVS, nbt.getFloat("EngineRevs"));
-        this.dataTracker.set(STEERING_ANGLE, nbt.getFloat("SteeringAngle"));
+            String oldPaintColorAttribute =  nbt.getString("PaintColor");
 
+            BodyType bodyType = switch (oldPaintColorAttribute) {
+                case "fade" -> BodyType.LIVERY_FADE;
+                default -> BodyType.SOLID_COLOR_OVERLAY;
+            };
+
+            int bodyColor = switch (oldPaintColorAttribute) {
+                case "orange" -> 0xFFF9801D;
+                case "magenta" -> 0xFFC74EBD;
+                case "light_blue" -> 0xFF3AB3DA;
+                case "yellow" -> 0xFFFED83D;
+                case "lime" -> 0xFF80C71F;
+                case "pink" -> 0xFFF38BAA;
+                case "gray" -> 0xFF474F52;
+                case "light_gray" -> 0xFF9D9D97;
+                case "cyan" -> 0xFF169C9C;
+                case "purple" -> 0xFF8932B8;
+                case "blue" -> 0xFF3C44AA;
+                case "brown" -> 0xFF835432;
+                case "green" -> 0xFF5E7C16;
+                case "red" -> 0xFFB02E26;
+                case "black" -> 0xFF1D1D21;
+                case "purple_gold" -> 0xFF70569C;
+                case "default" -> 0xFFA086D3;
+                default -> 0xFFFFFFFF;
+            };
+
+            int wheelColor = switch (oldPaintColorAttribute) {
+                case "purple_gold" -> 0xFFC0996F;
+                case "fade" -> 0xFFA43148;
+                default -> 0xFFFFFFFF;
+            };
+
+            this.setBodyType(bodyType);
+            this.setBodyColor(bodyColor);
+            this.setWheelColor(wheelColor);
+        }
+
+        if (nbt.contains("Fuel")) this.setFuelSynced(nbt.getFloat("Fuel"));
+        if (nbt.contains("Odo")) this.setOdometerSynced(nbt.getFloat("Odo"));
+
+        if (nbt.contains("EngineRevs")) this.setEngineRevs(nbt.getFloat("EngineRevs"));
+        if (nbt.contains("SteeringAngle")) this.setSteeringAngle(nbt.getFloat("SteeringAngle"));
+
+        if (nbt.contains("HornType")) this.setHornType(HornType.fromId(nbt.getInt("HornType")));
+        else if (nbt.contains("HornSound")) this.setHornType(HornType.HORN1); //< update from old horn system
         if (nbt.contains("WheelType")) this.setWheelType(WheelType.fromId(nbt.getInt("WheelType")));
+        if (nbt.contains("EngineType")) this.setEngineType(EngineType.fromId(nbt.getInt("EngineType")));
+        if (nbt.contains("BodyType")) this.setBodyType(BodyType.fromId(nbt.getInt("BodyType")));
+        if (nbt.contains("SpoilerType")) this.setSpoilerType(SpoilerType.fromId(nbt.getInt("SpoilerType")));
+        if (nbt.contains("AeroType")) this.setAeroType(AeroType.fromId(nbt.getInt("AeroType")));
+        if (nbt.contains("BodyColor")) this.setBodyColor(nbt.getInt("BodyColor"));
+        if (nbt.contains("WheelColor")) this.setWheelColor(nbt.getInt("WheelColor"));
+        if (nbt.contains("RaceNumber")) this.setRaceNumber(nbt.getInt("RaceNumber"));
     }
 
     @Override
@@ -852,177 +897,91 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
 
     // ==================== getter and setter related to data tracking ====================
-
-    public PaintColor getPaintColor() {
-        return PaintColor.getColor(this.dataTracker.get(PAINT_COLOR));
+    public HornType getHornType() {
+        return this.dataTracker.get(HORN_TYPE);
+    }
+    public void setHornType(HornType type) {
+        this.dataTracker.set(HORN_TYPE, type);
     }
 
-    public void setPaintColor(PaintColor paintColor) {
-        this.dataTracker.set(PAINT_COLOR, paintColor.toString());
-    }
-
-    public HornSounds getHornSound() {
-        return HornSounds.getHornSound(this.dataTracker.get(HORN_SOUND));
-    }
-
-    public void setHornSound(HornSounds hornSounds) {
-        this.dataTracker.set(HORN_SOUND, hornSounds.toString());
-    }
-
-
-
+    // driving stats
     public Float getFuelSynced() {
         return this.dataTracker.get(FUEL);
     }
-
     public void setFuelSynced(Float range) {
         if(range < 0.0f) range = 0.0f;
         this.dataTracker.set(FUEL, range);
     }
-
     public Float getOdometerSynced() {
         return this.dataTracker.get(ODO);
     }
-
     public void setOdometerSynced(Float odometer) {
         if(odometer < 0.0f) odometer = 0.0f;
         this.dataTracker.set(ODO, odometer);
     }
 
-
-
+    // animations
     public Float getEngineRevs() {
         return this.dataTracker.get(ENGINE_REVS);
     }
-
     private void setEngineRevs(Float acceleration) {
         this.dataTracker.set(ENGINE_REVS, acceleration);
     }
-
     public Float getSteeringAngle() {
         return this.dataTracker.get(STEERING_ANGLE);
     }
-
     private void setSteeringAngle(Float speed) {
         this.dataTracker.set(STEERING_ANGLE, speed);
     }
 
-
-
-
-    // -------------------- v2 data trackers --------------------
-
+    // kartv2 modifications
     public WheelType getWheelType() {
         return this.dataTracker.get(WHEEL_TYPE);
     }
-
     public void setWheelType(WheelType type) {
         this.dataTracker.set(WHEEL_TYPE, type);
     }
-
-
-
-    // ==================== customization ====================
-
-    public enum PaintColor implements StringIdentifiable {
-        DEFAULT     ("default"),
-
-        // vanilla dye colors
-        WHITE       ("white"),
-        ORANGE      ("orange"),
-        MAGENTA     ("magenta"),
-        LIGHT_BLUE  ("light_blue"),
-        YELLOW      ("yellow"),
-        LIME        ("lime"),
-        PINK        ("pink"),
-        GRAY        ("gray"),
-        LIGHT_GRAY  ("light_gray"),
-        CYAN        ("cyan"),
-        PURPLE      ("purple"),
-        BLUE        ("blue"),
-        BROWN       ("brown"),
-        GREEN       ("green"),
-        RED         ("red"),
-        BLACK       ("black"),
-
-        // custom variants
-        PURPLE_GOLD("purple_gold"),
-        FADE("fade");
-
-        private final String name;
-
-        public static final StringIdentifiable.EnumCodec<KartEntity.PaintColor> CODEC = StringIdentifiable.createCodec(KartEntity.PaintColor::values);
-
-        PaintColor(final String name) {
-            this.name = name;
-        }
-
-        @Override
-        public String asString() {
-            return this.name;
-        }
-
-        @Override
-        public String toString() {
-            return this.name;
-        }
-
-        public static KartEntity.PaintColor getColor(String name) {
-            return CODEC.byId(name, DEFAULT);
-        }
+    public EngineType getEngineType() {
+        return this.dataTracker.get(ENGINE_TYPE);
+    }
+    public void setEngineType(EngineType type) {
+        this.dataTracker.set(ENGINE_TYPE, type);
+    }
+    public BodyType getBodyType() {
+        return this.dataTracker.get(BODY_TYPE);
+    }
+    public void setBodyType(BodyType type) {
+        this.dataTracker.set(BODY_TYPE, type);
+    }
+    public SpoilerType getSpoilerType() {
+        return this.dataTracker.get(SPOILER_TYPE);
+    }
+    public void setSpoilerType(SpoilerType type) {
+        this.dataTracker.set(SPOILER_TYPE, type);
+    }
+    public AeroType getAeroType() {
+        return this.dataTracker.get(AERO_TYPE);
+    }
+    public void setAeroType(AeroType type) {
+        this.dataTracker.set(AERO_TYPE, type);
     }
 
-
-    // horn sound effects
-    public enum HornSounds implements StringIdentifiable {
-        HORN1("horn_1", ModSounds.HORN_CIVIC),
-        HORN2("horn_2", ModSounds.HORN_MINI),
-        HORN3("horn_3", ModSounds.HORN_BIKE),
-        VILLAGER("villager", SoundEvents.ENTITY_VILLAGER_HURT),
-        METAL_PIPE("metal_pipe", ModSounds.HORN_METAL_PIPE),
-        DISCORD_JOIN("discord_join", ModSounds.HORN_DISCORD_JOIN),
-        DISCORD_LEAVE("discord_leave", ModSounds.HORN_DISCORD_LEAVE),
-        AUGHH("aughh", ModSounds.HORN_AUGHH),
-        RIZZ("rizz", ModSounds.HORN_RIZZ),
-        YODA("yoda", ModSounds.HORN_YODA);
-
-
-        private final String name;
-        private final SoundEvent soundEvent;
-        public static final StringIdentifiable.EnumCodec<KartEntity.HornSounds> CODEC = StringIdentifiable.createCodec(KartEntity.HornSounds::values);
-
-        HornSounds(final String name, SoundEvent soundEvent) {
-            this.name = name;
-            this.soundEvent = soundEvent;
-        }
-
-        @Override
-        public String asString() {
-            return this.name;
-        }
-
-        @Override
-        public String toString() {
-            return this.name;
-        }
-
-        public static KartEntity.HornSounds getHornSound(String name) {
-            return CODEC.byId(name, HORN1);
-        }
-
-        public SoundEvent getSoundEvent() {
-            return this.soundEvent;
-        }
-
-        // next and previous select logic
-        private static final HornSounds[] vals = values();
-
-        public HornSounds next() {
-            return vals[(this.ordinal() + 1) % vals.length];
-        }
-
-        public HornSounds previous() {
-            return vals[((this.ordinal() + vals.length) - 1) % vals.length];
-        }
+    public int getBodyColor() {
+        return this.dataTracker.get(BODY_COLOR);
+    }
+    public void setBodyColor(int type) {
+        this.dataTracker.set(BODY_COLOR, type);
+    }
+    public int getWheelColor() {
+        return this.dataTracker.get(WHEEL_COLOR);
+    }
+    public void setWheelColor(int type) {
+        this.dataTracker.set(WHEEL_COLOR, type);
+    }
+    public int getRaceNumber() {
+        return this.dataTracker.get(RACE_NUMBER);
+    }
+    public void setRaceNumber(int type) {
+        this.dataTracker.set(RACE_NUMBER, type);
     }
 }

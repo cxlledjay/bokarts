@@ -3,7 +3,6 @@ package de.cxlledjay.bokarts.entity.custom.kart.property;
 import com.mojang.serialization.Codec;
 import de.cxlledjay.bokarts.BoKarts;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.data.TrackedDataHandler;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.util.Identifier;

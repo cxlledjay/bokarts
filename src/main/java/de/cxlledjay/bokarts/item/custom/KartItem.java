@@ -3,6 +3,7 @@ package de.cxlledjay.bokarts.item.custom;
 import de.cxlledjay.bokarts.component.ModDataComponentTypes;
 import de.cxlledjay.bokarts.config.ClientSyncedConfig;
 import de.cxlledjay.bokarts.entity.custom.kart.KartEntity;
+import de.cxlledjay.bokarts.entity.custom.kart.property.HornType;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -28,14 +29,12 @@ import java.util.function.Predicate;
 public class KartItem extends Item {
 
     private static final Predicate<Entity> RIDERS = EntityPredicates.EXCEPT_SPECTATOR.and(Entity::canHit);
-    private final KartEntity.PaintColor paintColor;
 
-    public KartItem(KartEntity.PaintColor paintColor, Item.Settings settings) {
+    public KartItem(Item.Settings settings) {
         super(settings);
-        this.paintColor = paintColor;
 
         // default data tracking
-        getDefaultStack().set(ModDataComponentTypes.KART_ITEM_HORN_SOUND, "horn_1");
+        getDefaultStack().set(ModDataComponentTypes.KART_ITEM_HORN_TYPE, HornType.HORN1);
         getDefaultStack().set(ModDataComponentTypes.KART_ITEM_FUEL, 0.0f);
         getDefaultStack().set(ModDataComponentTypes.KART_ITEM_ODOMETER, 0.0f);
     }
@@ -48,7 +47,7 @@ public class KartItem extends Item {
                 // Initialize default stats directly onto the base item
                 .component(ModDataComponentTypes.KART_ITEM_FUEL, 0.0f)
                 .component(ModDataComponentTypes.KART_ITEM_ODOMETER, 0.0f)
-                .component(ModDataComponentTypes.KART_ITEM_HORN_SOUND, "horn_1"); // Adjust type/value to match your horn component
+                .component(ModDataComponentTypes.KART_ITEM_HORN_TYPE, HornType.HORN1);
     }
 
 
@@ -57,9 +56,9 @@ public class KartItem extends Item {
 
         if(Screen.hasShiftDown()) {
             tooltip.add(Text.translatable("tooltip.bokarts.kart_item.details"));
-            if(stack.get(ModDataComponentTypes.KART_ITEM_HORN_SOUND) != null) {
+            if(stack.get(ModDataComponentTypes.KART_ITEM_HORN_TYPE) != null) {
                 String s = Text.translatable("tooltip.bokarts.kart_item.horn").getString()
-                        + " : §5\"" + stack.get(ModDataComponentTypes.KART_ITEM_HORN_SOUND) + "\"";
+                        + " : §5\"" + stack.get(ModDataComponentTypes.KART_ITEM_HORN_TYPE).asString() + "\"";
                 tooltip.add(Text.literal(s));
             }
             if(stack.get(ModDataComponentTypes.KART_ITEM_FUEL) != null) {
@@ -115,14 +114,13 @@ public class KartItem extends Item {
 
         if (hitResult.getType() == HitResult.Type.BLOCK) {
             KartEntity kart = this.createEntity(world, hitResult, itemStack, user);
-            kart.setPaintColor(this.paintColor);
             kart.setYaw(user.getYaw());
             if (!world.isSpaceEmpty(kart, kart.getBoundingBox())) {
                 return TypedActionResult.fail(itemStack);
             }
 
             // add tracked data to kart
-            kart.setHornSound(KartEntity.HornSounds.getHornSound(itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_HORN_SOUND, "horn_1")));
+            kart.setHornType(itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_HORN_TYPE, HornType.HORN1));
             kart.setFuelSynced(itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_FUEL, 0.0f));
             kart.setOdometerSynced(itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_ODOMETER, 0.0f));
 

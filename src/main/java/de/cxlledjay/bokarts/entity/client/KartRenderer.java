@@ -6,6 +6,7 @@ import de.cxlledjay.bokarts.entity.client.kartv2.wheels.WheelsModelBase;
 import de.cxlledjay.bokarts.entity.client.kartv2.wheels.WheelsModelNormal;
 import de.cxlledjay.bokarts.entity.client.kartv2.wheels.WheelsModelOffroad;
 import de.cxlledjay.bokarts.entity.custom.kart.KartEntity;
+import de.cxlledjay.bokarts.entity.custom.kart.property.BodyType;
 import de.cxlledjay.bokarts.entity.custom.kart.property.WheelType;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
@@ -104,9 +105,14 @@ public class KartRenderer extends EntityRenderer<KartEntity> {
         this.modelChassis.render(matrices, baseConsumer, light, OverlayTexture.DEFAULT_UV, 0xFFFFFFFF);
 
         // draw overlay texture
-        // Identifier liveryTexture = BoKarts.id("textures/entity/kart/livery/" + entity.getLivery().asString() + ".png");
-        // VertexConsumer liveryConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityTranslucent(liveryTexture));
-        // this.modelChassis.render(matrices, liveryConsumer, light, OverlayTexture.DEFAULT_UV, 0xFFFFFFFF);
+        Identifier overlayTexture = BoKarts.id("textures/entity/kartv2/body/" + entity.getBodyType().asString() + ".png");
+        int overlayColor = 0xFFFFFFFF;
+        if(entity.getBodyType() == BodyType.SOLID_COLOR_OVERLAY) {
+            // apply custom color
+            overlayColor = entity.getBodyColor();
+        }
+        VertexConsumer liveryConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityTranslucent(overlayTexture));
+        this.modelChassis.render(matrices, liveryConsumer, light, OverlayTexture.DEFAULT_UV, overlayColor);
     }
 
     private void renderWheels(KartEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {

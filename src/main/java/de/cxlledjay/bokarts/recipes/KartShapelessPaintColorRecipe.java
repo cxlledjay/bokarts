@@ -54,8 +54,8 @@ public class KartShapelessPaintColorRecipe extends ShapelessRecipe {
         if (oldKartStack.contains(ModDataComponentTypes.KART_ITEM_ODOMETER)) {
             newKartStack.set(ModDataComponentTypes.KART_ITEM_ODOMETER, oldKartStack.get(ModDataComponentTypes.KART_ITEM_ODOMETER));
         }
-        if (oldKartStack.contains(ModDataComponentTypes.KART_ITEM_HORN_SOUND)) {
-            newKartStack.set(ModDataComponentTypes.KART_ITEM_HORN_SOUND, oldKartStack.get(ModDataComponentTypes.KART_ITEM_HORN_SOUND));
+        if (oldKartStack.contains(ModDataComponentTypes.KART_ITEM_HORN_TYPE)) {
+            newKartStack.set(ModDataComponentTypes.KART_ITEM_HORN_TYPE, oldKartStack.get(ModDataComponentTypes.KART_ITEM_HORN_TYPE));
         }
 
         // return modified new ItemStack
