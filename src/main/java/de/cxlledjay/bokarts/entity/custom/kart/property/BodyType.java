@@ -13,7 +13,8 @@ import net.minecraft.util.function.ValueLists;
 
 public enum BodyType implements StringIdentifiable {
     SOLID_COLOR_OVERLAY(0, "solid_color_overlay"),
-    LIVERY_FADE(1, "livery_fade");
+    LIVERY_FADE(1, "livery_fade"),
+    LIVERY_RED_COW(2, "livery_red_cow");
 
 
     // id to value function

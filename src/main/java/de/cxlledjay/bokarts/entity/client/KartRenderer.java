@@ -3,16 +3,22 @@ package de.cxlledjay.bokarts.entity.client;
 import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.entity.client.kartv2.ChassisModel;
 import de.cxlledjay.bokarts.entity.client.kartv2.EngineModel;
+import de.cxlledjay.bokarts.entity.client.kartv2.aero.AeroRaceModel;
+import de.cxlledjay.bokarts.entity.client.kartv2.spoiler.SpoilerRaceModel;
+import de.cxlledjay.bokarts.entity.client.kartv2.spoiler.SpoilerStreetModel;
 import de.cxlledjay.bokarts.entity.client.kartv2.wheels.WheelsModelBase;
 import de.cxlledjay.bokarts.entity.client.kartv2.wheels.WheelsModelNormal;
 import de.cxlledjay.bokarts.entity.client.kartv2.wheels.WheelsModelOffroad;
 import de.cxlledjay.bokarts.entity.custom.kart.KartEntity;
+import de.cxlledjay.bokarts.entity.custom.kart.property.AeroType;
 import de.cxlledjay.bokarts.entity.custom.kart.property.BodyType;
+import de.cxlledjay.bokarts.entity.custom.kart.property.SpoilerType;
 import de.cxlledjay.bokarts.entity.custom.kart.property.WheelType;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.render.entity.model.SinglePartEntityModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -31,6 +37,8 @@ public class KartRenderer extends EntityRenderer<KartEntity> {
     private final ChassisModel<KartEntity> modelChassis;
     private final Map<WheelType, WheelsModelBase<KartEntity>> modelWheels = new EnumMap<>(WheelType.class);
     private final EngineModel<KartEntity> modelEngine;
+    private final Map<SpoilerType, SinglePartEntityModel<KartEntity>> modelSpoiler = new EnumMap<>(SpoilerType.class);
+    private final Map<AeroType, SinglePartEntityModel<KartEntity>> modelAero = new EnumMap<>(AeroType.class);
 
     // textures
     private static final Identifier TEXTURE_CHASSIS = BoKarts.id("textures/entity/kartv2/chassis.png");
@@ -52,6 +60,16 @@ public class KartRenderer extends EntityRenderer<KartEntity> {
 
         // engine
         this.modelEngine = new EngineModel<>(ctx.getPart(EngineModel.ENTITY_MODEL_LAYER));
+
+        // spoiler
+        this.modelSpoiler.put(SpoilerType.STREET, new SpoilerStreetModel<>(ctx.getPart(SpoilerStreetModel.ENTITY_MODEL_LAYER)));
+        this.modelSpoiler.put(SpoilerType.STREET_CARBON, new SpoilerStreetModel<>(ctx.getPart(SpoilerStreetModel.ENTITY_MODEL_LAYER)));
+        this.modelSpoiler.put(SpoilerType.RACE, new SpoilerRaceModel<>(ctx.getPart(SpoilerRaceModel.ENTITY_MODEL_LAYER)));
+        this.modelSpoiler.put(SpoilerType.RACE_CARBON, new SpoilerRaceModel<>(ctx.getPart(SpoilerRaceModel.ENTITY_MODEL_LAYER)));
+
+        // aero
+        this.modelAero.put(AeroType.RACE, new AeroRaceModel<>(ctx.getPart(AeroRaceModel.ENTITY_MODEL_LAYER)));
+        this.modelAero.put(AeroType.RACE_CARBON, new AeroRaceModel<>(ctx.getPart(AeroRaceModel.ENTITY_MODEL_LAYER)));
     }
 
     @Override
@@ -91,6 +109,8 @@ public class KartRenderer extends EntityRenderer<KartEntity> {
         renderChassis(kartEntity, tickDelta, matrixStack, vertexConsumerProvider, light);
         renderWheels(kartEntity, tickDelta, matrixStack, vertexConsumerProvider, light);
         renderEngine(kartEntity, tickDelta, matrixStack, vertexConsumerProvider, light);
+        renderOptionalSpoiler(kartEntity, tickDelta, matrixStack, vertexConsumerProvider, light);
+        renderOptionalAero(kartEntity, tickDelta, matrixStack, vertexConsumerProvider, light);
 
         // render racing number
         renderRacingNumber(kartEntity, tickDelta, matrixStack, vertexConsumerProvider, light, true);
@@ -167,6 +187,36 @@ public class KartRenderer extends EntityRenderer<KartEntity> {
         this.modelEngine.render(matrices, baseConsumer, light, OverlayTexture.DEFAULT_UV, 0xFFFFFFFF);
     }
 
+    private void renderOptionalSpoiler(KartEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+        // get data from kart
+        SpoilerType spoilerType = entity.getSpoilerType();
+
+        if(spoilerType.equals(SpoilerType.NONE)) return; // no spoiler
+
+        // get model and texture
+        SinglePartEntityModel<KartEntity> spoilerModel = this.modelSpoiler.get(spoilerType);
+        Identifier spoilerTexture = spoilerType.getTexture();
+
+        // render model
+        VertexConsumer baseConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityCutoutNoCull(spoilerTexture));
+        spoilerModel.render(matrices, baseConsumer, light, OverlayTexture.DEFAULT_UV, 0xFFFFFFFF);
+    }
+
+    private void renderOptionalAero(KartEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+        // get data from kart
+        AeroType aeroType = entity.getAeroType();
+
+        if(aeroType.equals(AeroType.NONE)) return; // no aero
+
+        // get model and texture
+        SinglePartEntityModel<KartEntity> aeroModel = this.modelAero.get(aeroType);
+        Identifier aeroTexture = aeroType.getTexture();
+
+        // render model
+        VertexConsumer baseConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityCutoutNoCull(aeroTexture));
+        aeroModel.render(matrices, baseConsumer, light, OverlayTexture.DEFAULT_UV, 0xFFFFFFFF);
+    }
+
 
 
 
@@ -180,7 +230,7 @@ public class KartRenderer extends EntityRenderer<KartEntity> {
 
         // convert racing number to text; if it is applicable
         Text textRacingNumber =
-                ((entity.getRaceNumber() >= 0) && (entity.getRaceNumber() <= 99))
+                ((entity.getRaceNumber() >= 1) && (entity.getRaceNumber() <= 99))
                     ? (Text.literal(String.format("%02d",entity.getRaceNumber())).formatted(Formatting.BOLD))
                     : (Text.literal(""));
 
@@ -190,7 +240,7 @@ public class KartRenderer extends EntityRenderer<KartEntity> {
         // positioning
         final float x = (left) ? (10.255f / 16.0f) : (-10.255f / 16.0f);
         final float y = 1.5f - (4.625f / 16.0f);
-        final float z = 2.0f / 16.0f;
+        final float z = 3.25f / 16.0f;
         matrices.translate(x, y, z);
 
         // rotation

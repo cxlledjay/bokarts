@@ -58,7 +58,7 @@ public enum AeroType implements StringIdentifiable {
     }
 
     // --- textures ---
-    public Identifier getTexture() {
+    public @Nullable Identifier getTexture() {
         return this.texture;
     }
 
