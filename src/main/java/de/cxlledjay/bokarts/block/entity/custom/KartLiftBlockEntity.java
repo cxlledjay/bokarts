@@ -29,14 +29,23 @@ public class KartLiftBlockEntity extends BlockEntity {
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.writeNbt(nbt, registryLookup);
-        nbt.putInt("animation_state", this.animationState.ordinal());
+        nbt.putInt("animationState", this.animationState.ordinal());
     }
 
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.readNbt(nbt, registryLookup);
-        if (nbt.contains("animation_state")) {
-            this.animationState = LiftState.values()[nbt.getInt("animation_state")];
+        if (nbt.contains("animationState")) {
+            this.animationState = LiftState.values()[nbt.getInt("animationState")];
+
+            // load animation progress upon loading block entity
+            if (this.animationState == LiftState.ACTIVE) {
+                this.animationProgress = 1.0f;
+                this.animationProgressPrev = 1.0f;
+            } else if (this.animationState == LiftState.EMPTY) {
+                this.animationProgress = 0.0f;
+                this.animationProgressPrev = 0.0f;
+            }
         }
     }
 
@@ -61,6 +70,13 @@ public class KartLiftBlockEntity extends BlockEntity {
                 if(entity.animationProgress >= 1.0f) {
                     entity.animationProgress = 1.0f;
                     entity.animationState = LiftState.ACTIVE; // stop animation => lift can be accessed
+
+                    // AND sync
+                    //TODO: create wrapper for state changes with automatic sync
+                    if (!world.isClient) {
+                        entity.markDirty();
+                        world.updateListeners(pos, state, state, 3);
+                    }
                 }
                 break;
             case LiftState.ANIMATION_DOWN:
@@ -68,7 +84,15 @@ public class KartLiftBlockEntity extends BlockEntity {
                 entity.animationProgress = Math.max(0.0f, entity.animationProgress - ANIMATION_INCREASE);
                 if(entity.animationProgress <= 0.0f){
                     entity.animationProgress = 0.0f;
-                    entity.releaseKart();
+                    entity.animationState = LiftState.EMPTY;
+
+                    if(!world.isClient) entity.releaseKart();
+
+                    // AND sync
+                    if (!world.isClient) {
+                        entity.markDirty();
+                        world.updateListeners(pos, state, state, 3);
+                    }
                 }
                 break;
         }
@@ -80,7 +104,6 @@ public class KartLiftBlockEntity extends BlockEntity {
 
 
         // dont forget to set as empty
-        this.animationState = LiftState.EMPTY;
     }
 
     public static enum LiftState {

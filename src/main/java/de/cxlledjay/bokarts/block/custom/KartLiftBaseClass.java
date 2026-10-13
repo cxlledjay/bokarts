@@ -91,8 +91,12 @@ public abstract class KartLiftBaseClass extends Block {
             // test if it exists and is the correct type
             if (lift_be instanceof KartLiftBlockEntity lift) {
 
+                // switch lift state
                 if(lift.animationState == KartLiftBlockEntity.LiftState.EMPTY) lift.animationState = KartLiftBlockEntity.LiftState.ANIMATION_UP;
                 else if(lift.animationState == KartLiftBlockEntity.LiftState.ACTIVE) lift.animationState = KartLiftBlockEntity.LiftState.ANIMATION_DOWN;
+
+                // AND sync
+                lift_be.markDirty();
                 world.updateListeners(corePos, state, state, 3);
 
             } else {

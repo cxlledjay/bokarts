@@ -12,9 +12,15 @@ import net.minecraft.util.function.ValueLists;
 import java.util.function.IntFunction;
 
 public enum WheelType implements StringIdentifiable {
-    STREET(0,"street"),
-    DRIFT(1,"drift"),
-    OFFROAD(2,"offroad") {
+    NONE(0,"none") {
+        @Override
+        public float getStepHeight() {
+            return 0.0f;
+        }
+    },
+    STREET(1,"street"),
+    DRIFT(2,"drift"),
+    OFFROAD(3,"offroad") {
         @Override
         public float getStepHeight() {
             return 1.05f;

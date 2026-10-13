@@ -12,12 +12,17 @@ import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.function.ValueLists;
 
 public enum BodyType implements StringIdentifiable {
-    SOLID_COLOR_OVERLAY(0, "solid_color_overlay"),
-    LIVERY_FADE(1, "livery_fade"),
-    LIVERY_RED_COW(2, "livery_red_cow"),
-    LIVERY_ENGLISH_RACING_ORANGE(3, "livery_english_racing_orange"),
-    LIVERY_MUNICH(4, "livery_munich"),
-    LIVERY_RALLY(5, "livery_rally");
+    SOLID_COLOR_OVERLAY(0, "solid_color_overlay", "Single Color"),
+    LIVERY_FADE(1, "livery_fade", "Fade"),
+    LIVERY_RED_COW(2, "livery_red_cow", "Red Cow"),
+    LIVERY_ENGLISH_RACING_ORANGE(3, "livery_english_racing_orange", "English Racing Orange"),
+    LIVERY_MUNICH(4, "livery_munich", "Munich"),
+    LIVERY_RALLY(5, "livery_rally", "Rally"),
+    LIVERY_CAUTION(6, "livery_caution", "Caution!"),
+    LIVERY_FULL_CARBON(7, "livery_full_carbon", "Cabron"),
+    LIVERY_CREEPER(8, "livery_creeper", "Creeper, aww man!"),
+    LIVERY_GROTTI(9, "livery_grotti", "Grotti"),
+    LIVERY_BENEFACTOR(10, "livery_benefactor", "Benefactor");
 
 
     // id to value function
@@ -34,11 +39,15 @@ public enum BodyType implements StringIdentifiable {
     // --- Properties ---
     private final int id;
     private final String name;
+    private final String display_name;
     private final Identifier texture;
+    // private final int bodyColor;
+    // private final int wheelColor;
 
-    BodyType(final int id, final String name) {
+    BodyType(final int id, final String name, final String display_name) {
         this.id = id;
         this.name = name;
+        this.display_name = display_name;
 
         // Example: dynamically creating a texture/model path using the enum's name
         this.texture = BoKarts.id("textures/entity/kartv2/body/" + name + ".png");
