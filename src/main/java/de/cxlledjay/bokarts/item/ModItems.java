@@ -3,6 +3,7 @@ package de.cxlledjay.bokarts.item;
 import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.entity.custom.kart.KartEntity;
 import de.cxlledjay.bokarts.item.custom.KartItem;
+import de.cxlledjay.bokarts.item.custom.KartItemv2;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
@@ -11,41 +12,42 @@ import static de.cxlledjay.bokarts.item.custom.KartItem.defaultKartSettings;
 
 public class ModItems {
 
-    // kart crafting ingredients
+    // the kart
+    public static final Item KART_ITEM    = registerItem("kart_item",    new KartItemv2(KartItemv2.defaultKartSettings()));
 
+    // kart tuning parts
+
+    // kart crafting ingredients
     public static final Item KART_CRAFTING_WHEEL = registerItem("kart_wheel", new Item(new Item.Settings()));
     public static final Item KART_CRAFTING_STEERING_WHEEL = registerItem("kart_steering_wheel", new Item(new Item.Settings()));
     public static final Item KART_CRAFTING_SEAT = registerItem("kart_seat", new Item(new Item.Settings()));
-
-
 
     // accessories
     public static final Item KART_KEY = registerItem("kart_key", new Item(new Item.Settings()));
 
 
 
-    public static final Item KART_DEFAULT    = registerItem("kart/default",    new KartItem(defaultKartSettings()));
 
-    // Vanilla dye colors
-    public static final Item KART_WHITE      = registerItem("kart/white",      new KartItem(defaultKartSettings()));
-    public static final Item KART_ORANGE     = registerItem("kart/orange",     new KartItem(defaultKartSettings()));
-    public static final Item KART_MAGENTA    = registerItem("kart/magenta",    new KartItem(defaultKartSettings()));
-    public static final Item KART_LIGHT_BLUE = registerItem("kart/light_blue", new KartItem(defaultKartSettings()));
-    public static final Item KART_YELLOW     = registerItem("kart/yellow",     new KartItem(defaultKartSettings()));
-    public static final Item KART_LIME       = registerItem("kart/lime",       new KartItem(defaultKartSettings()));
-    public static final Item KART_PINK       = registerItem("kart/pink",       new KartItem(defaultKartSettings()));
-    public static final Item KART_GRAY       = registerItem("kart/gray",       new KartItem(defaultKartSettings()));
-    public static final Item KART_LIGHT_GRAY = registerItem("kart/light_gray", new KartItem(defaultKartSettings()));
-    public static final Item KART_CYAN       = registerItem("kart/cyan",       new KartItem(defaultKartSettings()));
-    public static final Item KART_PURPLE     = registerItem("kart/purple",     new KartItem(defaultKartSettings()));
-    public static final Item KART_BLUE       = registerItem("kart/blue",       new KartItem(defaultKartSettings()));
-    public static final Item KART_BROWN      = registerItem("kart/brown",      new KartItem(defaultKartSettings()));
-    public static final Item KART_GREEN      = registerItem("kart/green",      new KartItem(defaultKartSettings()));
-    public static final Item KART_RED        = registerItem("kart/red",        new KartItem(defaultKartSettings()));
-    public static final Item KART_BLACK      = registerItem("kart/black",      new KartItem(defaultKartSettings()));
-    // special variants
-    public static final Item KART_PURPLE_GOLD = registerItem("kart/purple_gold",      new KartItem(defaultKartSettings()));
-    public static final Item KART_FADE        = registerItem("kart/fade",      new KartItem(defaultKartSettings()));
+    // LEGACY CODE; TO BE REMOVED; USED FOR BACKWARDS COMPATIBILITY!
+    public static final Item KART_DEFAULT    = registerItem("kart/default",         new KartItem(defaultKartSettings()));
+    public static final Item KART_WHITE      = registerItem("kart/white",           new KartItem(defaultKartSettings()));
+    public static final Item KART_ORANGE     = registerItem("kart/orange",          new KartItem(defaultKartSettings()));
+    public static final Item KART_MAGENTA    = registerItem("kart/magenta",         new KartItem(defaultKartSettings()));
+    public static final Item KART_LIGHT_BLUE = registerItem("kart/light_blue",      new KartItem(defaultKartSettings()));
+    public static final Item KART_YELLOW     = registerItem("kart/yellow",          new KartItem(defaultKartSettings()));
+    public static final Item KART_LIME       = registerItem("kart/lime",            new KartItem(defaultKartSettings()));
+    public static final Item KART_PINK       = registerItem("kart/pink",            new KartItem(defaultKartSettings()));
+    public static final Item KART_GRAY       = registerItem("kart/gray",            new KartItem(defaultKartSettings()));
+    public static final Item KART_LIGHT_GRAY = registerItem("kart/light_gray",      new KartItem(defaultKartSettings()));
+    public static final Item KART_CYAN       = registerItem("kart/cyan",            new KartItem(defaultKartSettings()));
+    public static final Item KART_PURPLE     = registerItem("kart/purple",          new KartItem(defaultKartSettings()));
+    public static final Item KART_BLUE       = registerItem("kart/blue",            new KartItem(defaultKartSettings()));
+    public static final Item KART_BROWN      = registerItem("kart/brown",           new KartItem(defaultKartSettings()));
+    public static final Item KART_GREEN      = registerItem("kart/green",           new KartItem(defaultKartSettings()));
+    public static final Item KART_RED        = registerItem("kart/red",             new KartItem(defaultKartSettings()));
+    public static final Item KART_BLACK      = registerItem("kart/black",           new KartItem(defaultKartSettings()));
+    public static final Item KART_PURPLE_GOLD = registerItem("kart/purple_gold",    new KartItem(defaultKartSettings()));
+    public static final Item KART_FADE        = registerItem("kart/fade",           new KartItem(defaultKartSettings()));
 
 
 

@@ -12,15 +12,15 @@ import net.minecraft.util.function.ValueLists;
 import java.util.function.IntFunction;
 
 public enum WheelType implements StringIdentifiable {
-    NONE(0,"none") {
+    NONE(0,"none", "None") {
         @Override
         public float getStepHeight() {
             return 0.0f;
         }
     },
-    STREET(1,"street"),
-    DRIFT(2,"drift"),
-    OFFROAD(3,"offroad") {
+    STREET(1,"street", "Street"),
+    DRIFT(2,"drift", "Drift"),
+    OFFROAD(3,"offroad", "Offroad") {
         @Override
         public float getStepHeight() {
             return 1.05f;
@@ -44,12 +44,14 @@ public enum WheelType implements StringIdentifiable {
     // properties
     private final int id;
     private final String name;
+    private final String display_name;
     private final Identifier texture;
     private final Identifier overlay;
 
-    WheelType(final int id, final String name) {
+    WheelType(final int id, final String name, final String display_name) {
         this.id = id;
         this.name = name;
+        this.display_name = display_name;
 
         // create paths for textures
         this.texture = BoKarts.id("textures/entity/kartv2/wheels/" + name + ".png");
@@ -91,5 +93,10 @@ public enum WheelType implements StringIdentifiable {
 
     public Identifier getOverlayTexture() {
         return this.overlay;
+    }
+
+    // --- items ---
+    public String getDisplayName() {
+        return this.display_name;
     }
 }

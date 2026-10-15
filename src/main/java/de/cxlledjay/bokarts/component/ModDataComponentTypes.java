@@ -2,7 +2,7 @@ package de.cxlledjay.bokarts.component;
 
 import com.mojang.serialization.Codec;
 import de.cxlledjay.bokarts.BoKarts;
-import de.cxlledjay.bokarts.entity.custom.kart.property.HornType;
+import de.cxlledjay.bokarts.entity.custom.kart.property.*;
 import net.minecraft.component.ComponentType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
@@ -15,6 +15,15 @@ public class ModDataComponentTypes {
     public static final ComponentType<Float> KART_ITEM_FUEL = register("kart_item_fuel", builder -> builder.codec(Codec.FLOAT));
     public static final ComponentType<Float> KART_ITEM_ODOMETER = register("kart_item_odometer", builder -> builder.codec(Codec.FLOAT));
 
+    // v2 component types
+    public static final ComponentType<BodyType> KART_ITEM_BODY_TYPE = register("kart_item_body_type", builder -> builder.codec(BodyType.CODEC));
+    public static final ComponentType<WheelType> KART_ITEM_WHEEL_TYPE = register("kart_item_wheel_type", builder -> builder.codec(WheelType.CODEC));
+    public static final ComponentType<EngineType> KART_ITEM_ENGINE_TYPE = register("kart_item_engine_type", builder -> builder.codec(EngineType.CODEC));
+    public static final ComponentType<SpoilerType> KART_ITEM_SPOILER_TYPE = register("kart_item_spoler_type", builder -> builder.codec(SpoilerType.CODEC));
+    public static final ComponentType<AeroType> KART_ITEM_AERO_TYPE = register("kart_item_aero_type", builder -> builder.codec(AeroType.CODEC));
+    public static final ComponentType<Integer> KART_ITEM_BODY_COLOR = register("kart_item_body_color", builder -> builder.codec(Codec.INT));
+    public static final ComponentType<Integer> KART_ITEM_WHEEL_COLOR = register("kart_item_wheel_color", builder -> builder.codec(Codec.INT));
+    public static final ComponentType<Integer> KART_ITEM_RACE_NUMBER = register("kart_item_race_number", builder -> builder.codec(Codec.INT));
 
 
     private static <T>ComponentType<T> register(String name, UnaryOperator<ComponentType.Builder<T>> builderOperator) {

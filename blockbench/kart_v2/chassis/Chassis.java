@@ -36,7 +36,6 @@ public class Chassis extends EntityModel<Entity> {
 		this.gas = this.accessoirs.getChild("gas");
 		this.body = this.kart_v2.getChild("body");
 	}
-
 	public static TexturedModelData getTexturedModelData() {
 		ModelData modelData = new ModelData();
 		ModelPartData modelPartData = modelData.getRoot();
@@ -174,7 +173,6 @@ public class Chassis extends EntityModel<Entity> {
 		ModelPartData cube_r30 = body.addChild("cube_r30", ModelPartBuilder.create().uv(77, 12).cuboid(-2.54F, -2.5F, -0.75F, 5.0F, 5.0F, 2.0F, new Dilation(-0.255F)), ModelTransform.of(7.25F, -3.25F, -16.25F, 0.0F, -0.3491F, 0.0F));
 		return TexturedModelData.of(modelData, 128, 128);
 	}
-
 	@Override
 	public void setAngles(Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
 	}

@@ -13,11 +13,11 @@ import net.minecraft.util.function.ValueLists;
 import org.jetbrains.annotations.Nullable;
 
 public enum SpoilerType implements StringIdentifiable {
-    NONE(0, "none"),
-    STREET(1, "street"),
-    STREET_CARBON(2, "street_carbon"),
-    RACE(3, "race"),
-    RACE_CARBON(4, "race_carbon");
+    NONE(0, "none", "None"),
+    STREET(1, "street", "Street (Normal)"),
+    STREET_CARBON(2, "street_carbon", "Street (Carbon)"),
+    RACE(3, "race", "Race (Normal)"),
+    RACE_CARBON(4, "race_carbon", "Race (Carbon)");
 
     // id to value function
     private static final IntFunction<SpoilerType> INDEX_TO_VALUE = ValueLists.createIdToValueFunction(
@@ -33,14 +33,16 @@ public enum SpoilerType implements StringIdentifiable {
     // --- Properties ---
     private final int id;
     private final String name;
+    private final String display_name;
     @Nullable
     private final Identifier texture;
 
-    SpoilerType(final int id, final String name) {
+    SpoilerType(final int id, final String name, final String display_name) {
         this.id = id;
         this.name = name;
+        this.display_name = display_name;
 
-        // Example: dynamically creating a texture/model path using the enum's name
+        // dynamically creating a texture/model path using the enum's name
         this.texture = (name.equals("none")) ? null : BoKarts.id("textures/entity/kartv2/spoiler/" + name + ".png");
     }
 
@@ -62,6 +64,11 @@ public enum SpoilerType implements StringIdentifiable {
     // --- textures ---
     public @Nullable Identifier getTexture() {
         return this.texture;
+    }
+
+    // --- items ---
+    public String getDisplayName() {
+        return this.display_name;
     }
 
 }

@@ -24,7 +24,8 @@ public enum BodyType implements StringIdentifiable {
     LIVERY_GROTTI(9, "livery_grotti", "Grotti"),
     LIVERY_BENEFACTOR(10, "livery_benefactor", "Benefactor"),
     LIVERY_SUPER_A_CAR(11, "livery_super_a_car", "Super a car"),
-    LIVERY_JAPANESE_RACE_CAR(12, "livery_japanese_race_car", "Japanese race car");
+    LIVERY_JAPANESE_RACE_CAR(12, "livery_japanese_race_car", "Japanese race car"),
+    LIVERY_POLIZFI(13, "livery_polizfi", "Police");
 
 
     // id to value function
@@ -38,7 +39,7 @@ public enum BodyType implements StringIdentifiable {
             INDEX_TO_VALUE, BodyType::getId
     );
 
-    // --- Properties ---
+    // --- properties ---
     private final int id;
     private final String name;
     private final String display_name;
@@ -51,7 +52,7 @@ public enum BodyType implements StringIdentifiable {
         this.name = name;
         this.display_name = display_name;
 
-        // Example: dynamically creating a texture/model path using the enum's name
+        // dynamically creating a texture/model path using the enum's name
         this.texture = BoKarts.id("textures/entity/kartv2/body/" + name + ".png");
     }
 
@@ -73,6 +74,11 @@ public enum BodyType implements StringIdentifiable {
     // --- textures ---
     public Identifier getTexture() {
         return this.texture;
+    }
+
+    // --- items ---
+    public String getDisplayName() {
+        return this.display_name;
     }
 
 }

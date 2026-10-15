@@ -197,6 +197,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         return this.getWheelType().getStepHeight();
     }
 
+    // disable collisions (prevent client server desync movement resets)
     @Override
     public boolean isPushable() {
         return false;
@@ -206,6 +207,13 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     public boolean isCollidable() {
         return false;
     }
+
+    @Override
+    public boolean collidesWith(Entity other) {
+        return false;
+    }
+
+
 
     @Override
     public void move(MovementType movementType, Vec3d movement) {
@@ -310,13 +318,13 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
     @Override
     public Item asItem() {
-        return ModItems.KART_DEFAULT;
+        return ModItems.KART_ITEM;
     }
 
     // set data component types of ItemStack to tracked data
     public ItemStack getKartAsCustomStack() {
 
-        // get correct variant
+        // get item
         ItemStack stack = new ItemStack(this.asItem());
 
         // sync values
@@ -327,6 +335,16 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         stack.set(ModDataComponentTypes.KART_ITEM_HORN_TYPE, this.getHornType());
         stack.set(ModDataComponentTypes.KART_ITEM_FUEL, this.getFuelSynced());
         stack.set(ModDataComponentTypes.KART_ITEM_ODOMETER, this.getOdometerSynced());
+
+        // set v2 data component types
+        stack.set(ModDataComponentTypes.KART_ITEM_BODY_TYPE, this.getBodyType());
+        stack.set(ModDataComponentTypes.KART_ITEM_WHEEL_TYPE, this.getWheelType());
+        stack.set(ModDataComponentTypes.KART_ITEM_ENGINE_TYPE, this.getEngineType());
+        stack.set(ModDataComponentTypes.KART_ITEM_SPOILER_TYPE, this.getSpoilerType());
+        stack.set(ModDataComponentTypes.KART_ITEM_AERO_TYPE, this.getAeroType());
+        stack.set(ModDataComponentTypes.KART_ITEM_BODY_COLOR, this.getBodyColor());
+        stack.set(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR, this.getWheelColor());
+        stack.set(ModDataComponentTypes.KART_ITEM_RACE_NUMBER, this.getRaceNumber());
 
         return stack;
     }
@@ -742,6 +760,8 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         }
     }
 
+    // ==================== display methods ====================
+
     public static String getFormattedDistanceString(Float distance) {
         String  rangeString;
         DecimalFormat decimalFormat = new DecimalFormat("0.0");
@@ -763,6 +783,9 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     }
 
 
+    public static boolean isVlalidRaceNumber(int raceNumber) {
+        return (raceNumber >= 1 && raceNumber <= 99);
+    }
 
 
     // ==================== data tracking ====================

@@ -5,36 +5,37 @@
   "item.bokarts.kart_steering_wheel" : "Kart Steering Wheel",
   "item.bokarts.kart_key" : "Kart Key",
 
-  "tooltip.bokarts.kart_item.shift":        "§7Press §f[SHIFT] §7to expand details",
-  "tooltip.bokarts.kart_item.details":      "§3=== §bKart Specs §3===",
-  "tooltip.bokarts.kart_item.horn":         " §8» §fHorn",
-  "tooltip.bokarts.kart_item.fuel":         " §8» §fFuel",
-  "tooltip.bokarts.kart_item.odometer":     " §8» §fOdometer",
+  "tooltip.bokarts.kart_item.shift":                "§7Press §f[SHIFT] §7to reveal details",
 
-  "item.bokarts.kart.default": "Kart (Default)",
+  "tooltip.bokarts.kart_item.shift_heading":        "§8================ [ KART INFO ] ================",
+  "tooltip.bokarts.kart_item.shift_heading2":       "§8---------------------------------------------",
+  "tooltip.bokarts.kart_item.shift_end":            "§8=============================================",
+
+  "tooltip.bokarts.kart_item.shift_tuning":         " §6§l[ TUNING ]",
+  "tooltip.bokarts.kart_item.shift_stats":          " §6§l[ STATS ]",
+
+  "tooltip.bokarts.kart_item.shift1_livery":        " §7Livery§7: §7",
+
+  "tooltip.bokarts.kart_item.shift2_wheels":        "  §b[*] §fWheels        §7>> §f",
+  "tooltip.bokarts.kart_item.shift2_engine":        "  §b[*] §fEngine        §7>> §f",
+  "tooltip.bokarts.kart_item.shift2_spoiler":       "  §b[*] §fSpoiler       §7>> §f",
+  "tooltip.bokarts.kart_item.shift2_aero":          "  §b[*] §fAero Kit      §7>> §f",
+  "tooltip.bokarts.kart_item.shift2_race_number":   "  §b[*] §fNumber        §7>> §f",
+
+  "tooltip.bokarts.kart_item.shift3_owner":         "  §b[*] §fOwner         §7>> §f",
+  "tooltip.bokarts.kart_item.shift3_horn":          "  §b[*] §fHorn Sound  §7>> §f",
+  "tooltip.bokarts.kart_item.shift3_fuel":          "  §b[*] §fFuel Level   §7>> §f",
+  "tooltip.bokarts.kart_item.shift3_odo":           "  §b[*] §fOdometer     §7>> §f",
 
 
+
+
+
+  "item.bokarts.kart_item": "Kart",
+
+  "tooltip.bokarts.kart_lift_block.crafting": "§7Used to craft and modify the Kart",
+  "tooltip.bokarts.kart_lift_block.setup": "§7In order to create a working Lift, place two Lift Blocks facing each other with two blocks space",
   "block.bokarts.kart_lift_block": "Kart Lift",
-
-  "item.bokarts.kart.white": "Kart (White)",
-  "item.bokarts.kart.orange": "Kart (Orange)",
-  "item.bokarts.kart.magenta": "Kart (Magenta)",
-  "item.bokarts.kart.light_blue": "Kart (Light Blue)",
-  "item.bokarts.kart.yellow": "Kart (Yellow)",
-  "item.bokarts.kart.lime": "Kart (Lime)",
-  "item.bokarts.kart.pink": "Kart (Pink)",
-  "item.bokarts.kart.gray": "Kart (Gray)",
-  "item.bokarts.kart.light_gray": "Kart (Light Gray)",
-  "item.bokarts.kart.cyan": "Kart (Cyan)",
-  "item.bokarts.kart.purple": "Kart (Purple)",
-  "item.bokarts.kart.blue": "Kart (Blue)",
-  "item.bokarts.kart.brown": "Kart (Brown)",
-  "item.bokarts.kart.green": "Kart (Green)",
-  "item.bokarts.kart.red": "Kart (Red)",
-  "item.bokarts.kart.black": "Kart (Black)",
-
-  "item.bokarts.kart.purple_gold": "Kart (Purple Gold)",
-  "item.bokarts.kart.fade": "Kart (Fade)",
 
   "entity.bokarts.kart" : "BoKart",
   "sounds.bokarts.kart_engine": "Kart Engine",

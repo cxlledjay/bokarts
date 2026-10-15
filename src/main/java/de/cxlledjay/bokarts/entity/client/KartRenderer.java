@@ -134,11 +134,11 @@ public class KartRenderer extends EntityRenderer<KartEntity> {
         this.modelChassis.render(matrices, baseConsumer, light, OverlayTexture.DEFAULT_UV, 0xFFFFFFFF);
 
         // ----- draw overlay texture -----
-        Identifier overlayTexture = BoKarts.id("textures/entity/kartv2/body/" + entity.getBodyType().asString() + ".png");
+        Identifier overlayTexture = entity.getBodyType().getTexture();
         int overlayColor = 0xFFFFFFFF;
         if(entity.getBodyType() == BodyType.SOLID_COLOR_OVERLAY) {
             // apply custom color
-            overlayColor = entity.getBodyColor();
+            overlayColor = entity.getBodyColor() | 0xFF000000;
         }
         VertexConsumer liveryConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityTranslucent(overlayTexture));
         this.modelChassis.render(matrices, liveryConsumer, light, OverlayTexture.DEFAULT_UV, overlayColor);
@@ -162,7 +162,7 @@ public class KartRenderer extends EntityRenderer<KartEntity> {
         Identifier wheelOverlayTexture = wheelType.getOverlayTexture();
 
         // rim color
-        int rimColor = entity.getWheelColor();
+        int rimColor = entity.getWheelColor() | 0xFF000000;
 
         // animate model
         wheelModel.setAngles(entity, tickDelta, 0.0f, -0.1f, 0.0f, 0.0f);
@@ -234,7 +234,7 @@ public class KartRenderer extends EntityRenderer<KartEntity> {
         int racingNumber = entity.getRaceNumber();
 
         // no (valid) number
-        if(!((racingNumber >= 1) && (racingNumber <= 99))) return;
+        if(!KartEntity.isVlalidRaceNumber(racingNumber)) return;
 
         // convert racing number to text
         Text textRacingNumber = Text.literal(String.format("%02d",entity.getRaceNumber())).formatted(Formatting.BOLD);
