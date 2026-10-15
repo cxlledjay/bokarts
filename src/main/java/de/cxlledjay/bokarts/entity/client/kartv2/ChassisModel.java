@@ -180,6 +180,10 @@ public class ChassisModel<T extends KartEntity> extends SinglePartEntityModel<T>
 		ModelPartData cube_r29 = body.addChild("cube_r29", ModelPartBuilder.create().uv(35, 12).cuboid(-2.46F, -2.5F, -0.75F, 5.0F, 5.0F, 2.0F, new Dilation(-0.255F)), ModelTransform.of(-7.25F, -3.25F, -16.25F, 0.0F, 0.3491F, 0.0F));
 
 		ModelPartData cube_r30 = body.addChild("cube_r30", ModelPartBuilder.create().uv(77, 12).cuboid(-2.54F, -2.5F, -0.75F, 5.0F, 5.0F, 2.0F, new Dilation(-0.255F)), ModelTransform.of(7.25F, -3.25F, -16.25F, 0.0F, -0.3491F, 0.0F));
+
+		ModelPartData license_plate = kart_v2.addChild("license_plate", ModelPartBuilder.create(), ModelTransform.pivot(0.0F, -3.0F, -17.55F));
+
+		ModelPartData cube_r31 = license_plate.addChild("cube_r31", ModelPartBuilder.create().uv(92, 80).cuboid(-4.0F, -1.0F, -0.5F, 8.0F, 2.0F, 1.0F, new Dilation(-0.3F)), ModelTransform.of(0.0F, 0.0F, 0.15F, -0.0873F, 0.0F, 0.0F));
 		return TexturedModelData.of(modelData, 128, 128);
 	}
 

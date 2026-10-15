@@ -10,10 +10,7 @@ import de.cxlledjay.bokarts.entity.client.kartv2.wheels.WheelsModelBase;
 import de.cxlledjay.bokarts.entity.client.kartv2.wheels.WheelsModelNormal;
 import de.cxlledjay.bokarts.entity.client.kartv2.wheels.WheelsModelOffroad;
 import de.cxlledjay.bokarts.entity.custom.kart.KartEntity;
-import de.cxlledjay.bokarts.entity.custom.kart.property.AeroType;
-import de.cxlledjay.bokarts.entity.custom.kart.property.BodyType;
-import de.cxlledjay.bokarts.entity.custom.kart.property.SpoilerType;
-import de.cxlledjay.bokarts.entity.custom.kart.property.WheelType;
+import de.cxlledjay.bokarts.entity.custom.kart.property.*;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.EntityRenderer;
@@ -30,6 +27,7 @@ import org.joml.Quaternionf;
 
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class KartRenderer extends EntityRenderer<KartEntity> {
 
@@ -42,6 +40,7 @@ public class KartRenderer extends EntityRenderer<KartEntity> {
 
     // textures
     private static final Identifier TEXTURE_CHASSIS = BoKarts.id("textures/entity/kartv2/chassis.png");
+    private static final Identifier TEXTURE_CHASSIS_LICENSE_PLATE_OVERLAY = BoKarts.id("textures/entity/kartv2/overlay_license_plate.png");
 
 
     public KartRenderer(EntityRendererFactory.Context ctx) {
@@ -131,11 +130,11 @@ public class KartRenderer extends EntityRenderer<KartEntity> {
         // animate model
         this.modelChassis.setAngles(entity, tickDelta, 0.0f, -0.1f, 0.0f, 0.0f);
 
-        // draw base texture
+        // ----- draw base texture -----
         VertexConsumer baseConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityCutoutNoCull(TEXTURE_CHASSIS));
         this.modelChassis.render(matrices, baseConsumer, light, OverlayTexture.DEFAULT_UV, 0xFFFFFFFF);
 
-        // draw overlay texture
+        // ----- draw overlay texture -----
         Identifier overlayTexture = BoKarts.id("textures/entity/kartv2/body/" + entity.getBodyType().asString() + ".png");
         int overlayColor = 0xFFFFFFFF;
         if(entity.getBodyType() == BodyType.SOLID_COLOR_OVERLAY) {
@@ -144,6 +143,19 @@ public class KartRenderer extends EntityRenderer<KartEntity> {
         }
         VertexConsumer liveryConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityTranslucent(overlayTexture));
         this.modelChassis.render(matrices, liveryConsumer, light, OverlayTexture.DEFAULT_UV, overlayColor);
+
+        // ----- draw license plate, if valid -----
+        String licensePlate = ""; //< retrieve vom entity; TODO: evaluate if applicable and cool
+        int strLength = licensePlate.length();
+
+        // no (valid) license plate
+        if(!((strLength >= 1) && (strLength <= 10))) return;
+
+        VertexConsumer licenseConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityTranslucent(TEXTURE_CHASSIS_LICENSE_PLATE_OVERLAY));
+        this.modelChassis.render(matrices, licenseConsumer, light, OverlayTexture.DEFAULT_UV, 0xFFFFFFFF);
+
+        // render text
+        renderLicensePlateText(Text.literal(licensePlate).formatted(Formatting.BOLD), tickDelta, matrices, vertexConsumers, light);
     }
 
     private void renderWheels(KartEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
@@ -151,6 +163,9 @@ public class KartRenderer extends EntityRenderer<KartEntity> {
         // ----- retrieve data from KartEntity -----
         // wheel type
         WheelType wheelType = entity.getWheelType();
+
+        // no wheels
+        if(wheelType == WheelType.NONE) return;
 
         // model
         WheelsModelBase<KartEntity> wheelModel = this.modelWheels.get(wheelType);
@@ -176,6 +191,10 @@ public class KartRenderer extends EntityRenderer<KartEntity> {
     }
 
     private void renderEngine(KartEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+
+        // no engine
+        if(entity.getEngineType() == EngineType.ENGINE_NONE) return;
+
         // animate model
         this.modelEngine.setAngles(entity, tickDelta, 0.0f, -0.1f, 0.0f, 0.0f);
 
@@ -225,14 +244,17 @@ public class KartRenderer extends EntityRenderer<KartEntity> {
 
     private void renderRacingNumber(KartEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, boolean left) {
 
+        // retrieve data from entity
+        int racingNumber = entity.getRaceNumber();
+
+        // no (valid) number
+        if(!((racingNumber >= 1) && (racingNumber <= 99))) return;
+
+        // convert racing number to text
+        Text textRacingNumber = Text.literal(String.format("%02d",entity.getRaceNumber())).formatted(Formatting.BOLD);
+
         // get text renderer
         TextRenderer textRenderer = this.getTextRenderer();
-
-        // convert racing number to text; if it is applicable
-        Text textRacingNumber =
-                ((entity.getRaceNumber() >= 1) && (entity.getRaceNumber() <= 99))
-                    ? (Text.literal(String.format("%02d",entity.getRaceNumber())).formatted(Formatting.BOLD))
-                    : (Text.literal(""));
 
         // get new 3d space
         matrices.push();
@@ -270,5 +292,53 @@ public class KartRenderer extends EntityRenderer<KartEntity> {
         // done
         matrices.pop();
     }
+
+    private void renderLicensePlateText(Text plateText, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+
+
+        // get text renderer
+        TextRenderer textRenderer = this.getTextRenderer();
+
+        // get new 3d space
+        matrices.push();
+
+        // positioning
+        final float x = 0.0f;
+        final float y = 1.5f - (3.425f / 16.0f);
+        final float z = -1.1f;
+        matrices.translate(x, y, z);
+
+        // rotation
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0f));
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(5.0f));
+
+        // size
+        final float size = 0.007F;
+        final float size2 = 0.006F;
+        matrices.scale(-size2, size, size);
+
+        // center text
+        float textWidth = textRenderer.getWidth(plateText);
+
+        // draw text
+        textRenderer.draw(
+                plateText,
+                -textWidth / 2.0f,
+                0.0f,
+                0xFF282828,
+                false,
+                matrices.peek().getPositionMatrix(),
+                vertexConsumers,
+                TextRenderer.TextLayerType.NORMAL,
+                0x00000000,
+                light
+        );
+
+        // done
+        matrices.pop();
+
+    }
+
+
 
 }

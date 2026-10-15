@@ -22,7 +22,9 @@ public enum BodyType implements StringIdentifiable {
     LIVERY_FULL_CARBON(7, "livery_full_carbon", "Cabron"),
     LIVERY_CREEPER(8, "livery_creeper", "Creeper, aww man!"),
     LIVERY_GROTTI(9, "livery_grotti", "Grotti"),
-    LIVERY_BENEFACTOR(10, "livery_benefactor", "Benefactor");
+    LIVERY_BENEFACTOR(10, "livery_benefactor", "Benefactor"),
+    LIVERY_SUPER_A_CAR(11, "livery_super_a_car", "Super a car"),
+    LIVERY_JAPANESE_RACE_CAR(12, "livery_japanese_race_car", "Japanese race car");
 
 
     // id to value function
