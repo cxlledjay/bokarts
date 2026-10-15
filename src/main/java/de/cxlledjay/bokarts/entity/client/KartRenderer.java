@@ -40,7 +40,6 @@ public class KartRenderer extends EntityRenderer<KartEntity> {
 
     // textures
     private static final Identifier TEXTURE_CHASSIS = BoKarts.id("textures/entity/kartv2/chassis.png");
-    private static final Identifier TEXTURE_CHASSIS_LICENSE_PLATE_OVERLAY = BoKarts.id("textures/entity/kartv2/overlay_license_plate.png");
 
 
     public KartRenderer(EntityRendererFactory.Context ctx) {
@@ -143,19 +142,6 @@ public class KartRenderer extends EntityRenderer<KartEntity> {
         }
         VertexConsumer liveryConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityTranslucent(overlayTexture));
         this.modelChassis.render(matrices, liveryConsumer, light, OverlayTexture.DEFAULT_UV, overlayColor);
-
-        // ----- draw license plate, if valid -----
-        String licensePlate = ""; //< retrieve vom entity; TODO: evaluate if applicable and cool
-        int strLength = licensePlate.length();
-
-        // no (valid) license plate
-        if(!((strLength >= 1) && (strLength <= 10))) return;
-
-        VertexConsumer licenseConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityTranslucent(TEXTURE_CHASSIS_LICENSE_PLATE_OVERLAY));
-        this.modelChassis.render(matrices, licenseConsumer, light, OverlayTexture.DEFAULT_UV, 0xFFFFFFFF);
-
-        // render text
-        renderLicensePlateText(Text.literal(licensePlate).formatted(Formatting.BOLD), tickDelta, matrices, vertexConsumers, light);
     }
 
     private void renderWheels(KartEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
@@ -292,53 +278,5 @@ public class KartRenderer extends EntityRenderer<KartEntity> {
         // done
         matrices.pop();
     }
-
-    private void renderLicensePlateText(Text plateText, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
-
-
-        // get text renderer
-        TextRenderer textRenderer = this.getTextRenderer();
-
-        // get new 3d space
-        matrices.push();
-
-        // positioning
-        final float x = 0.0f;
-        final float y = 1.5f - (3.425f / 16.0f);
-        final float z = -1.1f;
-        matrices.translate(x, y, z);
-
-        // rotation
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0f));
-        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(5.0f));
-
-        // size
-        final float size = 0.007F;
-        final float size2 = 0.006F;
-        matrices.scale(-size2, size, size);
-
-        // center text
-        float textWidth = textRenderer.getWidth(plateText);
-
-        // draw text
-        textRenderer.draw(
-                plateText,
-                -textWidth / 2.0f,
-                0.0f,
-                0xFF282828,
-                false,
-                matrices.peek().getPositionMatrix(),
-                vertexConsumers,
-                TextRenderer.TextLayerType.NORMAL,
-                0x00000000,
-                light
-        );
-
-        // done
-        matrices.pop();
-
-    }
-
-
 
 }
