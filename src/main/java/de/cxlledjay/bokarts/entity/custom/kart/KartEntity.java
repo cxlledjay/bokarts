@@ -13,6 +13,7 @@ import de.cxlledjay.bokarts.util.KartFuelItems;
 import de.cxlledjay.bokarts.util.ModTags;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.block.BlockState;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.*;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
@@ -29,7 +30,9 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.StringHelper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -346,7 +349,18 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         stack.set(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR, this.getWheelColor());
         stack.set(ModDataComponentTypes.KART_ITEM_RACE_NUMBER, this.getRaceNumber());
 
+        // set name with livery
+        String name = sanitize("Kart (" + this.getBodyType().getDisplayName() + ")");
+        if(name == null) name = "Kart";
+        stack.set(DataComponentTypes.CUSTOM_NAME, Text.literal(name).styled(style -> style.withItalic(false)));
+
         return stack;
+    }
+
+    @Nullable
+    private static String sanitize(String name) {
+        String string = StringHelper.stripInvalidChars(name);
+        return string.length() <= 50 ? string : null;
     }
 
     // override creative middle click
@@ -1005,4 +1019,6 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     public void setRaceNumber(int type) {
         this.dataTracker.set(RACE_NUMBER, type);
     }
+
+
 }

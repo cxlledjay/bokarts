@@ -16,10 +16,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.stat.Stats;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.*;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
@@ -59,6 +56,7 @@ public class KartItemv2 extends Item {
         return new Item.Settings()
                 .maxCount(1)
                 .fireproof()
+                .rarity(Rarity.UNCOMMON)
                 // Initialize default stats directly onto the base item
                 .component(ModDataComponentTypes.KART_ITEM_HORN_TYPE, HornType.HORN1)
                 .component(ModDataComponentTypes.KART_ITEM_FUEL, 0.0f)
@@ -88,8 +86,8 @@ public class KartItemv2 extends Item {
             // ----- banner + livery info -----
             tooltip.add(Text.translatable("tooltip.bokarts.kart_item.shift_heading"));
             // livery + opt color
-            BodyType bodyType = stack.get(ModDataComponentTypes.KART_ITEM_BODY_TYPE);
-            int bodyColor = (stack.get(ModDataComponentTypes.KART_ITEM_BODY_COLOR) == null) ? 0 : stack.get(ModDataComponentTypes.KART_ITEM_BODY_COLOR);
+            BodyType bodyType = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_BODY_TYPE, BodyType.SOLID_COLOR_OVERLAY);
+            int bodyColor = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_BODY_COLOR, 0xFFFFFFFF);
 
             if (bodyType != null) {
                 String s = Text.translatable("tooltip.bokarts.kart_item.shift1_livery").getString()
@@ -103,12 +101,14 @@ public class KartItemv2 extends Item {
             tooltip.add(Text.translatable("tooltip.bokarts.kart_item.shift_heading2"));
 
 
+
+
             // ----- tuning info -----
             tooltip.add(Text.translatable("tooltip.bokarts.kart_item.shift_tuning"));
 
             // wheels, + opt color
-            WheelType wheelType = stack.get(ModDataComponentTypes.KART_ITEM_WHEEL_TYPE);
-            int wheelColor = (stack.get(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR) == null) ? 0 : stack.get(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR);
+            WheelType wheelType = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_WHEEL_TYPE, WheelType.NONE);
+            int wheelColor = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR,  0xFFFFFFFF);
 
             if (wheelType != null) {
                 String s = Text.translatable("tooltip.bokarts.kart_item.shift2_wheels").getString()
@@ -119,29 +119,33 @@ public class KartItemv2 extends Item {
                 }
                 tooltip.add(Text.literal(s));
             }
+
             // engine
-            EngineType engineType = stack.get(ModDataComponentTypes.KART_ITEM_ENGINE_TYPE);
+            EngineType engineType = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_ENGINE_TYPE,  EngineType.ENGINE_NONE);
             if (engineType != null) {
                 String s = Text.translatable("tooltip.bokarts.kart_item.shift2_engine").getString()
                         + engineType.getDisplayName();
                 tooltip.add(Text.literal(s));
             }
+
             // spoiler
-            SpoilerType spoilerType = stack.get(ModDataComponentTypes.KART_ITEM_SPOILER_TYPE);
+            SpoilerType spoilerType = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_SPOILER_TYPE, SpoilerType.NONE);
             if ((spoilerType != null) && (spoilerType != SpoilerType.NONE)) {
                 String s = Text.translatable("tooltip.bokarts.kart_item.shift2_spoiler").getString()
                         + spoilerType.getDisplayName();
                 tooltip.add(Text.literal(s));
             }
+
             // aero
-            AeroType aeroType = stack.get(ModDataComponentTypes.KART_ITEM_AERO_TYPE);
+            AeroType aeroType = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_AERO_TYPE, AeroType.NONE);
             if ((aeroType != null) && (aeroType != AeroType.NONE)) {
                 String s = Text.translatable("tooltip.bokarts.kart_item.shift2_aero").getString()
                         + aeroType.getDisplayName();
                 tooltip.add(Text.literal(s));
             }
+
             // race number
-            int raceNumber = (stack.get(ModDataComponentTypes.KART_ITEM_RACE_NUMBER) == null) ? 0 : stack.get(ModDataComponentTypes.KART_ITEM_RACE_NUMBER);
+            int raceNumber = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_RACE_NUMBER, 0);
             if (KartEntity.isVlalidRaceNumber(raceNumber)) {
                 String s = Text.translatable("tooltip.bokarts.kart_item.shift2_race_number").getString()
                         + String.format("%02d", raceNumber);
@@ -149,24 +153,21 @@ public class KartItemv2 extends Item {
             }
 
 
+
+
             // ----- kart stats -----
             tooltip.add(Text.translatable("tooltip.bokarts.kart_item.shift_stats"));
 
-            // owner
-            if(true) {
-                String s = Text.translatable("tooltip.bokarts.kart_item.shift3_owner").getString()
-                        + "TBD";
-                tooltip.add(Text.literal(s));
-            }
             // horn
-            HornType hornType = stack.get(ModDataComponentTypes.KART_ITEM_HORN_TYPE);
+            HornType hornType = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_HORN_TYPE, HornType.HORN1);
             if (hornType != null) {
                 String s = Text.translatable("tooltip.bokarts.kart_item.shift3_horn").getString()
                         + hornType.getDisplayName();
                 tooltip.add(Text.literal(s));
             }
+
             // fuel
-            float fuel = (stack.get(ModDataComponentTypes.KART_ITEM_FUEL) == null) ? 0 : stack.get(ModDataComponentTypes.KART_ITEM_FUEL);
+            float fuel = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_FUEL, 0.0f);
             float percentage = fuel / ClientSyncedConfig.getMaxFuelCapacity();
             String color = "§c"; //< empty color
             if (percentage > 0.5f) {
@@ -178,11 +179,11 @@ public class KartItemv2 extends Item {
             }
 
             String s1 = Text.translatable("tooltip.bokarts.kart_item.shift3_fuel").getString()
-                    + KartEntity.getFormattedFuelCapacityString(stack.get(ModDataComponentTypes.KART_ITEM_FUEL))
+                    + KartEntity.getFormattedFuelCapacityString(fuel)
                     + color + " (" +String.format("%2d", ((int) (percentage * 100))) + "%)";
             tooltip.add(Text.literal(s1));
             // odo
-            float odo = (stack.get(ModDataComponentTypes.KART_ITEM_ODOMETER) == null) ? 0 : stack.get(ModDataComponentTypes.KART_ITEM_ODOMETER);
+            float odo = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_ODOMETER, 0.0f);
             String s2 = Text.translatable("tooltip.bokarts.kart_item.shift3_odo").getString()
                     + KartEntity.getFormattedDistanceString(odo);
             tooltip.add(Text.literal(s2));
@@ -221,6 +222,18 @@ public class KartItemv2 extends Item {
             }
         }
 
+        // check kart
+        EngineType engineType = itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_ENGINE_TYPE, EngineType.ENGINE_NONE);
+        if(engineType == EngineType.ENGINE_NONE) {
+            if (!world.isClient) user.sendMessage(Text.translatable("message.bokarts.kart_item.use_no_engine"));
+            return TypedActionResult.pass(itemStack);
+        }
+        WheelType wheelType = itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_WHEEL_TYPE, WheelType.NONE);
+        if(wheelType == WheelType.NONE) {
+            if (!world.isClient) user.sendMessage(Text.translatable("message.bokarts.kart_item.use_no_wheels"));
+            return TypedActionResult.pass(itemStack);
+        }
+
         // create kart
         if (hitResult.getType() == HitResult.Type.BLOCK) {
             KartEntity kart = this.createEntity(world, hitResult, itemStack, user);
@@ -246,6 +259,7 @@ public class KartItemv2 extends Item {
 
             // spawn kart
             if (!world.isClient) {
+                kart.setCustomName(null);
                 world.spawnEntity(kart);
                 world.emitGameEvent(user, GameEvent.ENTITY_PLACE, hitResult.getPos());
                 itemStack.decrementUnlessCreative(1, user);

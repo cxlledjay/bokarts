@@ -22,7 +22,7 @@ public class ModModelProvider extends FabricModelProvider {
     @Override
     public void generateItemModels(ItemModelGenerator itemModelGenerator) {
         // the kart
-        itemModelGenerator.register(ModItems.KART_ITEM, Models.GENERATED);
+        // itemModelGenerator.register(ModItems.KART_ITEM, Models.GENERATED_THREE_LAYERS);
 
         // crafting
         itemModelGenerator.register(ModItems.KART_CRAFTING_WHEEL, Models.GENERATED);

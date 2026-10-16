@@ -7,27 +7,27 @@
 
   "tooltip.bokarts.kart_item.shift":                "§7Press §f[SHIFT] §7to reveal details",
 
-  "tooltip.bokarts.kart_item.shift_heading":        "§8================ [ KART INFO ] ================",
-  "tooltip.bokarts.kart_item.shift_heading2":       "§8---------------------------------------------",
-  "tooltip.bokarts.kart_item.shift_end":            "§8=============================================",
+  "tooltip.bokarts.kart_item.shift_heading":        "§8=========== [ KART INFO ] ===========",
+  "tooltip.bokarts.kart_item.shift_heading2":       "§8----------------------------------",
+  "tooltip.bokarts.kart_item.shift_end":            "§8==================================",
 
   "tooltip.bokarts.kart_item.shift_tuning":         " §6§l[ TUNING ]",
   "tooltip.bokarts.kart_item.shift_stats":          " §6§l[ STATS ]",
 
   "tooltip.bokarts.kart_item.shift1_livery":        " §7Livery§7: §7",
 
-  "tooltip.bokarts.kart_item.shift2_wheels":        "  §b[*] §fWheels        §7>> §f",
-  "tooltip.bokarts.kart_item.shift2_engine":        "  §b[*] §fEngine        §7>> §f",
-  "tooltip.bokarts.kart_item.shift2_spoiler":       "  §b[*] §fSpoiler       §7>> §f",
-  "tooltip.bokarts.kart_item.shift2_aero":          "  §b[*] §fAero Kit      §7>> §f",
-  "tooltip.bokarts.kart_item.shift2_race_number":   "  §b[*] §fNumber        §7>> §f",
+  "tooltip.bokarts.kart_item.shift2_wheels":        "  §b[*] §fWheels §7>> §f",
+  "tooltip.bokarts.kart_item.shift2_engine":        "  §b[*] §fEngine §7>> §f",
+  "tooltip.bokarts.kart_item.shift2_spoiler":       "  §b[*] §fSpoiler §7>> §f",
+  "tooltip.bokarts.kart_item.shift2_aero":          "  §b[*] §fAero Kit §7>> §f",
+  "tooltip.bokarts.kart_item.shift2_race_number":   "  §b[*] §fNumber §7>> §f",
 
-  "tooltip.bokarts.kart_item.shift3_owner":         "  §b[*] §fOwner         §7>> §f",
-  "tooltip.bokarts.kart_item.shift3_horn":          "  §b[*] §fHorn Sound  §7>> §f",
-  "tooltip.bokarts.kart_item.shift3_fuel":          "  §b[*] §fFuel Level   §7>> §f",
-  "tooltip.bokarts.kart_item.shift3_odo":           "  §b[*] §fOdometer     §7>> §f",
+  "tooltip.bokarts.kart_item.shift3_horn":          "  §b[*] §fHorn Sound §7>> §f",
+  "tooltip.bokarts.kart_item.shift3_fuel":          "  §b[*] §fFuel Level §7>> §f",
+  "tooltip.bokarts.kart_item.shift3_odo":           "  §b[*] §fOdometer §7>> §f",
 
-
+  "message.bokarts.kart_item.use_no_engine": "§cCan't place Kart. It has no engine :(",
+  "message.bokarts.kart_item.use_no_wheels": "§cCan't place Kart. It has no wheels :(",
 
 
 
