@@ -1,27 +1,19 @@
 package de.cxlledjay.bokarts.datagen;
 
 import de.cxlledjay.bokarts.BoKarts;
+import de.cxlledjay.bokarts.block.ModBlocks;
+import de.cxlledjay.bokarts.item.ModItemGroups;
 import de.cxlledjay.bokarts.item.ModItems;
-import de.cxlledjay.bokarts.recipes.KartShapelessPaintColorRecipe;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
-import net.minecraft.advancement.Advancement;
-import net.minecraft.advancement.AdvancementEntry;
 import net.minecraft.data.server.recipe.RecipeExporter;
+import net.minecraft.data.server.recipe.RecipeProvider;
 import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
-import net.minecraft.data.server.recipe.ShapelessRecipeJsonBuilder;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.data.server.recipe.SmithingTransformRecipeJsonBuilder;
 import net.minecraft.item.Items;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.ShapelessRecipe;
+import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.book.RecipeCategory;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -34,18 +26,26 @@ public class ModRecipeProvider extends FabricRecipeProvider {
     @Override
     public void generate(RecipeExporter exporter) {
 
-        // crafting
-        ShapedRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, ModItems.KART_CRAFTING_WHEEL)
-                .pattern(" W ")
-                .pattern("WIW")
-                .pattern(" W ")
-                .input('W', Items.BLACK_WOOL)
-                .input('I', Items.IRON_INGOT)
-                .criterion(hasItem(Items.BLACK_WOOL), conditionsFromItem(Items.BLACK_WOOL))
-                .criterion(hasItem(Items.IRON_INGOT), conditionsFromItem(Items.IRON_INGOT))
+        // --- chassis ---
+        ShapedRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, ModItems.CHASSIS_BLUEPRINT)
+                .pattern(" L ")
+                .pattern("WSR")
+                .pattern("CIC")
+                .input('W', ModItems.STEERING_WHEEL)
+                .input('S', ModItems.SEAT)
+                .input('L', Items.LEVER)
+                .input('R', Items.REDSTONE_BLOCK)
+                .input('C', Items.COPPER_INGOT)
+                .input('I', Items.IRON_BLOCK)
+                .criterion(hasItem(ModItems.STEERING_WHEEL), conditionsFromItem(ModItems.STEERING_WHEEL))
+                .criterion(hasItem(ModItems.SEAT), conditionsFromItem(ModItems.SEAT))
+                .criterion(hasItem(Items.LEVER), conditionsFromItem(Items.LEVER))
+                .criterion(hasItem(Items.REDSTONE_BLOCK), conditionsFromItem(Items.REDSTONE_BLOCK))
+                .criterion(hasItem(Items.COPPER_INGOT), conditionsFromItem(Items.COPPER_INGOT))
+                .criterion(hasItem(Items.IRON_BLOCK), conditionsFromItem(Items.IRON_BLOCK))
                 .offerTo(exporter);
 
-        ShapedRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, ModItems.KART_CRAFTING_STEERING_WHEEL)
+        ShapedRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, ModItems.STEERING_WHEEL)
                 .pattern(" G ")
                 .pattern("WLW")
                 .pattern(" W ")
@@ -57,12 +57,234 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .criterion(hasItem(Items.GOLD_INGOT), conditionsFromItem(Items.GOLD_INGOT))
                 .offerTo(exporter);
 
-        ShapedRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, ModItems.KART_CRAFTING_SEAT)
+        ShapedRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, ModItems.SEAT)
                 .pattern("  W")
                 .pattern("  W")
                 .pattern("WWW")
                 .input('W', Items.GRAY_WOOL)
                 .criterion(hasItem(Items.GRAY_WOOL), conditionsFromItem(Items.GRAY_WOOL))
                 .offerTo(exporter);
+
+        // --- wheels ---
+        ShapedRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, ModItems.WHEELS_STREET)
+                .pattern("MWM")
+                .pattern("WIW")
+                .pattern("MWM")
+                .input('W', Items.BLACK_WOOL)
+                .input('I', Items.IRON_BLOCK)
+                .input('M', Items.GRAY_CONCRETE_POWDER)
+                .criterion(hasItem(Items.BLACK_WOOL), conditionsFromItem(Items.BLACK_WOOL))
+                .criterion(hasItem(Items.IRON_BLOCK), conditionsFromItem(Items.IRON_BLOCK))
+                .criterion(hasItem(Items.GRAY_CONCRETE_POWDER), conditionsFromItem(Items.GRAY_CONCRETE_POWDER))
+                .offerTo(exporter);
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, ModItems.WHEELS_DRIFT)
+                .pattern("MWM")
+                .pattern("WIW")
+                .pattern("MWM")
+                .input('W', Items.BLACK_WOOL)
+                .input('I', Items.IRON_BLOCK)
+                .input('M', Items.PACKED_ICE)
+                .criterion(hasItem(Items.BLACK_WOOL), conditionsFromItem(Items.BLACK_WOOL))
+                .criterion(hasItem(Items.IRON_BLOCK), conditionsFromItem(Items.IRON_BLOCK))
+                .criterion(hasItem(Items.PACKED_ICE), conditionsFromItem(Items.PACKED_ICE))
+                .offerTo(exporter);
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, ModItems.WHEELS_OFFROAD)
+                .pattern("MWM")
+                .pattern("WIW")
+                .pattern("MWM")
+                .input('W', Items.BLACK_WOOL)
+                .input('I', Items.IRON_BLOCK)
+                .input('M', Items.DIRT)
+                .criterion(hasItem(Items.BLACK_WOOL), conditionsFromItem(Items.BLACK_WOOL))
+                .criterion(hasItem(Items.IRON_BLOCK), conditionsFromItem(Items.IRON_BLOCK))
+                .criterion(hasItem(Items.DIRT), conditionsFromItem(Items.DIRT))
+                .offerTo(exporter);
+
+        // --- engines ---
+        ShapedRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, ModItems.ENGINE_COPPER)
+                .pattern("PP ")
+                .pattern("HFC")
+                .input('P', Items.PISTON)
+                .input('H', Items.HOPPER)
+                .input('F', Items.FURNACE)
+                .input('C', Items.COPPER_BLOCK)
+                .criterion(hasItem(Items.PISTON), conditionsFromItem(Items.PISTON))
+                .criterion(hasItem(Items.HOPPER), conditionsFromItem(Items.HOPPER))
+                .criterion(hasItem(Items.FURNACE), conditionsFromItem(Items.FURNACE))
+                .criterion(hasItem(Items.COPPER_BLOCK), conditionsFromItem(Items.COPPER_BLOCK))
+                .offerTo(exporter, BoKarts.id("engine_copper_crafting"));
+        ShapedRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, ModItems.ENGINE_COPPER)
+                .pattern("PP ")
+                .pattern("HFC")
+                .input('P', Items.PISTON)
+                .input('H', Items.HOPPER)
+                .input('F', Items.FURNACE)
+                .input('C', Items.WAXED_COPPER_BLOCK)
+                .criterion(hasItem(Items.PISTON), conditionsFromItem(Items.PISTON))
+                .criterion(hasItem(Items.HOPPER), conditionsFromItem(Items.HOPPER))
+                .criterion(hasItem(Items.FURNACE), conditionsFromItem(Items.FURNACE))
+                .criterion(hasItem(Items.WAXED_COPPER_BLOCK), conditionsFromItem(Items.WAXED_COPPER_BLOCK))
+                .offerTo(exporter, BoKarts.id("engine_copper_crafting1"));
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, ModItems.ENGINE_IRON)
+                .pattern("III")
+                .pattern("IEI")
+                .pattern("III")
+                .input('E', ModItems.ENGINE_COPPER)
+                .input('I', Items.IRON_INGOT)
+                .criterion(hasItem(ModItems.ENGINE_COPPER), conditionsFromItem(ModItems.ENGINE_COPPER))
+                .criterion(hasItem(Items.IRON_INGOT), conditionsFromItem(Items.IRON_INGOT))
+                .offerTo(exporter);
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, ModItems.ENGINE_GOLD)
+                .pattern("III")
+                .pattern("IEI")
+                .pattern("III")
+                .input('E', ModItems.ENGINE_IRON)
+                .input('I', Items.GOLD_INGOT)
+                .criterion(hasItem(ModItems.ENGINE_IRON), conditionsFromItem(ModItems.ENGINE_IRON))
+                .criterion(hasItem(Items.IRON_INGOT), conditionsFromItem(Items.IRON_INGOT))
+                .offerTo(exporter);
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, ModItems.ENGINE_DIAMOND)
+                .pattern("III")
+                .pattern("IEI")
+                .pattern("III")
+                .input('E', ModItems.ENGINE_GOLD)
+                .input('I', Items.DIAMOND)
+                .criterion(hasItem(ModItems.ENGINE_GOLD), conditionsFromItem(ModItems.ENGINE_GOLD))
+                .criterion(hasItem(Items.DIAMOND), conditionsFromItem(Items.DIAMOND))
+                .offerTo(exporter);
+
+        SmithingTransformRecipeJsonBuilder.create(
+                        Ingredient.ofItems(Items.NETHERITE_UPGRADE_SMITHING_TEMPLATE),
+                        Ingredient.ofItems(ModItems.ENGINE_DIAMOND),
+                        Ingredient.ofItems(Items.NETHERITE_INGOT),
+                        RecipeCategory.TRANSPORTATION,
+                        ModItems.ENGINE_NETHERITE
+                )
+                .criterion(hasItem(ModItems.ENGINE_DIAMOND), conditionsFromItem(ModItems.ENGINE_DIAMOND))
+                .criterion(hasItem(Items.NETHERITE_INGOT), conditionsFromItem(Items.NETHERITE_INGOT))
+                .criterion(hasItem(Items.NETHERITE_UPGRADE_SMITHING_TEMPLATE), conditionsFromItem(Items.NETHERITE_UPGRADE_SMITHING_TEMPLATE))
+                .offerTo(exporter, BoKarts.id("engine_netherite_smithing"));
+
+        // --- spoilers
+        ShapedRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, ModItems.SPOILER_STREET)
+                .pattern("BBB")
+                .pattern("C C")
+                .input('B', Items.BLACK_CONCRETE)
+                .input('C', Items.CHAIN)
+                .criterion(hasItem(Items.BLACK_CONCRETE), conditionsFromItem(Items.BLACK_CONCRETE))
+                .criterion(hasItem(Items.CHAIN), conditionsFromItem(Items.CHAIN))
+                .offerTo(exporter);
+        ShapedRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, ModItems.SPOILER_STREET_CARBON)
+                .pattern("BBB")
+                .pattern("C C")
+                .input('B', Items.COAL_BLOCK)
+                .input('C', Items.CHAIN)
+                .criterion(hasItem(Items.COAL_BLOCK), conditionsFromItem(Items.COAL_BLOCK))
+                .criterion(hasItem(Items.CHAIN), conditionsFromItem(Items.CHAIN))
+                .offerTo(exporter);
+        ShapedRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, ModItems.SPOILER_RACE)
+                .pattern("BBB")
+                .pattern("BBB")
+                .pattern("C C")
+                .input('B', Items.BLACK_CONCRETE)
+                .input('C', Items.CHAIN)
+                .criterion(hasItem(Items.BLACK_CONCRETE), conditionsFromItem(Items.BLACK_CONCRETE))
+                .criterion(hasItem(Items.CHAIN), conditionsFromItem(Items.CHAIN))
+                .offerTo(exporter);
+        ShapedRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, ModItems.SPOILER_RACE_CARBON)
+                .pattern("BBB")
+                .pattern("BBB")
+                .pattern("C C")
+                .input('B', Items.COAL_BLOCK)
+                .input('C', Items.CHAIN)
+                .criterion(hasItem(Items.COAL_BLOCK), conditionsFromItem(Items.COAL_BLOCK))
+                .criterion(hasItem(Items.CHAIN), conditionsFromItem(Items.CHAIN))
+                .offerTo(exporter);
+
+        // --- aero ---
+        ShapedRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, ModItems.AERO_RACE)
+                .pattern("CIC")
+                .pattern("CBC")
+                .pattern("BBB")
+                .input('I', Items.IRON_BARS)
+                .input('B', Items.BLACK_CONCRETE)
+                .input('C', Items.CHAIN)
+                .criterion(hasItem(Items.IRON_BARS), conditionsFromItem(Items.IRON_BARS))
+                .criterion(hasItem(Items.BLACK_CONCRETE), conditionsFromItem(Items.BLACK_CONCRETE))
+                .criterion(hasItem(Items.CHAIN), conditionsFromItem(Items.CHAIN))
+                .offerTo(exporter);
+        ShapedRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, ModItems.AERO_RACE_CARBON)
+                .pattern("CIC")
+                .pattern("CBC")
+                .pattern("BBB")
+                .input('I', Items.IRON_BARS)
+                .input('B', Items.COAL_BLOCK)
+                .input('C', Items.CHAIN)
+                .criterion(hasItem(Items.IRON_BARS), conditionsFromItem(Items.IRON_BARS))
+                .criterion(hasItem(Items.COAL_BLOCK), conditionsFromItem(Items.COAL_BLOCK))
+                .criterion(hasItem(Items.CHAIN), conditionsFromItem(Items.CHAIN))
+                .offerTo(exporter);
+
+
+
+        // --- liveries ---
+        ShapedRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, ModItems.LIVERY_TEMPLATE)
+                .pattern("RGB")
+                .pattern("PPP")
+                .input('R', Items.RED_DYE)
+                .input('G', Items.GREEN_DYE)
+                .input('B', Items.BLUE_DYE)
+                .input('P', Items.PAPER)
+                .criterion(hasItem(Items.RED_DYE), conditionsFromItem(Items.RED_DYE))
+                .criterion(hasItem(Items.GREEN_DYE), conditionsFromItem(Items.GREEN_DYE))
+                .criterion(hasItem(Items.BLUE_DYE), conditionsFromItem(Items.BLUE_DYE))
+                .criterion(hasItem(Items.PAPER), conditionsFromItem(Items.PAPER))
+                .offerTo(exporter);
+
+
+        // --- key ---
+        ShapedRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, ModItems.KEY)
+                .pattern("II ")
+                .pattern(" I ")
+                .pattern(" F ")
+                .input('I', Items.IRON_INGOT)
+                .input('F', Items.BLACK_DYE)
+                .criterion(hasItem(Items.IRON_INGOT), conditionsFromItem(Items.IRON_INGOT))
+                .criterion(hasItem(Items.BLACK_DYE), conditionsFromItem(Items.BLACK_DYE))
+                .offerTo(exporter);
+
+
+        // --- lift ---
+        ShapedRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, ModBlocks.KART_LIFT)
+                .pattern(" I ")
+                .pattern(" RL")
+                .pattern("CIC")
+                .input('I', Items.IRON_BLOCK)
+                .input('R', Items.REDSTONE_BLOCK)
+                .input('L', Items.LEVER)
+                .input('C', Items.OXIDIZED_COPPER)
+                .criterion(hasItem(Items.IRON_BLOCK), conditionsFromItem(Items.IRON_BLOCK))
+                .criterion(hasItem(Items.REDSTONE_BLOCK), conditionsFromItem(Items.REDSTONE_BLOCK))
+                .criterion(hasItem(Items.LEVER), conditionsFromItem(Items.LEVER))
+                .criterion(hasItem(Items.OXIDIZED_COPPER), conditionsFromItem(Items.OXIDIZED_COPPER))
+                .offerTo(exporter, BoKarts.id("kart_lift_crafting"));
+        ShapedRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, ModBlocks.KART_LIFT)
+                .pattern(" I ")
+                .pattern(" RL")
+                .pattern("CIC")
+                .input('I', Items.IRON_BLOCK)
+                .input('R', Items.REDSTONE_BLOCK)
+                .input('L', Items.LEVER)
+                .input('C', Items.WAXED_OXIDIZED_COPPER)
+                .criterion(hasItem(Items.IRON_BLOCK), conditionsFromItem(Items.IRON_BLOCK))
+                .criterion(hasItem(Items.REDSTONE_BLOCK), conditionsFromItem(Items.REDSTONE_BLOCK))
+                .criterion(hasItem(Items.LEVER), conditionsFromItem(Items.LEVER))
+                .criterion(hasItem(Items.WAXED_OXIDIZED_COPPER), conditionsFromItem(Items.WAXED_OXIDIZED_COPPER))
+                .offerTo(exporter, BoKarts.id("kart_lift_crafting1"));
     }
 }

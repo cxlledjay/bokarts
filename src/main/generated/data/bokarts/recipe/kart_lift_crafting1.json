@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "C": {
+      "item": "minecraft:waxed_oxidized_copper"
+    },
+    "I": {
+      "item": "minecraft:iron_block"
+    },
+    "L": {
+      "item": "minecraft:lever"
+    },
+    "R": {
+      "item": "minecraft:redstone_block"
+    }
+  },
+  "pattern": [
+    " I ",
+    " RL",
+    "CIC"
+  ],
+  "result": {
+    "count": 1,
+    "id": "bokarts:kart_lift_block"
+  }
+}

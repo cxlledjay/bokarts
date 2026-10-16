@@ -1,0 +1,65 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_iron_block": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:iron_block"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_lever": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:lever"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_redstone_block": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:redstone_block"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "bokarts:kart_lift_crafting1"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    },
+    "has_waxed_oxidized_copper": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:waxed_oxidized_copper"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_iron_block",
+      "has_redstone_block",
+      "has_lever",
+      "has_waxed_oxidized_copper"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "bokarts:kart_lift_crafting1"
+    ]
+  }
+}

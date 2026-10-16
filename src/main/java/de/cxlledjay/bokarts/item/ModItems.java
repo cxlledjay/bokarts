@@ -1,7 +1,6 @@
 package de.cxlledjay.bokarts.item;
 
 import de.cxlledjay.bokarts.BoKarts;
-import de.cxlledjay.bokarts.entity.custom.kart.KartEntity;
 import de.cxlledjay.bokarts.item.custom.KartItem;
 import de.cxlledjay.bokarts.item.custom.KartItemv2;
 import de.cxlledjay.bokarts.item.custom.LiveryTemplate;
@@ -16,16 +15,36 @@ public class ModItems {
     // the kart
     public static final Item KART_ITEM    = registerItem("kart_item",    new KartItemv2(KartItemv2.defaultKartSettings()));
 
+    // ----- kart crafting ingredients -----
+    // chassis
+    public static final Item STEERING_WHEEL = registerItem("steering_wheel", new Item(new Item.Settings()));
+    public static final Item SEAT = registerItem("seat", new Item(new Item.Settings()));
+    public static final Item CHASSIS_BLUEPRINT = registerItem("chassis_blueprint", new Item(new Item.Settings()));
+    // wheels
+    public static final Item WHEELS_STREET = registerItem("wheels_street", new Item(new Item.Settings()));
+    public static final Item WHEELS_DRIFT = registerItem("wheels_drift", new Item(new Item.Settings()));
+    public static final Item WHEELS_OFFROAD = registerItem("wheels_offroad", new Item(new Item.Settings()));
+    // engines
+    public static final Item ENGINE_COPPER = registerItem("engine_copper", new Item(new Item.Settings()));
+    public static final Item ENGINE_IRON = registerItem("engine_iron", new Item(new Item.Settings()));
+    public static final Item ENGINE_GOLD = registerItem("engine_gold", new Item(new Item.Settings()));
+    public static final Item ENGINE_DIAMOND = registerItem("engine_diamond", new Item(new Item.Settings()));
+    public static final Item ENGINE_NETHERITE = registerItem("engine_netherite", new Item(new Item.Settings()));
+
     // kart tuning parts
+    public static final Item SPOILER_STREET = registerItem("spoiler_street", new Item(new Item.Settings()));
+    public static final Item SPOILER_STREET_CARBON = registerItem("spoiler_street_carbon", new Item(new Item.Settings()));
+    public static final Item SPOILER_RACE = registerItem("spoiler_race", new Item(new Item.Settings()));
+    public static final Item SPOILER_RACE_CARBON = registerItem("spoiler_race_carbon", new Item(new Item.Settings()));
+    public static final Item AERO_RACE = registerItem("aero_race", new Item(new Item.Settings()));
+    public static final Item AERO_RACE_CARBON = registerItem("aero_race_carbon", new Item(new Item.Settings()));
+
+    // customization
     public static final Item LIVERY_TEMPLATE = registerItem("livery_template", new LiveryTemplate(LiveryTemplate.defaultLiverySettings()));
 
-    // kart crafting ingredients
-    public static final Item KART_CRAFTING_WHEEL = registerItem("kart_wheel", new Item(new Item.Settings()));
-    public static final Item KART_CRAFTING_STEERING_WHEEL = registerItem("kart_steering_wheel", new Item(new Item.Settings()));
-    public static final Item KART_CRAFTING_SEAT = registerItem("kart_seat", new Item(new Item.Settings()));
 
     // accessories
-    public static final Item KART_KEY = registerItem("kart_key", new Item(new Item.Settings()));
+    public static final Item KEY = registerItem("key", new Item(new Item.Settings()));
 
 
 

@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "E": {
+      "item": "bokarts:engine_gold"
+    },
+    "I": {
+      "item": "minecraft:diamond"
+    }
+  },
+  "pattern": [
+    "III",
+    "IEI",
+    "III"
+  ],
+  "result": {
+    "count": 1,
+    "id": "bokarts:engine_diamond"
+  }
+}

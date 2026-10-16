@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "E": {
+      "item": "bokarts:engine_copper"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    }
+  },
+  "pattern": [
+    "III",
+    "IEI",
+    "III"
+  ],
+  "result": {
+    "count": 1,
+    "id": "bokarts:engine_iron"
+  }
+}

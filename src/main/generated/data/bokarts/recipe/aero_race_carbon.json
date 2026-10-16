@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "minecraft:coal_block"
+    },
+    "C": {
+      "item": "minecraft:chain"
+    },
+    "I": {
+      "item": "minecraft:iron_bars"
+    }
+  },
+  "pattern": [
+    "CIC",
+    "CBC",
+    "BBB"
+  ],
+  "result": {
+    "count": 1,
+    "id": "bokarts:aero_race_carbon"
+  }
+}

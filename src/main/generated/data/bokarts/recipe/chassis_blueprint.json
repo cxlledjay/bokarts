@@ -1,0 +1,33 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "C": {
+      "item": "minecraft:copper_ingot"
+    },
+    "I": {
+      "item": "minecraft:iron_block"
+    },
+    "L": {
+      "item": "minecraft:lever"
+    },
+    "R": {
+      "item": "minecraft:redstone_block"
+    },
+    "S": {
+      "item": "bokarts:seat"
+    },
+    "W": {
+      "item": "bokarts:steering_wheel"
+    }
+  },
+  "pattern": [
+    " L ",
+    "WSR",
+    "CIC"
+  ],
+  "result": {
+    "count": 1,
+    "id": "bokarts:chassis_blueprint"
+  }
+}

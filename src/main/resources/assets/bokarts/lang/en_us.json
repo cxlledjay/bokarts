@@ -1,11 +1,34 @@
 {
   "itemgroup.bokarts.bokart_items" : "BoKarts",
 
+  "item.bokarts.chassis_blueprint" : "Chassis Blueprint",
+  "item.bokarts.steering_wheel" : "Kart Steering Wheel",
+  "item.bokarts.seat" : "Kart Seat",
+
+  "item.bokarts.wheels_street" : "Kart Wheels (Street)",
+  "item.bokarts.wheels_drift" : "Kart Wheels (Drift)",
+  "item.bokarts.wheels_offroad" : "Kart Wheels (Offroad)",
+
+  "item.bokarts.engine_copper": "Kart Engine (Copper)",
+  "item.bokarts.engine_iron": "Kart Engine (Iron)",
+  "item.bokarts.engine_gold": "Kart Engine (Gold)",
+  "item.bokarts.engine_diamond": "Kart Engine (Diamond)",
+  "item.bokarts.engine_netherite": "Kart Engine (Netherite)",
+
+  "item.bokarts.spoiler_street": "Kart Spoiler (Street)",
+  "item.bokarts.spoiler_street_carbon": "Kart Spoiler (Street Carbon)",
+  "item.bokarts.spoiler_race": "Kart Spoiler (Race)",
+  "item.bokarts.spoiler_race_carbon": "Kart Spoiler (Race Carbon)",
+
+  "item.bokarts.aero_race": "Kart Aero Kit (Race)",
+  "item.bokarts.aero_race_carbon": "Kart Aero Kit (Race Carbon)",
+
+
   "item.bokarts.livery_template" : "Livery Template",
-  "item.bokarts.kart_seat" : "Kart Seat",
-  "item.bokarts.kart_wheel" : "Kart Wheel",
-  "item.bokarts.kart_steering_wheel" : "Kart Steering Wheel",
-  "item.bokarts.kart_key" : "Kart Key",
+
+  "item.bokarts.key" : "Kart Key",
+
+
 
   "tooltip.bokarts.kart_item.shift":                "§7Press §f[SHIFT] §7to reveal details",
 

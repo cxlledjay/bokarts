@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "C": {
+      "item": "minecraft:waxed_copper_block"
+    },
+    "F": {
+      "item": "minecraft:furnace"
+    },
+    "H": {
+      "item": "minecraft:hopper"
+    }
+  },
+  "pattern": [
+    "H ",
+    "FC"
+  ],
+  "result": {
+    "count": 1,
+    "id": "bokarts:engine_copper"
+  }
+}

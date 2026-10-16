@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "F": {
+      "item": "minecraft:black_dye"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    }
+  },
+  "pattern": [
+    "II ",
+    " I ",
+    " F "
+  ],
+  "result": {
+    "count": 1,
+    "id": "bokarts:key"
+  }
+}

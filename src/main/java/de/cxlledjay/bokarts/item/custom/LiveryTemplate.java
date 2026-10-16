@@ -27,7 +27,6 @@ public class LiveryTemplate extends Item {
     public static Item.Settings defaultLiverySettings() {
         return new Item.Settings()
                 .maxCount(1)
-                .rarity(Rarity.UNCOMMON)
                 .component(ModDataComponentTypes.KART_ITEM_BODY_TYPE, BodyType.SOLID_COLOR_OVERLAY)
                 .component(ModDataComponentTypes.KART_ITEM_BODY_COLOR, 0xFFFFFFFF)
                 .component(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR, 0xFFFFFFFF);
