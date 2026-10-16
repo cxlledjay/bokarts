@@ -23,6 +23,7 @@ public class ModItemGroups {
                         entries.add(new ItemStack(ModItems.KART_ITEM));
 
                         // crafting ingredients
+                        entries.add(new ItemStack(ModItems.LIVERY_TEMPLATE));
                         entries.add(new ItemStack(ModItems.KART_CRAFTING_SEAT));
                         entries.add(new ItemStack(ModItems.KART_CRAFTING_WHEEL));
                         entries.add(new ItemStack(ModItems.KART_CRAFTING_STEERING_WHEEL));

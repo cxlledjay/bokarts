@@ -1,5 +1,7 @@
 {
   "itemgroup.bokarts.bokart_items" : "BoKarts",
+
+  "item.bokarts.livery_template" : "Livery Template",
   "item.bokarts.kart_seat" : "Kart Seat",
   "item.bokarts.kart_wheel" : "Kart Wheel",
   "item.bokarts.kart_steering_wheel" : "Kart Steering Wheel",
@@ -26,6 +28,13 @@
   "tooltip.bokarts.kart_item.shift3_fuel":          "  §b[*] §fFuel Level §7>> §f",
   "tooltip.bokarts.kart_item.shift3_odo":           "  §b[*] §fOdometer §7>> §f",
 
+
+  "tooltip.bokarts.livery_template.shift":          "§7Press §f[SHIFT] §7to reveal details",
+  "tooltip.bokarts.livery_template.body_type":      "§7Livery§7: §7",
+  "tooltip.bokarts.livery_template.body_color":     " §b[*] §fBody Color §7>> §f",
+  "tooltip.bokarts.livery_template.wheel_color":    " §b[*] §fWheel Color §7>> §f",
+
+
   "message.bokarts.kart_item.use_no_engine": "§cCan't place Kart. It has no engine :(",
   "message.bokarts.kart_item.use_no_wheels": "§cCan't place Kart. It has no wheels :(",
 
@@ -34,7 +43,7 @@
   "item.bokarts.kart_item": "Kart",
 
   "tooltip.bokarts.kart_lift_block.crafting": "§7Used to craft and modify the Kart",
-  "tooltip.bokarts.kart_lift_block.setup": "§7In order to create a working Lift, place two Lift Blocks facing each other with two blocks space",
+  "tooltip.bokarts.kart_lift_block.setup": "§7Place two Lift Blocks facing each other with two blocks space",
   "block.bokarts.kart_lift_block": "Kart Lift",
 
   "entity.bokarts.kart" : "BoKart",

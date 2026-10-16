@@ -4,6 +4,7 @@ import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.entity.custom.kart.KartEntity;
 import de.cxlledjay.bokarts.item.custom.KartItem;
 import de.cxlledjay.bokarts.item.custom.KartItemv2;
+import de.cxlledjay.bokarts.item.custom.LiveryTemplate;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
@@ -16,6 +17,7 @@ public class ModItems {
     public static final Item KART_ITEM    = registerItem("kart_item",    new KartItemv2(KartItemv2.defaultKartSettings()));
 
     // kart tuning parts
+    public static final Item LIVERY_TEMPLATE = registerItem("livery_template", new LiveryTemplate(LiveryTemplate.defaultLiverySettings()));
 
     // kart crafting ingredients
     public static final Item KART_CRAFTING_WHEEL = registerItem("kart_wheel", new Item(new Item.Settings()));

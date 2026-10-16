@@ -8,15 +8,15 @@ public class KartItemColorProvider {
 
     public static void registerKartItemOverlay() {
         ColorProviderRegistry.ITEM.register((stack, tintIndex) -> {
-            int color = 0xFFFFFFFF; //< default, if no color or layer 0
-            if(tintIndex == 1) {
+            int color = 0xFFFFFFFF; //< default, if no color or layer 2
+            if(tintIndex == 0) {
                 // set to body color
                 color = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_BODY_COLOR, 0xFFFFFFFF);
-            } else if (tintIndex == 2) {
+            } else if (tintIndex == 1) {
                 // set to wheels color
                 color = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR, 0xFFFFFFFF);
             }
             return color | 0xFF000000;
-        }, ModItems.KART_ITEM);
+        }, ModItems.KART_ITEM, ModItems.LIVERY_TEMPLATE);
     }
 }

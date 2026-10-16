@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "bokarts:item/livery_template_layer0",
+    "layer1": "bokarts:item/livery_template_layer1",
+    "layer2": "bokarts:item/livery_template_layer2"
+  }
+}
