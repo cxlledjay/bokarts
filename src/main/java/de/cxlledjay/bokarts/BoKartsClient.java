@@ -14,6 +14,7 @@ import de.cxlledjay.bokarts.keymapping.ModKeyMappings;
 import de.cxlledjay.bokarts.networking.ModPackets;
 import de.cxlledjay.bokarts.screen.ModScreenHandlers;
 import de.cxlledjay.bokarts.screen.custom.KartInventoryScreen;
+import de.cxlledjay.bokarts.screen.custom.KartLiftScreen;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
@@ -38,6 +39,7 @@ public class BoKartsClient implements ClientModInitializer {
 
         // screens
         HandledScreens.register(ModScreenHandlers.KART_INVENTORY_SCREEN_HANDLER, KartInventoryScreen::new);
+        HandledScreens.register(ModScreenHandlers.KART_LIFT_SCREEN_HANDLER, KartLiftScreen::new);
 
         // kart lift rendering
         EntityModelLayerRegistry.registerModelLayer(KartLiftArmsModel.KART_LIFT_ARMS_LAYER, KartLiftArmsModel::getTexturedModelData);

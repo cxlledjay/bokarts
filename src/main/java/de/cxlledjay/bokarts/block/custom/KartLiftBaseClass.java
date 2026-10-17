@@ -92,12 +92,15 @@ public abstract class KartLiftBaseClass extends Block {
             if (lift_be instanceof KartLiftBlockEntity lift) {
 
                 // switch lift state
-                if(lift.animationState == KartLiftBlockEntity.LiftState.EMPTY) lift.animationState = KartLiftBlockEntity.LiftState.ANIMATION_UP;
-                else if(lift.animationState == KartLiftBlockEntity.LiftState.ACTIVE) lift.animationState = KartLiftBlockEntity.LiftState.ANIMATION_DOWN;
+                // if(lift.liftState == KartLiftBlockEntity.LiftState.EMPTY) lift.liftState = KartLiftBlockEntity.LiftState.ANIMATION_UP;
+                // else if(lift.liftState == KartLiftBlockEntity.LiftState.ACTIVE) lift.liftState = KartLiftBlockEntity.LiftState.ANIMATION_DOWN;
 
                 // AND sync
-                lift_be.markDirty();
-                world.updateListeners(corePos, state, state, 3);
+                // lift_be.markDirty();
+                // world.updateListeners(corePos, state, state, 3);
+
+                // TESTING: open kart lift screen
+                player.openHandledScreen(lift);
 
             } else {
                 BoKarts.LOGGER.info("ERROR: No BlockEntity found at {}", corePos.toShortString());

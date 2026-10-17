@@ -69,7 +69,7 @@
   "tooltip.bokarts.kart_lift_block.setup": "§7Place two Lift Blocks facing each other with two blocks space",
   "block.bokarts.kart_lift_block": "Kart Lift",
 
-  "entity.bokarts.kart" : "BoKart",
+  "entity.bokarts.kart" : "Kart",
   "sounds.bokarts.kart_engine": "Kart Engine",
   "sounds.bokarts.horn": "Kart Horn",
 

@@ -29,18 +29,18 @@ public class KartInventoryScreen extends HandledScreen<KartInventoryScreenHandle
 
     private static final Identifier BACKGROUND_TEXTURE = BoKarts.id("textures/gui/kart_inventory/kart_inventory.png");
     ButtonTextures REFUEL_BUTTON_TEXTURES = new ButtonTextures(
-            BoKarts.id("refuel"),
-            BoKarts.id("refuel_highlighted")
+            BoKarts.id("kart_inventory/refuel"),
+            BoKarts.id("kart_inventory/refuel_highlighted")
     );
     private static final Identifier FURNACE_UNLIT = Identifier.of("minecraft", "textures/block/furnace_front.png");
     private static final Identifier FURNACE_LIT = Identifier.of("minecraft", "textures/block/furnace_front_on.png");
     ButtonTextures HORN_PREVIOUS_TEXTURES = new ButtonTextures(
-            BoKarts.id("horn_prev"),
-            BoKarts.id("horn_prev_highlighted")
+            BoKarts.id("kart_inventory/horn_prev"),
+            BoKarts.id("kart_inventory/horn_prev_highlighted")
     );
     ButtonTextures HORN_NEXT_TEXTURES = new ButtonTextures(
-            BoKarts.id("horn_next"),
-            BoKarts.id("horn_next_highlighted")
+            BoKarts.id("kart_inventory/horn_next"),
+            BoKarts.id("kart_inventory/horn_next_highlighted")
     );
 
     public KartInventoryScreen(KartInventoryScreenHandler handler, PlayerInventory inventory, Text title) {
