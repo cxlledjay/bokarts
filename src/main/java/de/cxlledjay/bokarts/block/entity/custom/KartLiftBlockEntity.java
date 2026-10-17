@@ -1,6 +1,7 @@
 package de.cxlledjay.bokarts.block.entity.custom;
 
 import de.cxlledjay.bokarts.BoKarts;
+import de.cxlledjay.bokarts.block.custom.KartLiftBaseClass;
 import de.cxlledjay.bokarts.block.entity.ModBlockEntities;
 import de.cxlledjay.bokarts.component.ModDataComponentTypes;
 import de.cxlledjay.bokarts.entity.ModEntities;
@@ -13,6 +14,7 @@ import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -24,8 +26,11 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -87,8 +92,39 @@ public class KartLiftBlockEntity extends BlockEntity implements ExtendedScreenHa
         }
 
         // and sync
-        this.markDirty();
-        if(this.world != null) this.world.updateListeners(this.getPos(),this.getCachedState(), this.getCachedState(), 3);
+        syncKartData();
+    }
+
+    private void releaseKart() {
+        // get kart
+        KartEntity kartEntity = this.getKartEntity();
+
+        // only spawn on the server, and only if a kart exists
+        if (kartEntity != null && this.world != null && !this.world.isClient) {
+
+            // calculate position and rotation
+            Direction facing = this.getCachedState().get(KartLiftBaseClass.FACING);
+            Vec3d center = this.getPos().toCenterPos();
+
+            double spawnX = center.x + (facing.getOffsetX() * 1.5);
+            double spawnY = center.y - 1.42;
+            double spawnZ = center.z + (facing.getOffsetZ() * 1.5);
+
+            float yaw = facing.asRotation() - 90.0F;
+
+            // apply position and rotation
+            kartEntity.refreshPositionAndAngles(spawnX, spawnY, spawnZ, yaw, 0.0F);
+            kartEntity.setBodyYaw(yaw);
+            kartEntity.setHeadYaw(yaw);
+
+            // spawn it
+            this.world.spawnEntity(kartEntity);
+
+            // delete from lift
+            this.storedKart = null;
+            this.pendingKartNbt = null;
+            this.syncKartData();
+        }
     }
 
     public KartEntity getKartEntity() {
@@ -156,6 +192,9 @@ public class KartLiftBlockEntity extends BlockEntity implements ExtendedScreenHa
             if (nbt.contains("stored_kart")) {
                 this.pendingKartNbt = nbt.getCompound("stored_kart");
                 this.storedKart = null; // force creation once world is loaded
+            } else {
+                this.pendingKartNbt = null;
+                this.storedKart = null;
             }
         }
     }
@@ -192,26 +231,14 @@ public class KartLiftBlockEntity extends BlockEntity implements ExtendedScreenHa
                 entity.animationProgress = Math.max(0.0f, entity.animationProgress - ANIMATION_INCREASE);
                 if(entity.animationProgress <= 0.0f){
                     entity.animationProgress = 0.0f;
+                    entity.releaseKart();
                     entity.liftState = LiftState.EMPTY;
-
-                    if(!world.isClient) entity.releaseKart();
-
-                    // AND sync
-                    if (!world.isClient) {
-                        entity.markDirty();
-                        world.updateListeners(pos, state, state, 3);
-                    }
+                    entity.syncKartData();
                 }
                 break;
         }
 
 
-    }
-
-    private void releaseKart() {
-
-
-        // dont forget to set as empty
     }
 
     // -------------------- screen --------------------

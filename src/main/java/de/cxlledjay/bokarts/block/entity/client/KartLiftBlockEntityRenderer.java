@@ -3,12 +3,14 @@ package de.cxlledjay.bokarts.block.entity.client;
 import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.block.custom.KartLiftCoreBlock;
 import de.cxlledjay.bokarts.block.entity.custom.KartLiftBlockEntity;
+import de.cxlledjay.bokarts.entity.custom.kart.KartEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
@@ -17,6 +19,7 @@ import net.minecraft.util.math.RotationAxis;
 
 public class KartLiftBlockEntityRenderer implements BlockEntityRenderer<KartLiftBlockEntity> {
 
+    // models and texture
     private final KartLiftArmsModel model;
     private static final Identifier TEXTURE = BoKarts.id("textures/entity/kart_lift/kart_lift_arms.png");
 
@@ -25,8 +28,13 @@ public class KartLiftBlockEntityRenderer implements BlockEntityRenderer<KartLift
     public static final float MAX_LIFT_HEIGHT = 1.5f;
     public static final float ARMS_TRAVEL = 70.0f;
 
+    // kart renderer
+    private final EntityRenderDispatcher entityRenderDispatcher;
+
+
     public KartLiftBlockEntityRenderer(BlockEntityRendererFactory.Context ctx) {
         this.model = new KartLiftArmsModel(ctx.getLayerModelPart(KartLiftArmsModel.KART_LIFT_ARMS_LAYER));
+        this.entityRenderDispatcher = ctx.getEntityRenderDispatcher();
     }
 
     @Override
@@ -89,6 +97,32 @@ public class KartLiftBlockEntityRenderer implements BlockEntityRenderer<KartLift
             // -------------------- render --------------------
             VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityCutoutNoCull(TEXTURE));
             this.model.render(matrices, vertexConsumer, light, overlay, 0xFFFFFFFF);
+
+            // -------------------- render kart --------------------
+
+            // get kart from block entity
+            KartEntity kart = entity.getKartEntity();
+
+            // if there is any
+            if (kart != null) {
+
+                // manipulate kart rendering on top of lift rendering
+                matrices.push();
+                matrices.scale(-1.0f, -1.0f, 1.0f);
+
+                // call vanilla entity rendering
+                this.entityRenderDispatcher.render(
+                        kart,
+                        0.0, -1.361f, 0.0,
+                        90.0f,
+                        tickDelta,
+                        matrices,
+                        vertexConsumers,
+                        light
+                );
+
+                matrices.pop();
+            }
 
             matrices.pop();
         }
