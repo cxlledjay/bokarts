@@ -16,12 +16,13 @@ import net.minecraft.world.World;
 public class KartLiftScreenHandler extends ScreenHandler {
 
     // tracked inventory
-    private static final int LIFT_INVENTORY_SIZE = 13;
-    private final Inventory liftInventory = new SimpleInventory(LIFT_INVENTORY_SIZE);
+    public static final int LIFT_INVENTORY_SIZE = 12;
+    private final Inventory liftInventory;
+    private final Inventory kartInventory;
 
     // corresponding lift block entity block pos
-    private BlockPos liftBlockEntityBlockPos;
-    private World world;
+    private final BlockPos liftBlockEntityBlockPos;
+    private final World world;
 
 
     // keeping track of the current tab
@@ -37,51 +38,64 @@ public class KartLiftScreenHandler extends ScreenHandler {
 
 
 
-    // server sided constructor
-    public KartLiftScreenHandler(int syncId, PlayerInventory playerInventory, BlockPos liftBlockEntityBlockPos) {
-        this(syncId, playerInventory);
-
-        // init block entity
-        this.liftBlockEntityBlockPos = liftBlockEntityBlockPos;
-        this.world = playerInventory.player.getWorld();
+    // client constructor
+    public KartLiftScreenHandler(int syncId, PlayerInventory playerInventory, BlockPos pos) {
+        this(
+                syncId,
+                playerInventory,
+                new SimpleInventory(LIFT_INVENTORY_SIZE),
+                new SimpleInventory(1),
+                pos);
     }
 
 
-    // client sided constructor
-    public KartLiftScreenHandler(int syncId, PlayerInventory playerInventory) {
+    // server constructor
+    public KartLiftScreenHandler(int syncId, PlayerInventory playerInventory, Inventory liftInventory, Inventory blockEntityInventory, BlockPos liftBlockEntityBlockPos) {
         super(ModScreenHandlers.KART_LIFT_SCREEN_HANDLER, syncId);
 
-        // check inventory
+        // init final fields
+        this.liftBlockEntityBlockPos = liftBlockEntityBlockPos;
+        this.world = playerInventory.player.getWorld();
+        this.liftInventory = liftInventory;
+        this.kartInventory = blockEntityInventory;
+
+        // check inventories
         checkSize(this.liftInventory, LIFT_INVENTORY_SIZE);
+        checkSize(this.kartInventory, 1);
 
         // TODO: create inventory from kart
 
 
         // --- slots ---
         // insert kart
-        this.addSlot(new TabbedKartLiftSlot(liftInventory, 0, 7, 14, KartLiftTab.INSERT_KART_ITEM, this));
+        this.addSlot(new TabbedKartLiftSlot(this.kartInventory, 0, 7, 14, KartLiftTab.INSERT_KART_ITEM, this));
         // modification
-        this.addSlot(new TabbedKartLiftSlot(liftInventory, 1, 131, 48, KartLiftTab.MODIFICATION, this));
-        this.addSlot(new TabbedKartLiftSlot(liftInventory, 2, 157, 48, KartLiftTab.MODIFICATION, this));
-        this.addSlot(new TabbedKartLiftSlot(liftInventory, 3, 183, 48, KartLiftTab.MODIFICATION, this));
-        this.addSlot(new TabbedKartLiftSlot(liftInventory, 4, 209, 48, KartLiftTab.MODIFICATION, this));
+        this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 0, 131, 48, KartLiftTab.MODIFICATION, this));
+        this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 1, 157, 48, KartLiftTab.MODIFICATION, this));
+        this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 2, 183, 48, KartLiftTab.MODIFICATION, this));
+        this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 3, 209, 48, KartLiftTab.MODIFICATION, this));
         // customization
-        this.addSlot(new TabbedKartLiftSlot(liftInventory, 5, 131, 48, KartLiftTab.CUSTOMIZATION, this));
+        this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 4, 131, 48, KartLiftTab.CUSTOMIZATION, this));
         // key
-        this.addSlot(new TabbedKartLiftSlot(liftInventory, 6, 131, 48, KartLiftTab.KEY, this));
-        this.addSlot(new TabbedKartLiftSlot(liftInventory, 7, 152, 48, KartLiftTab.KEY, this));
-        this.addSlot(new TabbedKartLiftSlot(liftInventory, 8, 198, 48, KartLiftTab.KEY, this));
+        this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 5, 131, 48, KartLiftTab.KEY, this));
+        this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 6, 152, 48, KartLiftTab.KEY, this));
+        this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 7, 198, 48, KartLiftTab.KEY, this));
         // upgrades
-        this.addSlot(new TabbedKartLiftSlot(liftInventory, 9, 131, 48, KartLiftTab.UPGRADE, this));
-        this.addSlot(new TabbedKartLiftSlot(liftInventory, 10, 157, 48, KartLiftTab.UPGRADE, this));
-        this.addSlot(new TabbedKartLiftSlot(liftInventory, 11, 183, 48, KartLiftTab.UPGRADE, this));
-        this.addSlot(new TabbedKartLiftSlot(liftInventory, 12, 209, 48, KartLiftTab.UPGRADE, this));
+        this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 8, 131, 48, KartLiftTab.UPGRADE, this));
+        this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 9, 157, 48, KartLiftTab.UPGRADE, this));
+        this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 10, 183, 48, KartLiftTab.UPGRADE, this));
+        this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 11, 209, 48, KartLiftTab.UPGRADE, this));
 
 
         // player inventory
         addPlayerInventory(playerInventory);
         addPlayerHotbar(playerInventory);
     }
+
+
+
+
+    // -------------------- tabs --------------------
 
     public KartLiftTab getCurrentTab() {
         return this.tab;
@@ -91,7 +105,14 @@ public class KartLiftScreenHandler extends ScreenHandler {
         this.tab = tab;
     }
 
-    private KartLiftBlockEntity getLiftEntity() {
+
+    // -------------------- the lift --------------------
+
+    public BlockPos getLiftBlockEntityBlockPos() {
+        return this.liftBlockEntityBlockPos;
+    }
+
+    public KartLiftBlockEntity getLiftEntity() {
         if (this.world != null) {
             BlockEntity be = this.world.getBlockEntity(this.liftBlockEntityBlockPos);
             if (be instanceof KartLiftBlockEntity lift) {
@@ -101,12 +122,9 @@ public class KartLiftScreenHandler extends ScreenHandler {
         return null;
     }
 
-    public boolean hasKartLoaded() {
-        if(getLiftEntity() == null) return false;
-        return getLiftEntity().liftState == KartLiftBlockEntity.LiftState.ACTIVE;
-    }
 
 
+    // -------------------- vanilla logic --------------------
 
     @Override
     public ItemStack quickMove(PlayerEntity player, int slot) {

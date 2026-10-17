@@ -1,8 +1,12 @@
 package de.cxlledjay.bokarts.screen.custom;
 
 import de.cxlledjay.bokarts.BoKarts;
+import de.cxlledjay.bokarts.config.ClientSyncedConfig;
+import de.cxlledjay.bokarts.entity.custom.kart.KartEntity;
+import de.cxlledjay.bokarts.networking.packet.ChangeKartLiftStateC2S;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ButtonTextures;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -77,7 +81,7 @@ public class KartLiftScreen extends HandledScreen<KartLiftScreenHandler> {
         super.init();
 
         // starting tab
-        if(this.handler.hasKartLoaded()) this.handler.setCurrentTab(KartLiftScreenHandler.KartLiftTab.MODIFICATION);
+        if(this.handler.getLiftEntity().hasKartLoaded()) this.handler.setCurrentTab(KartLiftScreenHandler.KartLiftTab.MODIFICATION);
         else this.handler.setCurrentTab(KartLiftScreenHandler.KartLiftTab.INSERT_KART_ITEM);
 
         // -------------------- tab buttons --------------------
@@ -87,7 +91,7 @@ public class KartLiftScreen extends HandledScreen<KartLiftScreenHandler> {
                     TAB_WIDTH, TAB_HEIGHT,
                     TAB_BUTTON_MODIFICATION_TEXTURES,
                     button -> {
-                        if (this.handler.hasKartLoaded())
+                        if (this.handler.getLiftEntity().hasKartLoaded())
                             this.handler.setCurrentTab(KartLiftScreenHandler.KartLiftTab.MODIFICATION);
                     }
             ) {
@@ -103,7 +107,7 @@ public class KartLiftScreen extends HandledScreen<KartLiftScreenHandler> {
                     TAB_WIDTH, TAB_HEIGHT,
                     TAB_BUTTON_CUSTOMIZATION_TEXTURES,
                     button -> {
-                        if (this.handler.hasKartLoaded())
+                        if (this.handler.getLiftEntity().hasKartLoaded())
                             this.handler.setCurrentTab(KartLiftScreenHandler.KartLiftTab.CUSTOMIZATION);
                     }
             ) {
@@ -119,7 +123,7 @@ public class KartLiftScreen extends HandledScreen<KartLiftScreenHandler> {
                     TAB_WIDTH, TAB_HEIGHT,
                     TAB_BUTTON_KEY_TEXTURES,
                     button -> {
-                        if (this.handler.hasKartLoaded())
+                        if (this.handler.getLiftEntity().hasKartLoaded())
                             this.handler.setCurrentTab(KartLiftScreenHandler.KartLiftTab.KEY);
                     }
             ) {
@@ -132,14 +136,15 @@ public class KartLiftScreen extends HandledScreen<KartLiftScreenHandler> {
         }
 
         // -------------------- lift control --------------------
-        if (this.handler.hasKartLoaded()) {
+        if (this.handler.getLiftEntity().hasKartLoaded()) {
             // lift down
             this.addDrawableChild(new TexturedButtonWidget(
                     this.x, this.y + 56,
                     27, 30,
                     LIFT_CONTROL_DOWN_TEXTURES,
                     button -> {
-                        BoKarts.LOGGER.info("LIFT GOING DOWN!");
+                        ClientPlayNetworking.send(new ChangeKartLiftStateC2S(this.handler.getLiftBlockEntityBlockPos()));
+                        this.close();
                     }
             ) {
                 @Override
@@ -155,7 +160,8 @@ public class KartLiftScreen extends HandledScreen<KartLiftScreenHandler> {
                     27, 30,
                     LIFT_CONTROL_UP_TEXTURES,
                     button -> {
-                        BoKarts.LOGGER.info("LIFT GOING UP!");
+                        ClientPlayNetworking.send(new ChangeKartLiftStateC2S(this.handler.getLiftBlockEntityBlockPos()));
+                        this.close();
                     }
             ) {
                 @Override
@@ -204,10 +210,19 @@ public class KartLiftScreen extends HandledScreen<KartLiftScreenHandler> {
 
 
         // insert kart item overlay
-        if(this.handler.hasKartLoaded()) {
+        if(this.handler.getLiftEntity().hasKartLoaded()) {
             context.drawTexture(OVERLAY_KART_ITEM_INSERT_LOCKED, this.x, this.y, 0, 0, this.backgroundWidth, this.backgroundHeight);
         } else {
             context.drawTexture(OVERLAY_KART_ITEM_INSERT, this.x, this.y, 0, 0, this.backgroundWidth, this.backgroundHeight);
         }
+    }
+
+
+    @Override
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        // render stuff like normal inventory
+        this.renderBackground(context, mouseX, mouseY, delta);
+        super.render(context, mouseX, mouseY, delta);
+        this.drawMouseoverTooltip(context, mouseX, mouseY);
     }
 }

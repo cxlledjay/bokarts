@@ -91,20 +91,11 @@ public abstract class KartLiftBaseClass extends Block {
             // test if it exists and is the correct type
             if (lift_be instanceof KartLiftBlockEntity lift) {
 
-                // switch lift state
-                // if(lift.liftState == KartLiftBlockEntity.LiftState.EMPTY) lift.liftState = KartLiftBlockEntity.LiftState.ANIMATION_UP;
-                // else if(lift.liftState == KartLiftBlockEntity.LiftState.ACTIVE) lift.liftState = KartLiftBlockEntity.LiftState.ANIMATION_DOWN;
+                // screen can only be opened when active or empty
+                if(lift.liftState == KartLiftBlockEntity.LiftState.ACTIVE || lift.liftState == KartLiftBlockEntity.LiftState.EMPTY) {
+                    player.openHandledScreen(lift);
+                }
 
-                // AND sync
-                // lift_be.markDirty();
-                // world.updateListeners(corePos, state, state, 3);
-
-                // TESTING: open kart lift screen
-                player.openHandledScreen(lift);
-
-            } else {
-                BoKarts.LOGGER.info("ERROR: No BlockEntity found at {}", corePos.toShortString());
-                player.sendMessage(Text.literal("§cERROR: Block Entity is missing!"), false);
             }
         }
 

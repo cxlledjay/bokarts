@@ -14,7 +14,6 @@ import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.stat.Stats;
-import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.*;
 import net.minecraft.util.hit.HitResult;
@@ -242,20 +241,7 @@ public class KartItemv2 extends Item {
                 return TypedActionResult.fail(itemStack);
             }
 
-            // add tracked data to kart
-            kart.setHornType(itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_HORN_TYPE, HornType.HORN1));
-            kart.setFuelSynced(itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_FUEL, 0.0f));
-            kart.setOdometerSynced(itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_ODOMETER, 0.0f));
-
-            // v2 tracked data
-            kart.setBodyType(itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_BODY_TYPE, BodyType.SOLID_COLOR_OVERLAY));
-            kart.setWheelType(itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_WHEEL_TYPE, WheelType.NONE));
-            kart.setEngineType(itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_ENGINE_TYPE, EngineType.ENGINE_NONE));
-            kart.setSpoilerType(itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_SPOILER_TYPE, SpoilerType.NONE));
-            kart.setAeroType(itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_AERO_TYPE, AeroType.NONE));
-            kart.setBodyColor(itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_BODY_COLOR, 0xFFFFFFFF));
-            kart.setWheelColor(itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR, 0xFFFFFFFF));
-            kart.setRaceNumber(itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_RACE_NUMBER, 0));
+            applyDataFromItemStack(kart, itemStack);
 
             // spawn kart
             if (!world.isClient) {
@@ -272,6 +258,24 @@ public class KartItemv2 extends Item {
         } else {
             return TypedActionResult.pass(itemStack);
         }
+    }
+
+    // apply data components to tracked data of entity
+    public static void applyDataFromItemStack(KartEntity kart, ItemStack itemStack) {
+        // add tracked data to kart
+        kart.setHornType(itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_HORN_TYPE, HornType.HORN1));
+        kart.setFuelSynced(itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_FUEL, 0.0f));
+        kart.setOdometerSynced(itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_ODOMETER, 0.0f));
+
+        // v2 tracked data
+        kart.setBodyType(itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_BODY_TYPE, BodyType.NONE));
+        kart.setWheelType(itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_WHEEL_TYPE, WheelType.NONE));
+        kart.setEngineType(itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_ENGINE_TYPE, EngineType.ENGINE_NONE));
+        kart.setSpoilerType(itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_SPOILER_TYPE, SpoilerType.NONE));
+        kart.setAeroType(itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_AERO_TYPE, AeroType.NONE));
+        kart.setBodyColor(itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_BODY_COLOR, 0xFFFFFFFF));
+        kart.setWheelColor(itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR, 0xFFFFFFFF));
+        kart.setRaceNumber(itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_RACE_NUMBER, 0));
     }
 
     // create entity helper

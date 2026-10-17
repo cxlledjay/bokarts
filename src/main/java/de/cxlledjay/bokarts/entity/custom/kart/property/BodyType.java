@@ -12,20 +12,21 @@ import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.function.ValueLists;
 
 public enum BodyType implements StringIdentifiable {
-    SOLID_COLOR_OVERLAY             (0, "solid_color_overlay",              "Single Color",             0xFFFFFFFF),
-    LIVERY_FADE                     (1, "livery_fade",                      "Fade",                     0xFF423f6d),
-    LIVERY_RED_COW                  (2, "livery_red_cow",                   "Red Cow",                  0xFF21203f),
-    LIVERY_ENGLISH_RACING_ORANGE    (3, "livery_english_racing_orange",     "English Racing Orange",    0xFFff5d02),
-    LIVERY_MUNICH                   (4, "livery_munich",                    "Munich",                   0xFF0065b0),
-    LIVERY_RALLY                    (5, "livery_rally",                     "Rally",                    0xFF002c9c),
-    LIVERY_CAUTION                  (6, "livery_caution",                   "Caution!",                 0xFFfcf761),
-    LIVERY_FULL_CARBON              (7, "livery_full_carbon",               "Cabron",                   0xFF272728),
-    LIVERY_CREEPER                  (8, "livery_creeper",                   "Creeper, aww man!",        0xFF0ba10b),
-    LIVERY_GROTTI                   (9, "livery_grotti",                    "Grotti",                   0xFFe91a1a),
-    LIVERY_BENEFACTOR               (10, "livery_benefactor",               "Benefactor",               0xFF1db8c6),
-    LIVERY_SUPER_A_CAR              (11, "livery_super_a_car",              "Super A Car",              0xFFfb9c0f),
-    LIVERY_JAPANESE_RACE_CAR        (12, "livery_japanese_race_car",        "Japanese Race Car",        0xFF4b56fa),
-    LIVERY_POLIZFI                  (13, "livery_polizfi",                  "Police",                   0xFF234fde);
+    NONE                            (0, "none",                             "Blank",                    0xFFFFFFFF),
+    SOLID_COLOR_OVERLAY             (1, "solid_color_overlay",              "Single Color",             0xFFFFFFFF),
+    LIVERY_FADE                     (2, "livery_fade",                      "Fade",                     0xFF423f6d),
+    LIVERY_RED_COW                  (3, "livery_red_cow",                   "Red Cow",                  0xFF21203f),
+    LIVERY_ENGLISH_RACING_ORANGE    (4, "livery_english_racing_orange",     "English Racing Orange",    0xFFff5d02),
+    LIVERY_MUNICH                   (5, "livery_munich",                    "Munich",                   0xFF0065b0),
+    LIVERY_RALLY                    (6, "livery_rally",                     "Rally",                    0xFF002c9c),
+    LIVERY_CAUTION                  (7, "livery_caution",                   "Caution!",                 0xFFfcf761),
+    LIVERY_FULL_CARBON              (8, "livery_full_carbon",               "Cabron",                   0xFF272728),
+    LIVERY_CREEPER                  (9, "livery_creeper",                   "Creeper, aww man!",        0xFF0ba10b),
+    LIVERY_GROTTI                   (10, "livery_grotti",                    "Grotti",                   0xFFe91a1a),
+    LIVERY_BENEFACTOR               (11, "livery_benefactor",               "Benefactor",               0xFF1db8c6),
+    LIVERY_SUPER_A_CAR              (12, "livery_super_a_car",              "Super A Car",              0xFFfb9c0f),
+    LIVERY_JAPANESE_RACE_CAR        (13, "livery_japanese_race_car",        "Japanese Race Car",        0xFF4b56fa),
+    LIVERY_POLIZFI                  (14, "livery_polizfi",                  "Police",                   0xFF234fde);
 
 
     // id to value function

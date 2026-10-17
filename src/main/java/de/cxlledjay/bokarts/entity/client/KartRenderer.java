@@ -133,10 +133,13 @@ public class KartRenderer extends EntityRenderer<KartEntity> {
         VertexConsumer baseConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityCutoutNoCull(TEXTURE_CHASSIS));
         this.modelChassis.render(matrices, baseConsumer, light, OverlayTexture.DEFAULT_UV, 0xFFFFFFFF);
 
+        BodyType bodyType = entity.getBodyType();
+        if (bodyType == BodyType.NONE) return;
+
         // ----- draw overlay texture -----
-        Identifier overlayTexture = entity.getBodyType().getTexture();
+        Identifier overlayTexture = bodyType.getTexture();
         int overlayColor = 0xFFFFFFFF;
-        if(entity.getBodyType() == BodyType.SOLID_COLOR_OVERLAY) {
+        if(bodyType == BodyType.SOLID_COLOR_OVERLAY) {
             // apply custom color
             overlayColor = entity.getBodyColor() | 0xFF000000;
         }

@@ -1,5 +1,6 @@
 package de.cxlledjay.bokarts.entity.custom.kart;
 
+import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.component.ModDataComponentTypes;
 import de.cxlledjay.bokarts.config.ClientSyncedConfig;
 import de.cxlledjay.bokarts.entity.ModEntities;
@@ -325,14 +326,18 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     }
 
     // set data component types of ItemStack to tracked data
+    private ItemStack syncAndGetKartAsCustomStack() {
+        this.setFuelSynced(this.currentFuel);
+        this.setOdometerSynced(this.currentOdometer);
+
+        return getKartAsCustomStack();
+    }
+
+
     public ItemStack getKartAsCustomStack() {
 
         // get item
         ItemStack stack = new ItemStack(this.asItem());
-
-        // sync values
-        this.setFuelSynced(this.currentFuel);
-        this.setOdometerSynced(this.currentOdometer);
 
         // set DataComponentTypes
         stack.set(ModDataComponentTypes.KART_ITEM_HORN_TYPE, this.getHornType());
@@ -366,7 +371,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     // override creative middle click
     @Override
     public ItemStack getPickBlockStack() {
-        return this.getKartAsCustomStack();
+        return this.syncAndGetKartAsCustomStack();
     }
 
     // override dropped item on destroy
@@ -375,7 +380,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         // Check if the game is trying to drop our base Kart item
         if (stack.isOf(this.asItem())) {
             // Swap out the blank vanilla stack with our custom Component stack!
-            stack = this.getKartAsCustomStack();
+            stack = this.syncAndGetKartAsCustomStack();
         }
 
         // Let the game spawn the item into the world
@@ -818,9 +823,9 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
         // v2
         builder.add(HORN_TYPE, HornType.HORN1);
-        builder.add(WHEEL_TYPE, WheelType.STREET);
-        builder.add(ENGINE_TYPE, EngineType.ENGINE_COPPER);
-        builder.add(BODY_TYPE, BodyType.SOLID_COLOR_OVERLAY);
+        builder.add(WHEEL_TYPE, WheelType.NONE);
+        builder.add(ENGINE_TYPE, EngineType.ENGINE_NONE);
+        builder.add(BODY_TYPE, BodyType.NONE);
         builder.add(SPOILER_TYPE, SpoilerType.NONE);
         builder.add(AERO_TYPE, AeroType.NONE);
         builder.add(BODY_COLOR, 0xFFFFFFFF);
