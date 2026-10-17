@@ -2,6 +2,7 @@ package de.cxlledjay.bokarts.block.entity.custom;
 
 import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.block.custom.KartLiftBaseClass;
+import de.cxlledjay.bokarts.block.custom.KartLiftCoreBlock;
 import de.cxlledjay.bokarts.block.entity.ModBlockEntities;
 import de.cxlledjay.bokarts.component.ModDataComponentTypes;
 import de.cxlledjay.bokarts.entity.ModEntities;
@@ -9,30 +10,38 @@ import de.cxlledjay.bokarts.entity.custom.kart.KartEntity;
 import de.cxlledjay.bokarts.entity.custom.kart.property.*;
 import de.cxlledjay.bokarts.item.ModItems;
 import de.cxlledjay.bokarts.item.custom.KartItemv2;
+import de.cxlledjay.bokarts.item.custom.modification.AeroItem;
+import de.cxlledjay.bokarts.item.custom.modification.EngineItem;
+import de.cxlledjay.bokarts.item.custom.modification.SpoilerItem;
+import de.cxlledjay.bokarts.item.custom.modification.WheelsItem;
+import de.cxlledjay.bokarts.screen.custom.KartLiftInventory;
 import de.cxlledjay.bokarts.screen.custom.KartLiftScreenHandler;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
+import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
+import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class KartLiftBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory<BlockPos> {
 
@@ -72,8 +81,9 @@ public class KartLiftBlockEntity extends BlockEntity implements ExtendedScreenHa
     public void toggleLiftState() {
         switch (this.liftState) {
             case EMPTY:
-                // check if there is a blueprint or kart item inside the inventory ==> use this one
-                // check for entities ==> use this one
+                // get kart from world; if there was none, there is nothing to do
+                if(this.getKartEntity() == null)
+                    if(!this.stealKartFromWorld()) return;
 
                 // start animation
                 this.liftState = LiftState.ANIMATION_UP;
@@ -95,7 +105,64 @@ public class KartLiftBlockEntity extends BlockEntity implements ExtendedScreenHa
         syncKartData();
     }
 
-    private void releaseKart() {
+
+    // returns true if steal was successful
+    private boolean stealKartFromWorld () {
+
+        // security
+        if (this.world == null || this.world.isClient) {
+            return false;
+        }
+
+        // get facing direction
+        Direction facing = this.getCachedState().get(KartLiftCoreBlock.FACING);
+
+        // build hitbox
+        BlockPos pos1 = this.pos.offset(facing, 1);
+        BlockPos pos2 = this.pos.offset(facing, 2);
+        Box searchArea = new Box(pos1).union(new Box(pos2)).expand(0, 1.0, 0);
+
+        // get a list of all karts inside the hitbox
+        List<KartEntity> karts = this.world.getEntitiesByClass(
+                KartEntity.class,
+                searchArea,
+                EntityPredicates.VALID_ENTITY
+        );
+
+        // check if there is something in the list
+        if (!karts.isEmpty()) {
+            // get first one if there are multiple
+            KartEntity targetKart = karts.getFirst();
+
+            // dont steal if there are passengers
+            if(targetKart.hasPassengers()) return false;
+
+            // save to nbt
+            NbtCompound kartData = new NbtCompound();
+            targetKart.saveSelfNbt(kartData);
+
+            // init the entity for getKartEntity()
+            this.pendingKartNbt = kartData;
+            this.storedKart = null;
+
+            // delete actual kart
+            targetKart.discard();
+
+            // and sync
+            this.syncKartData();
+
+            // return success
+            return true;
+        }
+
+        // nothing to steal :(
+        return false;
+    }
+
+
+
+
+    public void releaseKart() {
         // get kart
         KartEntity kartEntity = this.getKartEntity();
 
@@ -112,13 +179,17 @@ public class KartLiftBlockEntity extends BlockEntity implements ExtendedScreenHa
 
             float yaw = facing.asRotation() - 90.0F;
 
-            // apply position and rotation
-            kartEntity.refreshPositionAndAngles(spawnX, spawnY, spawnZ, yaw, 0.0F);
-            kartEntity.setBodyYaw(yaw);
-            kartEntity.setHeadYaw(yaw);
-
-            // spawn it
-            this.world.spawnEntity(kartEntity);
+            if(kartEntity.isDrivable()) {
+                // apply position and rotation
+                kartEntity.refreshPositionAndAngles(spawnX, spawnY, spawnZ, yaw, 0.0F);
+                kartEntity.setBodyYaw(yaw);
+                kartEntity.setHeadYaw(yaw);
+                // spawn it
+                this.world.spawnEntity(kartEntity);
+            } else {
+                // invalid kart (not drivable) => spawn item
+                ItemScatterer.spawn(this.world,spawnX,spawnY,spawnZ,kartEntity.getKartAsCustomStack());
+            }
 
             // delete from lift
             this.storedKart = null;
@@ -138,9 +209,163 @@ public class KartLiftBlockEntity extends BlockEntity implements ExtendedScreenHa
         return this.storedKart;
     }
 
-    public void setKartEntity(KartEntity kart) {
-        this.storedKart = kart;
+
+    // -------------------- modification business logic --------------------
+
+    public void setPropertyFromItemStack(ItemStack stack) {
+
+        // security
+        if(this.world == null || this.getKartEntity() == null) return;
+
+        // get item
+        Item item = stack.getItem();
+
+        // ----- select what modification to apply -----
+
+        // wheels
+        if(item instanceof WheelsItem) {
+            WheelType wheelType = WheelType.NONE;
+            if(item == ModItems.WHEELS_STREET) wheelType = WheelType.STREET;
+            else if(item == ModItems.WHEELS_DRIFT) wheelType = WheelType.DRIFT;
+            else if(item == ModItems.WHEELS_OFFROAD) wheelType = WheelType.OFFROAD;
+            storedKart.setWheelType(wheelType);
+        }
+
+        // engines
+        else if(item instanceof EngineItem) {
+            EngineType engineType = EngineType.ENGINE_NONE;
+            if(item == ModItems.ENGINE_COPPER) engineType = EngineType.ENGINE_COPPER;
+            else if(item == ModItems.ENGINE_IRON) engineType = EngineType.ENGINE_IRON;
+            else if(item == ModItems.ENGINE_GOLD) engineType = EngineType.ENGINE_GOLD;
+            else if(item == ModItems.ENGINE_DIAMOND) engineType = EngineType.ENGINE_DIAMOND;
+            else if(item == ModItems.ENGINE_NETHERITE) engineType = EngineType.ENGINE_NETHERITE;
+            storedKart.setEngineType(engineType);
+        }
+
+        // spoilers
+        else if(item instanceof SpoilerItem) {
+            SpoilerType spoilerType = SpoilerType.NONE;
+            if(item == ModItems.SPOILER_STREET) spoilerType = SpoilerType.STREET;
+            else if(item == ModItems.SPOILER_STREET_CARBON) spoilerType = SpoilerType.STREET_CARBON;
+            else if(item == ModItems.SPOILER_RACE) spoilerType = SpoilerType.RACE;
+            else if(item == ModItems.SPOILER_RACE_CARBON) spoilerType = SpoilerType.RACE_CARBON;
+            storedKart.setSpoilerType(spoilerType);
+        }
+
+        // aero kits
+        else if(item instanceof AeroItem) {
+            AeroType aeroType = AeroType.NONE;
+            if(item == ModItems.AERO_RACE)  aeroType = AeroType.RACE;
+            else if(item == ModItems.AERO_RACE_CARBON)  aeroType = AeroType.RACE_CARBON;
+            storedKart.setAeroType(aeroType);
+        }
+
+        // livery
+        else if(item == ModItems.LIVERY_TEMPLATE) {
+            BodyType bodyType = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_BODY_TYPE, BodyType.NONE);
+            int bodyColor = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_BODY_COLOR, 0xFFFFFFFF);
+            int wheelColor = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR, 0xFFFFFFFF);
+            storedKart.setBodyType(bodyType);
+            storedKart.setBodyColor(bodyColor);
+            storedKart.setWheelColor(wheelColor);
+        }
+        // TODO: upgrades ...
+
+        // and sync
         this.syncKartData();
+    }
+
+    public void removePropertyFromItemStack(ItemStack stack) {
+
+        // security
+        if(this.world == null || this.getKartEntity() == null) return;
+
+        // get item
+        Item item = stack.getItem();
+
+        if(item instanceof WheelsItem) {
+            storedKart.setWheelType(WheelType.NONE);
+        }
+        else if(item instanceof EngineItem) {
+            storedKart.setEngineType(EngineType.ENGINE_NONE);
+        }
+        else if(item instanceof SpoilerItem) {
+            storedKart.setSpoilerType(SpoilerType.NONE);
+        }
+        else if(item instanceof AeroItem) {
+            storedKart.setAeroType(AeroType.NONE);
+        }
+        else if(item == ModItems.LIVERY_TEMPLATE) {
+            storedKart.setBodyType(BodyType.NONE);
+            storedKart.setBodyColor(0xFFFFFFFF);
+            storedKart.setWheelColor(0xFFFFFFFF);
+        }
+        // TODO: upgrades
+
+        // and sync
+        this.syncKartData();
+    }
+
+
+    public Inventory getInventoryFromKart() {
+
+        // security
+        if(this.world == null) return null;
+
+        // no kart stored => empty inventory
+        if(this.getKartEntity() == null) return new KartLiftInventory(KartLiftScreenHandler.LIFT_INVENTORY_SIZE, this);
+
+        // get all item stacks from kart
+
+        // wheels
+        ItemStack wheelItem = switch(this.getKartEntity().getWheelType()) {
+            case STREET -> new ItemStack(ModItems.WHEELS_STREET);
+            case DRIFT -> new ItemStack(ModItems.WHEELS_DRIFT);
+            case OFFROAD -> new ItemStack(ModItems.WHEELS_OFFROAD);
+            default -> ItemStack.EMPTY;
+        };
+        // engines
+        ItemStack engineItem = switch(this.getKartEntity().getEngineType()) {
+            case ENGINE_COPPER -> new ItemStack(ModItems.ENGINE_COPPER);
+            case ENGINE_IRON -> new ItemStack(ModItems.ENGINE_IRON);
+            case ENGINE_GOLD -> new ItemStack(ModItems.ENGINE_GOLD);
+            case ENGINE_DIAMOND -> new ItemStack(ModItems.ENGINE_DIAMOND);
+            case ENGINE_NETHERITE ->  new ItemStack(ModItems.ENGINE_NETHERITE);
+            default -> ItemStack.EMPTY;
+        };
+        // spoilers
+        ItemStack spoilerItem = switch(this.getKartEntity().getSpoilerType()) {
+            case STREET -> new ItemStack(ModItems.SPOILER_STREET);
+            case STREET_CARBON ->  new ItemStack(ModItems.SPOILER_STREET_CARBON);
+            case RACE  -> new ItemStack(ModItems.SPOILER_RACE);
+            case RACE_CARBON -> new ItemStack(ModItems.SPOILER_RACE_CARBON);
+            default -> ItemStack.EMPTY;
+        };
+        // aero
+        ItemStack aeroItem = switch(this.getKartEntity().getAeroType()) {
+            case RACE  -> new ItemStack(ModItems.AERO_RACE);
+            case RACE_CARBON -> new ItemStack(ModItems.AERO_RACE_CARBON);
+            default -> ItemStack.EMPTY;
+        };
+
+        // livery
+        ItemStack liveryItem = ItemStack.EMPTY;
+        if(storedKart.getBodyType() != BodyType.NONE) liveryItem = new ItemStack(ModItems.LIVERY_TEMPLATE);
+
+        liveryItem.set(ModDataComponentTypes.KART_ITEM_BODY_TYPE, this.getKartEntity().getBodyType());
+        liveryItem.set(ModDataComponentTypes.KART_ITEM_BODY_COLOR, this.getKartEntity().getBodyColor());
+        liveryItem.set(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR, this.getKartEntity().getWheelColor());
+
+
+        // apply to inventory
+        KartLiftInventory temp = new KartLiftInventory(KartLiftScreenHandler.LIFT_INVENTORY_SIZE, this);
+        temp.setStack(0,wheelItem);
+        temp.setStack(1,engineItem);
+        temp.setStack(2,spoilerItem);
+        temp.setStack(3,aeroItem);
+        temp.setStack(4,liveryItem);
+
+        return temp;
     }
 
 
@@ -250,7 +475,7 @@ public class KartLiftBlockEntity extends BlockEntity implements ExtendedScreenHa
 
     @Override
     public @Nullable ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-        return new KartLiftScreenHandler(syncId, playerInventory, new SimpleInventory(KartLiftScreenHandler.LIFT_INVENTORY_SIZE), virtualKartInventory, this.pos);
+        return new KartLiftScreenHandler(syncId, playerInventory, getInventoryFromKart(), virtualKartInventory, this.pos);
     }
 
     @Override

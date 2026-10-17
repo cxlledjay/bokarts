@@ -129,7 +129,7 @@ public class KartInventoryScreen extends HandledScreen<KartInventoryScreenHandle
         context.drawTexture(furnaceTexture, furnaceX, furnaceY, 0, 0, 16, 16, 16, 16);
 
         // render kart like horses
-        this.drawKart(context, i + 52, j + 42, 21, mouseX, mouseY, this.kart);
+        drawKart(context, i + 52, j + 42, 21, mouseX, mouseY, this.kart);
     }
 
     @Override
@@ -166,7 +166,7 @@ public class KartInventoryScreen extends HandledScreen<KartInventoryScreenHandle
 
 
     // helper method to draw kart following the mouse
-    private void drawKart(DrawContext context, int x, int y, int size, float mouseX, float mouseY, KartEntity kart) {
+    public static void drawKart(DrawContext context, int x, int y, int size, float mouseX, float mouseY, KartEntity kart) {
         // 1. Swap the subtraction order to fix the inverted tracking
         float lookX = (float)Math.atan((mouseX - x) / 40.0f);
         float lookY = (float)Math.atan((mouseY - y) / 40.0f);

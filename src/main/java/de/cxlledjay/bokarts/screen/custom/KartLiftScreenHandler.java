@@ -1,6 +1,12 @@
 package de.cxlledjay.bokarts.screen.custom;
 
 import de.cxlledjay.bokarts.block.entity.custom.KartLiftBlockEntity;
+import de.cxlledjay.bokarts.item.ModItems;
+import de.cxlledjay.bokarts.item.custom.KartItemv2;
+import de.cxlledjay.bokarts.item.custom.modification.AeroItem;
+import de.cxlledjay.bokarts.item.custom.modification.EngineItem;
+import de.cxlledjay.bokarts.item.custom.modification.SpoilerItem;
+import de.cxlledjay.bokarts.item.custom.modification.WheelsItem;
 import de.cxlledjay.bokarts.screen.ModScreenHandlers;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -63,28 +69,91 @@ public class KartLiftScreenHandler extends ScreenHandler {
         checkSize(this.liftInventory, LIFT_INVENTORY_SIZE);
         checkSize(this.kartInventory, 1);
 
-        // TODO: create inventory from kart
-
 
         // --- slots ---
         // insert kart
-        this.addSlot(new TabbedKartLiftSlot(this.kartInventory, 0, 7, 14, KartLiftTab.INSERT_KART_ITEM, this));
+        this.addSlot(new TabbedKartLiftSlot(this.kartInventory, 0, 7, 14, KartLiftTab.INSERT_KART_ITEM, this){
+            @Override
+            public boolean canInsert(ItemStack stack) {
+                return ((stack.getItem() instanceof KartItemv2) || (stack.getItem() == ModItems.CHASSIS_BLUEPRINT));
+            }
+        });
         // modification
-        this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 0, 131, 48, KartLiftTab.MODIFICATION, this));
-        this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 1, 157, 48, KartLiftTab.MODIFICATION, this));
-        this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 2, 183, 48, KartLiftTab.MODIFICATION, this));
-        this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 3, 209, 48, KartLiftTab.MODIFICATION, this));
+        this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 0, 131, 48, KartLiftTab.MODIFICATION, this) {
+            @Override
+            public boolean canInsert(ItemStack stack) {
+                return (stack.getItem() instanceof WheelsItem);
+            }
+        });
+        this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 1, 157, 48, KartLiftTab.MODIFICATION, this) {
+            @Override
+            public boolean canInsert(ItemStack stack) {
+                return (stack.getItem() instanceof EngineItem);
+            }
+        });
+        this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 2, 183, 48, KartLiftTab.MODIFICATION, this) {
+            @Override
+            public boolean canInsert(ItemStack stack) {
+                return (stack.getItem() instanceof SpoilerItem);
+            }
+        });
+        this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 3, 209, 48, KartLiftTab.MODIFICATION, this) {
+            @Override
+            public boolean canInsert(ItemStack stack) {
+                return (stack.getItem() instanceof AeroItem);
+            }
+        });
         // customization
-        this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 4, 131, 48, KartLiftTab.CUSTOMIZATION, this));
+        this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 4, 131, 48, KartLiftTab.CUSTOMIZATION, this) {
+            @Override
+            public boolean canInsert(ItemStack stack) {
+                return (stack.getItem() == ModItems.LIVERY_TEMPLATE);
+            }
+        });
         // key
-        this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 5, 131, 48, KartLiftTab.KEY, this));
-        this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 6, 152, 48, KartLiftTab.KEY, this));
-        this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 7, 198, 48, KartLiftTab.KEY, this));
+        this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 5, 131, 48, KartLiftTab.KEY, this) {
+            @Override
+            public boolean canInsert(ItemStack stack) {
+                return (stack.getItem() == ModItems.KEY);
+            }
+        });
+        this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 6, 152, 48, KartLiftTab.KEY, this) {
+            @Override
+            public boolean canInsert(ItemStack stack) {
+                return (stack.getItem() == ModItems.KEY); // TODO: change to key programming tool item
+            }
+        });
+        this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 7, 198, 48, KartLiftTab.KEY, this) {
+            @Override
+            public boolean canInsert(ItemStack stack) {
+                return false;
+            }
+        });
         // upgrades
-        this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 8, 131, 48, KartLiftTab.UPGRADE, this));
-        this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 9, 157, 48, KartLiftTab.UPGRADE, this));
-        this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 10, 183, 48, KartLiftTab.UPGRADE, this));
-        this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 11, 209, 48, KartLiftTab.UPGRADE, this));
+        this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 8, 131, 48, KartLiftTab.UPGRADE, this) {
+            @Override
+            public boolean canInsert(ItemStack stack) {
+                return false; //< TODO: add upgrades
+            }
+        });
+        this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 9, 157, 48, KartLiftTab.UPGRADE, this) {
+            @Override
+            public boolean canInsert(ItemStack stack) {
+                return false; //< TODO: add upgrades
+            }
+        });
+        this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 10, 183, 48, KartLiftTab.UPGRADE, this) {
+            @Override
+            public boolean canInsert(ItemStack stack) {
+                return false; //< TODO: add upgrades
+            }
+        });
+        this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 11, 209, 48, KartLiftTab.UPGRADE, this) {
+            @Override
+            public boolean canInsert(ItemStack stack) {
+                return false; //< TODO: add upgrades
+            }
+        });
 
 
         // player inventory
@@ -126,14 +195,25 @@ public class KartLiftScreenHandler extends ScreenHandler {
 
     // -------------------- vanilla logic --------------------
 
+    private static final int TOTAL_INVENTORY_SIZE = LIFT_INVENTORY_SIZE + 1;
+    private static final int PLAYER_INVENTORY_START = TOTAL_INVENTORY_SIZE;
+    private static final int PLAYER_INVENTORY_END = PLAYER_INVENTORY_START + 27;
+    private static final int PLAYER_HOTBAR_END = PLAYER_INVENTORY_END + 9;
+
     @Override
     public ItemStack quickMove(PlayerEntity player, int slot) {
-        return null;
+        return null; //< TODO: crashes game when shift clicking...
     }
 
     @Override
     public boolean canUse(PlayerEntity player) {
         return this.liftInventory.canPlayerUse(player);
+    }
+
+    @Override
+    public void onClosed(PlayerEntity player) {
+        this.liftInventory.clear();
+        super.onClosed(player);
     }
 
 

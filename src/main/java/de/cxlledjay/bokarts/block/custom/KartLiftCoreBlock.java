@@ -177,8 +177,8 @@ public class KartLiftCoreBlock extends KartLiftBaseClass implements BlockEntityP
             if (state.contains(IS_CONTROL) && state.get(IS_CONTROL)) {
                 BlockEntity be = world.getBlockEntity(pos);
                 if (be instanceof KartLiftBlockEntity liftBE) {
-                    // drop inventory logic => propagate to be class!
-                    BoKarts.LOGGER.info("dropping inv at {}", be.getPos().toShortString());
+                    // release the kart before breaking
+                    liftBE.releaseKart();
                 }
             }
 

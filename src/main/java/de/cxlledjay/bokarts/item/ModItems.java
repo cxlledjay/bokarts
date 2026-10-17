@@ -4,6 +4,10 @@ import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.item.custom.KartItem;
 import de.cxlledjay.bokarts.item.custom.KartItemv2;
 import de.cxlledjay.bokarts.item.custom.LiveryTemplate;
+import de.cxlledjay.bokarts.item.custom.modification.AeroItem;
+import de.cxlledjay.bokarts.item.custom.modification.EngineItem;
+import de.cxlledjay.bokarts.item.custom.modification.SpoilerItem;
+import de.cxlledjay.bokarts.item.custom.modification.WheelsItem;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
@@ -21,23 +25,23 @@ public class ModItems {
     public static final Item SEAT = registerItem("seat", new Item(new Item.Settings()));
     public static final Item CHASSIS_BLUEPRINT = registerItem("chassis_blueprint", new Item(new Item.Settings()));
     // wheels
-    public static final Item WHEELS_STREET = registerItem("wheels_street", new Item(new Item.Settings()));
-    public static final Item WHEELS_DRIFT = registerItem("wheels_drift", new Item(new Item.Settings()));
-    public static final Item WHEELS_OFFROAD = registerItem("wheels_offroad", new Item(new Item.Settings()));
+    public static final Item WHEELS_STREET = registerItem("wheels_street", new WheelsItem(new Item.Settings()));
+    public static final Item WHEELS_DRIFT = registerItem("wheels_drift", new WheelsItem(new Item.Settings()));
+    public static final Item WHEELS_OFFROAD = registerItem("wheels_offroad", new WheelsItem(new Item.Settings()));
     // engines
-    public static final Item ENGINE_COPPER = registerItem("engine_copper", new Item(new Item.Settings()));
-    public static final Item ENGINE_IRON = registerItem("engine_iron", new Item(new Item.Settings()));
-    public static final Item ENGINE_GOLD = registerItem("engine_gold", new Item(new Item.Settings()));
-    public static final Item ENGINE_DIAMOND = registerItem("engine_diamond", new Item(new Item.Settings()));
-    public static final Item ENGINE_NETHERITE = registerItem("engine_netherite", new Item(new Item.Settings()));
-
-    // kart tuning parts
-    public static final Item SPOILER_STREET = registerItem("spoiler_street", new Item(new Item.Settings()));
-    public static final Item SPOILER_STREET_CARBON = registerItem("spoiler_street_carbon", new Item(new Item.Settings()));
-    public static final Item SPOILER_RACE = registerItem("spoiler_race", new Item(new Item.Settings()));
-    public static final Item SPOILER_RACE_CARBON = registerItem("spoiler_race_carbon", new Item(new Item.Settings()));
-    public static final Item AERO_RACE = registerItem("aero_race", new Item(new Item.Settings()));
-    public static final Item AERO_RACE_CARBON = registerItem("aero_race_carbon", new Item(new Item.Settings()));
+    public static final Item ENGINE_COPPER = registerItem("engine_copper", new EngineItem(new Item.Settings()));
+    public static final Item ENGINE_IRON = registerItem("engine_iron", new EngineItem(new Item.Settings()));
+    public static final Item ENGINE_GOLD = registerItem("engine_gold", new EngineItem(new Item.Settings()));
+    public static final Item ENGINE_DIAMOND = registerItem("engine_diamond", new EngineItem(new Item.Settings()));
+    public static final Item ENGINE_NETHERITE = registerItem("engine_netherite", new EngineItem(new Item.Settings()));
+    // spoilers
+    public static final Item SPOILER_STREET = registerItem("spoiler_street", new SpoilerItem(new Item.Settings()));
+    public static final Item SPOILER_STREET_CARBON = registerItem("spoiler_street_carbon", new SpoilerItem(new Item.Settings()));
+    public static final Item SPOILER_RACE = registerItem("spoiler_race", new SpoilerItem(new Item.Settings()));
+    public static final Item SPOILER_RACE_CARBON = registerItem("spoiler_race_carbon", new SpoilerItem(new Item.Settings()));
+    // aero kits
+    public static final Item AERO_RACE = registerItem("aero_race", new AeroItem(new Item.Settings()));
+    public static final Item AERO_RACE_CARBON = registerItem("aero_race_carbon", new AeroItem(new Item.Settings()));
 
     // customization
     public static final Item LIVERY_TEMPLATE = registerItem("livery_template", new LiveryTemplate(LiveryTemplate.defaultLiverySettings()));

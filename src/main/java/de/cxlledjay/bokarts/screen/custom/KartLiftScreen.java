@@ -215,6 +215,12 @@ public class KartLiftScreen extends HandledScreen<KartLiftScreenHandler> {
         } else {
             context.drawTexture(OVERLAY_KART_ITEM_INSERT, this.x, this.y, 0, 0, this.backgroundWidth, this.backgroundHeight);
         }
+
+        // and also render the kart
+        KartEntity kart = this.handler.getLiftEntity().getKartEntity();
+        int i = (this.width - this.backgroundWidth) / 2;
+        int j = (this.height - this.backgroundHeight) / 2;
+        if(kart != null) KartInventoryScreen.drawKart(context, i + 77, j + 67, 27, mouseX, mouseY, kart);
     }
 
 

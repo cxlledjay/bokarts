@@ -1,6 +1,5 @@
 package de.cxlledjay.bokarts.entity.custom.kart;
 
-import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.component.ModDataComponentTypes;
 import de.cxlledjay.bokarts.config.ClientSyncedConfig;
 import de.cxlledjay.bokarts.entity.ModEntities;
@@ -31,7 +30,6 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.StringHelper;
 import net.minecraft.util.math.BlockPos;
@@ -387,6 +385,11 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         return super.dropStack(stack, yOffset);
     }
 
+
+
+    public boolean isDrivable() {
+        return ((this.getWheelType() != WheelType.NONE) && (this.getEngineType() != EngineType.ENGINE_NONE));
+    }
 
 
     // ==================== input handling ====================
