@@ -43,7 +43,7 @@ public class KartEngineSound extends MovingSoundInstance {
     @Override
     public void tick() {
 
-        if (this.kart.isRemoved() || !this.kart.hasPassengers() || this.kart.getFuelSynced() <= 0.0f) {
+        if (this.kart.isRemoved() || !this.kart.hasPassengers() || this.kart.getFuelSynced() <= 0.0f || !this.kart.isKeyInIgnition()) {
             this.setDone();
             return;
         }

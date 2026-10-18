@@ -1,6 +1,6 @@
 package de.cxlledjay.bokarts.config;
 
-import de.cxlledjay.bokarts.networking.packet.KartConfigSyncS2C;
+import de.cxlledjay.bokarts.networking.packet.ConfigSyncS2C;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -10,7 +10,7 @@ public class ClientSyncedConfig {
     public static void initSyncedConfigServerEvent() {
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             // Grab the server's authoritative config value
-            KartConfigSyncS2C payload = new KartConfigSyncS2C(
+            ConfigSyncS2C payload = new ConfigSyncS2C(
                     BoKartsConfig.maxFuelCapacity,
                     BoKartsConfig.fuelConsumptionPerTick,
                     BoKartsConfig.fuelTimeToRangeConversion,

@@ -18,6 +18,20 @@ public class ModKeyMappings {
             KART_KEY_CATEGORY
     ));
 
+    public static final KeyBinding KART_HORN_NEXT_KEYBINDING = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+            "key.bokarts.horn_next",
+            InputUtil.Type.KEYSYM,
+            GLFW.GLFW_KEY_RIGHT,
+            KART_KEY_CATEGORY
+    ));
+
+    public static final KeyBinding KART_HORN_PREV_KEYBINDING = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+            "key.bokarts.horn_prev",
+            InputUtil.Type.KEYSYM,
+            GLFW.GLFW_KEY_LEFT,
+            KART_KEY_CATEGORY
+    ));
+
     public static void register() {
             BoKarts.LOGGER.info("Registering KeyMappings for " + BoKarts.MOD_ID);
     }

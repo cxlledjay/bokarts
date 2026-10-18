@@ -2,9 +2,8 @@ package de.cxlledjay.bokarts.screen.custom;
 
 import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.block.entity.custom.KartLiftBlockEntity;
-import de.cxlledjay.bokarts.config.ClientSyncedConfig;
 import de.cxlledjay.bokarts.entity.custom.kart.KartEntity;
-import de.cxlledjay.bokarts.networking.packet.ChangeKartLiftStateC2S;
+import de.cxlledjay.bokarts.networking.packet.KartLiftChangeStateC2S;
 import de.cxlledjay.bokarts.networking.packet.KartLiftModifyRaceNumberC2S;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -18,7 +17,6 @@ import net.minecraft.client.gui.widget.TexturedButtonWidget;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import org.lwjgl.glfw.GLFW;
 
 @Environment(EnvType.CLIENT)
 public class KartLiftScreen extends HandledScreen<KartLiftScreenHandler> {
@@ -154,7 +152,7 @@ public class KartLiftScreen extends HandledScreen<KartLiftScreenHandler> {
                     27, 30,
                     LIFT_CONTROL_DOWN_TEXTURES,
                     button -> {
-                        ClientPlayNetworking.send(new ChangeKartLiftStateC2S(this.handler.getLiftBlockEntityBlockPos()));
+                        ClientPlayNetworking.send(new KartLiftChangeStateC2S(this.handler.getLiftBlockEntityBlockPos()));
                         this.close();
                     }
             ) {
@@ -172,7 +170,7 @@ public class KartLiftScreen extends HandledScreen<KartLiftScreenHandler> {
                     27, 30,
                     LIFT_CONTROL_UP_TEXTURES,
                     button -> {
-                        ClientPlayNetworking.send(new ChangeKartLiftStateC2S(this.handler.getLiftBlockEntityBlockPos()));
+                        ClientPlayNetworking.send(new KartLiftChangeStateC2S(this.handler.getLiftBlockEntityBlockPos()));
                         this.close();
                     }
             ) {

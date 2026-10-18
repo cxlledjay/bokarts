@@ -9,11 +9,11 @@ import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.packet.CustomPayload;
 
-public record AddFuelPayloadC2S() implements CustomPayload {
+public record KartEntityAddFuelPayloadC2S() implements CustomPayload {
 
-    public static final CustomPayload.Id<AddFuelPayloadC2S> ID = new CustomPayload.Id<>(BoKarts.id("add_fuel"));
+    public static final CustomPayload.Id<KartEntityAddFuelPayloadC2S> ID = new CustomPayload.Id<>(BoKarts.id("add_fuel"));
 
-    public static final PacketCodec<RegistryByteBuf, AddFuelPayloadC2S> STREAM_CODEC = PacketCodec.unit(new AddFuelPayloadC2S());
+    public static final PacketCodec<RegistryByteBuf, KartEntityAddFuelPayloadC2S> STREAM_CODEC = PacketCodec.unit(new KartEntityAddFuelPayloadC2S());
 
 
     @Override
@@ -21,7 +21,7 @@ public record AddFuelPayloadC2S() implements CustomPayload {
         return ID;
     }
 
-    public static void receive(AddFuelPayloadC2S payload, ServerPlayNetworking.Context ctx) {
+    public static void receive(KartEntityAddFuelPayloadC2S payload, ServerPlayNetworking.Context ctx) {
         PlayerEntity player = ctx.player();
 
         // check valid screen interaction

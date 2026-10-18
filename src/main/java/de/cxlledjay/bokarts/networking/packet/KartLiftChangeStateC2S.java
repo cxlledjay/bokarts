@@ -9,13 +9,13 @@ import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.util.math.BlockPos;
 
-public record ChangeKartLiftStateC2S(BlockPos blockPos) implements CustomPayload {
+public record KartLiftChangeStateC2S(BlockPos blockPos) implements CustomPayload {
 
-    public static final CustomPayload.Id<ChangeKartLiftStateC2S> ID = new CustomPayload.Id<>(BoKarts.id("change_kart_lift_state"));
+    public static final CustomPayload.Id<KartLiftChangeStateC2S> ID = new CustomPayload.Id<>(BoKarts.id("change_kart_lift_state"));
 
-    public static final PacketCodec<RegistryByteBuf, ChangeKartLiftStateC2S> STREAM_CODEC =  PacketCodec.tuple(
-            BlockPos.PACKET_CODEC, ChangeKartLiftStateC2S::blockPos,
-            ChangeKartLiftStateC2S::new
+    public static final PacketCodec<RegistryByteBuf, KartLiftChangeStateC2S> STREAM_CODEC =  PacketCodec.tuple(
+            BlockPos.PACKET_CODEC, KartLiftChangeStateC2S::blockPos,
+            KartLiftChangeStateC2S::new
     );
 
 
@@ -24,7 +24,7 @@ public record ChangeKartLiftStateC2S(BlockPos blockPos) implements CustomPayload
         return ID;
     }
 
-    public static void receive(ChangeKartLiftStateC2S payload, ServerPlayNetworking.Context ctx) {
+    public static void receive(KartLiftChangeStateC2S payload, ServerPlayNetworking.Context ctx) {
         BlockEntity be = ctx.player().getWorld().getBlockEntity(payload.blockPos());
 
         if (be instanceof KartLiftBlockEntity lift) {

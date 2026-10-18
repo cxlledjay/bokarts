@@ -60,7 +60,6 @@
   "tooltip.bokarts.livery_template.wheel_color":    " §b[*] §fWheel Color §7>> §f",
 
   "tooltip.bokarts.kart_key.shift": "§7Press §f[SHIFT] §7to reveal details",
-  "tooltip.bokarts.kart_key.info": "§7Pairing Info: §f",
   "tooltip.bokarts.kart_key.no_info": "§c<no information available>",
 
 
@@ -81,6 +80,8 @@
 
   "key.category.bokarts.controls" : "BoKarts Controls",
   "key.bokarts.horn": "Horn",
+  "key.bokarts.horn_next": "Next Horn Sound",
+  "key.bokarts.horn_prev": "Previous Horn Sound",
 
   "stat.bokarts.kart_one_cm": "Distance by Kart",
 
@@ -97,6 +98,10 @@
   "bokarts.midnightconfig.title": "BoKart Settings",
 
   "bokarts.midnightconfig.category.server": "Server Settings",
+  "bokarts.midnightconfig.category.client": "Cient Settings",
+
+  "bokarts.midnightconfig.hornPreviewVolume": "Horn Preview Volume",
+  "bokarts.midnightconfig.hornPreviewVolume.tooltip": "To disable preview, set to 0.0f. 1.0f is as loud as the normal horn",
 
   "bokarts.midnightconfig.maxFuelCapacity": "Maximum Fuel Capacity (mL)",
   "bokarts.midnightconfig.maxFuelCapacity.tooltip": "The maximum amount of fuel a Kart can carry",

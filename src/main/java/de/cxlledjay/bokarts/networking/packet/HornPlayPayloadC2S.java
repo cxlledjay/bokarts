@@ -8,18 +8,18 @@ import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.packet.CustomPayload;
 
-public record HornPayloadC2S() implements CustomPayload {
+public record HornPlayPayloadC2S() implements CustomPayload {
 
-    public static final CustomPayload.Id<HornPayloadC2S> ID = new CustomPayload.Id<>(BoKarts.id("play_horn"));
+    public static final CustomPayload.Id<HornPlayPayloadC2S> ID = new CustomPayload.Id<>(BoKarts.id("play_horn"));
 
-    public static final PacketCodec<RegistryByteBuf, HornPayloadC2S> STREAM_CODEC = PacketCodec.unit(new HornPayloadC2S());
+    public static final PacketCodec<RegistryByteBuf, HornPlayPayloadC2S> STREAM_CODEC = PacketCodec.unit(new HornPlayPayloadC2S());
 
     @Override
     public Id<? extends CustomPayload> getId() {
         return ID;
     }
 
-    public static void receive(HornPayloadC2S payload, ServerPlayNetworking.Context ctx) {
+    public static void receive(HornPlayPayloadC2S payload, ServerPlayNetworking.Context ctx) {
         PlayerEntity player = ctx.player();
 
         if(player.getVehicle() instanceof KartEntity kart) {

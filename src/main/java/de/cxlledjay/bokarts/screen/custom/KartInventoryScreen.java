@@ -4,8 +4,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.config.ClientSyncedConfig;
 import de.cxlledjay.bokarts.entity.custom.kart.KartEntity;
-import de.cxlledjay.bokarts.networking.packet.AddFuelPayloadC2S;
-import de.cxlledjay.bokarts.networking.packet.SetHornPayloadC2S;
+import de.cxlledjay.bokarts.networking.packet.KartEntityAddFuelPayloadC2S;
+import de.cxlledjay.bokarts.networking.packet.HornCyclePayloadC2S;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -67,7 +67,7 @@ public class KartInventoryScreen extends HandledScreen<KartInventoryScreenHandle
                 REFUEL_BUTTON_TEXTURES,
                 button -> {
                     // click logic: send packet to add fuel
-                    AddFuelPayloadC2S payloadC2S = new AddFuelPayloadC2S();
+                    KartEntityAddFuelPayloadC2S payloadC2S = new KartEntityAddFuelPayloadC2S();
                     ClientPlayNetworking.send(payloadC2S);
                 }
         ) {
@@ -85,7 +85,7 @@ public class KartInventoryScreen extends HandledScreen<KartInventoryScreenHandle
                 HORN_PREVIOUS_TEXTURES,
                 button -> {
                     // click logic: send packet server
-                    SetHornPayloadC2S payloadC2S = new SetHornPayloadC2S(-1);
+                    HornCyclePayloadC2S payloadC2S = new HornCyclePayloadC2S(-1);
                     ClientPlayNetworking.send(payloadC2S);
                 }
         ) {
@@ -102,7 +102,7 @@ public class KartInventoryScreen extends HandledScreen<KartInventoryScreenHandle
                 HORN_NEXT_TEXTURES,
                 button -> {
                     // click logic: send packet server
-                    SetHornPayloadC2S payloadC2S = new SetHornPayloadC2S(1);
+                    HornCyclePayloadC2S payloadC2S = new HornCyclePayloadC2S(1);
                     ClientPlayNetworking.send(payloadC2S);
                 }
         ) {

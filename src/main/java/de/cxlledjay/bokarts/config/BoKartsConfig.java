@@ -10,6 +10,8 @@ public class BoKartsConfig extends MidnightConfig {
 
     // TBD
 
+    @Entry(category = "client", min = 0.0f, max = 1.0f, isSlider = true)
+    public static float hornPreviewVolume = 0.5f;
 
 
 

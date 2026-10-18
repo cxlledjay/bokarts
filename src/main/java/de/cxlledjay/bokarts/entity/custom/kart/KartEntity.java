@@ -1,12 +1,13 @@
 package de.cxlledjay.bokarts.entity.custom.kart;
 
 import de.cxlledjay.bokarts.component.ModDataComponentTypes;
+import de.cxlledjay.bokarts.config.BoKartsConfig;
 import de.cxlledjay.bokarts.config.ClientSyncedConfig;
 import de.cxlledjay.bokarts.entity.ModEntities;
 import de.cxlledjay.bokarts.entity.custom.ModTrackedDataHandlers;
 import de.cxlledjay.bokarts.entity.custom.kart.property.*;
 import de.cxlledjay.bokarts.item.ModItems;
-import de.cxlledjay.bokarts.networking.packet.KartInputPayloadC2S;
+import de.cxlledjay.bokarts.networking.packet.KartEntityInputPayloadC2S;
 import de.cxlledjay.bokarts.screen.custom.KartInventoryScreenHandler;
 import de.cxlledjay.bokarts.sound.KartEngineSound;
 import de.cxlledjay.bokarts.util.KartFuelItems;
@@ -18,7 +19,6 @@ import net.minecraft.entity.*;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
-import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.item.Item;
@@ -31,6 +31,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.StringHelper;
 import net.minecraft.util.math.BlockPos;
@@ -50,6 +51,8 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     private static final float STEERING_SPEED = 20.0f;
     private static final float STEERING_CENTER = 0.0f;
     private static final float ENGINE_ACCELERATION = 0.1f;
+    private static final int HORN_COOLDOWN = 10;
+    private static final int KEY_FOB_DURATION = 100;
 
     // -------------------- tracked data --------------------
     // stats
@@ -88,6 +91,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     // sound tracking
     private boolean engineSoundStarted = false;
     private float soundScaling = 0.0f;
+    private int currentHornTicks = 0;
 
     // range tracking
     public float currentFuel = -1;
@@ -107,6 +111,9 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     public float steeringAngle = STEERING_CENTER;
     public float steeringAnglePrev = STEERING_CENTER;
     private float engineRevs = 0.0f;
+
+    // key fob tracking
+    private int keyFobTimer = 0;
 
 
 
@@ -438,7 +445,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
 
                 // send new input to server
-                ClientPlayNetworking.send(new KartInputPayloadC2S(
+                ClientPlayNetworking.send(new KartEntityInputPayloadC2S(
                         this.getId(), this.pressingLeft, this.pressingRight, this.pressingForward, this.pressingBack, this.pressingSlow
                 ));
 
@@ -469,7 +476,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
         // no fuel = no drive
         boolean isOutOfFuel = this.currentFuel <= 0.0f;
-        boolean ignitionDeniesDriving = !this.isKeyInIgnition() && this.getKeyUuid() != null; //temp code for testing
+        boolean ignitionDeniesDriving = !this.isKeyInIgnition() && this.getKeyUuid() != null;
         if (isOutOfFuel | ignitionDeniesDriving) {
             super.setInputs(false, false, false, false);
         }
@@ -541,6 +548,13 @@ public class KartEntity extends BoatEntity implements RideableInventory{
             // update client
             this.setEngineRevs(this.engineRevs);
             this.setSteeringAngle(this.steeringAngle);
+
+
+
+            // ---------------- horn stuff ----------------
+
+            if(this.currentHornTicks > 0) this.currentHornTicks--;
+            this.tickKeyFob();
         }
 
         // ==================== [CLIENT SIDED CODE] ====================
@@ -551,9 +565,8 @@ public class KartEntity extends BoatEntity implements RideableInventory{
             this.steeringAngle = this.getSteeringAngle();
 
 
-            // do no animations or sound when out of fuel!
-
-            if(!isOutOfFuel) {
+            // do no animations or sound when out of fuel or no key is in ignition
+            if(!(isOutOfFuel | ignitionDeniesDriving)) {
                 // kart speed calculation
                 double yawRad = Math.toRadians(this.getYaw());
                 double forwardX = -Math.sin(yawRad);
@@ -647,7 +660,6 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         return angle;
     }
 
-
     private void calculateEngineRevs() {
         if (pressingForward) {
             // positive acceleration
@@ -674,6 +686,31 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         return engineRotationDelta;
     }
 
+    private void tickKeyFob() {
+        // only do something when active
+        if(this.keyFobTimer > 0) {
+
+            if(this.keyFobTimer == KEY_FOB_DURATION) {
+                // play first horn
+                this.playHornSoundNoCooldown();
+            } else if (this.keyFobTimer == KEY_FOB_DURATION-5) {
+                // play second horn
+                this.playHornSoundNoCooldown();
+            } else if (this.keyFobTimer == 1) {
+                // reset
+                this.setGlowing(false);
+            }
+
+            this.keyFobTimer--;
+        }
+    }
+
+    public void triggerKeyFob() {
+        if(this.keyFobTimer > 0) return; //< no spamming!
+        this.keyFobTimer = KEY_FOB_DURATION;
+        this.setGlowing(true);
+    }
+
 
     // ==================== sounds ====================
 
@@ -694,6 +731,13 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
     // horn
     public void playHornSound() {
+        if(this.currentHornTicks != 0) return; // on cooldown
+        this.currentHornTicks = HORN_COOLDOWN; // set cooldown
+
+        this.playHornSoundNoCooldown();
+    }
+
+    private void playHornSoundNoCooldown() {
         this.getWorld().playSound(
                 null, // Excluded player (null = everyone hears it)
                 this.getX(), this.getY(), this.getZ(),
@@ -719,7 +763,9 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         // preview HornSound
         Identifier oldSoundId = this.getHornType().getSoundEvent().getId();
         player.networkHandler.sendPacket(new StopSoundS2CPacket(oldSoundId, SoundCategory.PLAYERS));
-        player.playSoundToPlayer(newHorn.getSoundEvent(), SoundCategory.PLAYERS, 1.0f, 1.0f);
+        player.playSoundToPlayer(newHorn.getSoundEvent(), SoundCategory.PLAYERS, BoKartsConfig.hornPreviewVolume, 1.0f);
+        String msg = "[" + (newHorn.getId() + 1) + "/" + HornType.values().length + "] " + newHorn.getDisplayName();
+        player.sendMessage(Text.literal(msg).formatted(Formatting.YELLOW), true);
 
         // set HornSound for Kart
         this.setHornType(newHorn);

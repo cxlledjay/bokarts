@@ -4,11 +4,15 @@ import de.cxlledjay.bokarts.component.ModDataComponentTypes;
 import de.cxlledjay.bokarts.entity.custom.kart.KartEntity;
 import de.cxlledjay.bokarts.item.ModItems;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.text.Text;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.util.Hand;
+import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.math.Box;
+import net.minecraft.world.World;
 
 import java.util.List;
 import java.util.UUID;
@@ -19,10 +23,44 @@ public class KartKey extends Item {
         super(settings);
     }
 
+    @Override
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+
+        // get key
+        ItemStack pairedKey = user.getStackInHand(hand);
+
+        // run on server only
+        if(!world.isClient()) {
+
+            // get key uuid
+            UUID keyUuid = pairedKey.getOrDefault(ModDataComponentTypes.KART_KEY_PAIRED_UUID, null);
+
+            if(keyUuid != null) {
+                // search in two chunks radius
+                Box searchBox = user.getBoundingBox().expand(32.0);
+
+                List<KartEntity> karts = world.getEntitiesByClass(
+                        KartEntity.class,
+                        searchBox,
+                        // match kart key uuid
+                        kart -> keyUuid.equals(kart.getKeyUuid())
+                );
+
+                // found something!
+                if(!karts.isEmpty()) {
+                    KartEntity matchingKart = karts.getFirst();
+                    matchingKart.triggerKeyFob();
+                }
+            }
+        }
+        return TypedActionResult.success(pairedKey, world.isClient());
+    }
+
+
+    // -------------------- appearance --------------------
 
     @Override
     public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
-        super.appendTooltip(stack, context, tooltip, type);
 
         String string = stack.getOrDefault(ModDataComponentTypes.KART_KEY_INFO, null);
         Text info = Text.translatable("tooltip.bokarts.kart_key.no_info");
@@ -35,12 +73,13 @@ public class KartKey extends Item {
         // info tooltip
         else {
             if(string != null) {
-                info = Text.translatable("tooltip.bokarts.kart_key.info").append(string);
+                info = Text.literal(string);
             }
             tooltip.add(info);
         }
-    }
 
+        super.appendTooltip(stack, context, tooltip, type);
+    }
 
     public static ItemStack createPairedKey(UUID uuid, KartEntity kartEntity) {
         ItemStack pairedKey =  new ItemStack(ModItems.KEY_PAIRED);
@@ -52,7 +91,6 @@ public class KartKey extends Item {
 
         return pairedKey;
     }
-
 
     private static String createKartKeyInfoStringFromKart (KartEntity kart) {
         // safety

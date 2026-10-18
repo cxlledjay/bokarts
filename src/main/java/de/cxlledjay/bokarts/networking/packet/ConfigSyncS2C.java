@@ -8,7 +8,7 @@ import net.minecraft.network.packet.CustomPayload;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
-public record KartConfigSyncS2C(
+public record ConfigSyncS2C(
         float maxFuelCapacity,
         float fuelConsumptionPerTick,
         float fuelTimeToRangeConversion,
@@ -19,11 +19,11 @@ public record KartConfigSyncS2C(
         float slipperinessNoPassenger
 ) implements CustomPayload {
 
-    public static final CustomPayload.Id<KartConfigSyncS2C> ID = new CustomPayload.Id<>(BoKarts.id("config_sync"));
+    public static final CustomPayload.Id<ConfigSyncS2C> ID = new CustomPayload.Id<>(BoKarts.id("config_sync"));
 
-    public static final PacketCodec<RegistryByteBuf, KartConfigSyncS2C> STREAM_CODEC = PacketCodec.of(
-            KartConfigSyncS2C::write,
-            KartConfigSyncS2C::read
+    public static final PacketCodec<RegistryByteBuf, ConfigSyncS2C> STREAM_CODEC = PacketCodec.of(
+            ConfigSyncS2C::write,
+            ConfigSyncS2C::read
     );
 
     @Override
@@ -42,8 +42,8 @@ public record KartConfigSyncS2C(
         buf.writeFloat(this.slipperinessNoPassenger);
     }
 
-    private static KartConfigSyncS2C read(RegistryByteBuf buf) {
-        return new KartConfigSyncS2C(
+    private static ConfigSyncS2C read(RegistryByteBuf buf) {
+        return new ConfigSyncS2C(
                 buf.readFloat(),
                 buf.readFloat(),
                 buf.readFloat(),
@@ -56,7 +56,7 @@ public record KartConfigSyncS2C(
     }
 
     // Client-side receiver logic
-    public static void receive(KartConfigSyncS2C payload, ClientPlayNetworking.Context ctx) {
+    public static void receive(ConfigSyncS2C payload, ClientPlayNetworking.Context ctx) {
         ctx.client().execute(() -> {
             ClientSyncedConfig.isUsingServerConfig = true;
             ClientSyncedConfig.activeMaxFuelCapacity = payload.maxFuelCapacity();

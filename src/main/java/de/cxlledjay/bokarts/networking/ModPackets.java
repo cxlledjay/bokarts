@@ -10,29 +10,29 @@ public class ModPackets {
 
     public static void registerPayloads() {
         // S2C
-        PayloadTypeRegistry.playS2C().register(KartConfigSyncS2C.ID, KartConfigSyncS2C.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(ConfigSyncS2C.ID, ConfigSyncS2C.STREAM_CODEC);
 
         // C2S
-        PayloadTypeRegistry.playC2S().register(HornPayloadC2S.ID, HornPayloadC2S.STREAM_CODEC);
-        PayloadTypeRegistry.playC2S().register(AddFuelPayloadC2S.ID, AddFuelPayloadC2S.STREAM_CODEC);
-        PayloadTypeRegistry.playC2S().register(SetHornPayloadC2S.ID, SetHornPayloadC2S.STREAM_CODEC);
-        PayloadTypeRegistry.playC2S().register(KartInputPayloadC2S.ID, KartInputPayloadC2S.STREAM_CODEC);
-        PayloadTypeRegistry.playC2S().register(ChangeKartLiftStateC2S.ID, ChangeKartLiftStateC2S.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(HornPlayPayloadC2S.ID, HornPlayPayloadC2S.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(KartEntityAddFuelPayloadC2S.ID, KartEntityAddFuelPayloadC2S.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(HornCyclePayloadC2S.ID, HornCyclePayloadC2S.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(KartEntityInputPayloadC2S.ID, KartEntityInputPayloadC2S.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(KartLiftChangeStateC2S.ID, KartLiftChangeStateC2S.STREAM_CODEC);
         PayloadTypeRegistry.playC2S().register(KartLiftModifyRaceNumberC2S.ID, KartLiftModifyRaceNumberC2S.STREAM_CODEC);
     }
 
 
     public static void registerC2SPackets() {
-        ServerPlayNetworking.registerGlobalReceiver(HornPayloadC2S.ID, HornPayloadC2S::receive);
-        ServerPlayNetworking.registerGlobalReceiver(AddFuelPayloadC2S.ID, AddFuelPayloadC2S::receive);
-        ServerPlayNetworking.registerGlobalReceiver(SetHornPayloadC2S.ID, SetHornPayloadC2S::receive);
-        ServerPlayNetworking.registerGlobalReceiver(KartInputPayloadC2S.ID, KartInputPayloadC2S::receive);
-        ServerPlayNetworking.registerGlobalReceiver(ChangeKartLiftStateC2S.ID, ChangeKartLiftStateC2S::receive);
+        ServerPlayNetworking.registerGlobalReceiver(HornPlayPayloadC2S.ID, HornPlayPayloadC2S::receive);
+        ServerPlayNetworking.registerGlobalReceiver(KartEntityAddFuelPayloadC2S.ID, KartEntityAddFuelPayloadC2S::receive);
+        ServerPlayNetworking.registerGlobalReceiver(HornCyclePayloadC2S.ID, HornCyclePayloadC2S::receive);
+        ServerPlayNetworking.registerGlobalReceiver(KartEntityInputPayloadC2S.ID, KartEntityInputPayloadC2S::receive);
+        ServerPlayNetworking.registerGlobalReceiver(KartLiftChangeStateC2S.ID, KartLiftChangeStateC2S::receive);
         ServerPlayNetworking.registerGlobalReceiver(KartLiftModifyRaceNumberC2S.ID, KartLiftModifyRaceNumberC2S::receive);
     }
 
     public static void registerS2CPackets(){
-        ClientPlayNetworking.registerGlobalReceiver(KartConfigSyncS2C.ID, KartConfigSyncS2C::receive);
+        ClientPlayNetworking.registerGlobalReceiver(ConfigSyncS2C.ID, ConfigSyncS2C::receive);
     }
 
 }
