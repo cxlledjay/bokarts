@@ -206,7 +206,8 @@ public class KartLiftScreen extends HandledScreen<KartLiftScreenHandler> {
             try {
                 num = Integer.parseInt(newText);
             } catch (NumberFormatException e) {
-                return;
+                if(newText.isEmpty()) num = 0;
+                else return;
             }
 
             // send to kart
