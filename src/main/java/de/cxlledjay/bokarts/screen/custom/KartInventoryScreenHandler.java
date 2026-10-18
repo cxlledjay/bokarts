@@ -64,7 +64,7 @@ public class KartInventoryScreenHandler extends ScreenHandler {
             ItemStack originalStack = slot.getStack();
             newStack = originalStack.copy();
             if (invSlot < this.fuelInventory.size()) {
-                if (!this.insertItem(originalStack, this.fuelInventory.size(), this.slots.size(), true)) {
+                if (!this.insertItem(originalStack, this.fuelInventory.size(), this.slots.size(), false)) {
                     return ItemStack.EMPTY;
                 }
             } else if (!this.insertItem(originalStack, 0, this.fuelInventory.size(), false)) {

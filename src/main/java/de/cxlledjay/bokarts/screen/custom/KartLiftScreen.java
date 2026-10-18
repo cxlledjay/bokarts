@@ -1,19 +1,24 @@
 package de.cxlledjay.bokarts.screen.custom;
 
 import de.cxlledjay.bokarts.BoKarts;
+import de.cxlledjay.bokarts.block.entity.custom.KartLiftBlockEntity;
 import de.cxlledjay.bokarts.config.ClientSyncedConfig;
 import de.cxlledjay.bokarts.entity.custom.kart.KartEntity;
 import de.cxlledjay.bokarts.networking.packet.ChangeKartLiftStateC2S;
+import de.cxlledjay.bokarts.networking.packet.KartLiftModifyRaceNumberC2S;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ButtonTextures;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.TexturedButtonWidget;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import org.lwjgl.glfw.GLFW;
 
 @Environment(EnvType.CLIENT)
 public class KartLiftScreen extends HandledScreen<KartLiftScreenHandler> {
@@ -55,6 +60,12 @@ public class KartLiftScreen extends HandledScreen<KartLiftScreenHandler> {
             BoKarts.id("kart_lift/lift_control/lift_down_hovered")
     );
 
+    // local tab
+    private KartLiftScreenHandler.KartLiftTab currentTab;
+
+    // race number text widget
+    TextFieldWidget raceNumberInputWidget;
+
     // ----- positioning -----
     // tabs
     private static final int TAB_WIDTH = 27;
@@ -81,8 +92,8 @@ public class KartLiftScreen extends HandledScreen<KartLiftScreenHandler> {
         super.init();
 
         // starting tab
-        if(this.handler.getLiftEntity().hasKartLoaded()) this.handler.setCurrentTab(KartLiftScreenHandler.KartLiftTab.MODIFICATION);
-        else this.handler.setCurrentTab(KartLiftScreenHandler.KartLiftTab.INSERT_KART_ITEM);
+        if(this.handler.getLiftEntity().hasKartLoaded()) this.changeTab(KartLiftScreenHandler.KartLiftTab.MODIFICATION);
+        else this.changeTab(KartLiftScreenHandler.KartLiftTab.INSERT_KART_ITEM);
 
         // -------------------- tab buttons --------------------
         {
@@ -92,7 +103,7 @@ public class KartLiftScreen extends HandledScreen<KartLiftScreenHandler> {
                     TAB_BUTTON_MODIFICATION_TEXTURES,
                     button -> {
                         if (this.handler.getLiftEntity().hasKartLoaded())
-                            this.handler.setCurrentTab(KartLiftScreenHandler.KartLiftTab.MODIFICATION);
+                            this.changeTab(KartLiftScreenHandler.KartLiftTab.MODIFICATION);
                     }
             ) {
                 @Override
@@ -108,7 +119,7 @@ public class KartLiftScreen extends HandledScreen<KartLiftScreenHandler> {
                     TAB_BUTTON_CUSTOMIZATION_TEXTURES,
                     button -> {
                         if (this.handler.getLiftEntity().hasKartLoaded())
-                            this.handler.setCurrentTab(KartLiftScreenHandler.KartLiftTab.CUSTOMIZATION);
+                            this.changeTab(KartLiftScreenHandler.KartLiftTab.CUSTOMIZATION);
                     }
             ) {
                 @Override
@@ -124,7 +135,7 @@ public class KartLiftScreen extends HandledScreen<KartLiftScreenHandler> {
                     TAB_BUTTON_KEY_TEXTURES,
                     button -> {
                         if (this.handler.getLiftEntity().hasKartLoaded())
-                            this.handler.setCurrentTab(KartLiftScreenHandler.KartLiftTab.KEY);
+                            this.changeTab(KartLiftScreenHandler.KartLiftTab.KEY);
                     }
             ) {
                 @Override
@@ -153,7 +164,8 @@ public class KartLiftScreen extends HandledScreen<KartLiftScreenHandler> {
                     super.setFocused(false);
                 }
             });
-        } else {
+        }
+        else {
             // lift up
             this.addDrawableChild(new TexturedButtonWidget(
                     this.x, this.y + 56,
@@ -172,8 +184,70 @@ public class KartLiftScreen extends HandledScreen<KartLiftScreenHandler> {
             });
         }
 
+        // -------------------- race number --------------------
+        this.raceNumberInputWidget = new TextFieldWidget(
+                this.textRenderer,
+                this.x + 160, this.y + 54,
+                38, 9,
+                Text.literal("Race Number Input")
+        );
+        this.raceNumberInputWidget.setMaxLength(2);
+        this.raceNumberInputWidget.setDrawsBackground(false);
+        this.raceNumberInputWidget.setFocused(false);
+        this.raceNumberInputWidget.setVisible(false);
+        if(this.handler.getLiftEntity().getKartEntity() != null) {
+            int oldNumber =  this.handler.getLiftEntity().getKartEntity().getRaceNumber();
+            this.raceNumberInputWidget.setText(String.valueOf(oldNumber));
+            this.raceNumberInputWidget.setCursorToEnd(false);
+        }
+        this.raceNumberInputWidget.setChangedListener(newText -> {
+            // get number
+            int num;
+            try {
+                num = Integer.parseInt(newText);
+            } catch (NumberFormatException e) {
+                return;
+            }
+
+            // send to kart
+            KartLiftBlockEntity lift = this.handler.getLiftEntity();
+            if(lift != null && lift.getKartEntity() != null) {
+                if (num != lift.getKartEntity().getRaceNumber()) {
+                    ClientPlayNetworking.send(new KartLiftModifyRaceNumberC2S(this.handler.getLiftBlockEntityBlockPos(), num));
+                }
+            }
+        });
+        this.addDrawableChild(this.raceNumberInputWidget);
 
     }
+
+
+    private void changeTab(KartLiftScreenHandler.KartLiftTab tab) {
+        // update locally
+        this.currentTab = tab;
+
+        // set visibility of text input for race number
+        if(this.currentTab == KartLiftScreenHandler.KartLiftTab.CUSTOMIZATION) {
+            if(this.raceNumberInputWidget != null) this.raceNumberInputWidget.setVisible(true);
+        } else {
+            if(this.raceNumberInputWidget != null) this.raceNumberInputWidget.setVisible(false);
+        }
+
+        // update in screen handler
+        this.handler.setCurrentTab(tab);
+    }
+
+    // window resize protection
+    @Override
+    public void resize(MinecraftClient client, int width, int height) {
+        KartLiftScreenHandler.KartLiftTab currentTab1 = currentTab;
+        String savedText = this.raceNumberInputWidget.getText();
+        this.init(client, width, height);
+        this.raceNumberInputWidget.setText(savedText); // keep text
+        this.changeTab(currentTab1); // keep tab
+    }
+
+
 
     @Override
     protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {

@@ -27,7 +27,6 @@ import org.joml.Quaternionf;
 
 import java.util.EnumMap;
 import java.util.Map;
-import java.util.Objects;
 
 public class KartRenderer extends EntityRenderer<KartEntity> {
 
@@ -237,7 +236,7 @@ public class KartRenderer extends EntityRenderer<KartEntity> {
         int racingNumber = entity.getRaceNumber();
 
         // no (valid) number
-        if(!KartEntity.isVlalidRaceNumber(racingNumber)) return;
+        if(!KartEntity.isValidRaceNumber(racingNumber)) return;
 
         // convert racing number to text
         Text textRacingNumber = Text.literal(String.format("%02d",entity.getRaceNumber())).formatted(Formatting.BOLD);

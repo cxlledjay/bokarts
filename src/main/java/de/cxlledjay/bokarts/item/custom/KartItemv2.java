@@ -145,7 +145,7 @@ public class KartItemv2 extends Item {
 
             // race number
             int raceNumber = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_RACE_NUMBER, 0);
-            if (KartEntity.isVlalidRaceNumber(raceNumber)) {
+            if (KartEntity.isValidRaceNumber(raceNumber)) {
                 String s = Text.translatable("tooltip.bokarts.kart_item.shift2_race_number").getString()
                         + String.format("%02d", raceNumber);
                 tooltip.add(Text.literal(s));

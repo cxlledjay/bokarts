@@ -212,97 +212,85 @@ public class KartLiftBlockEntity extends BlockEntity implements ExtendedScreenHa
 
     // -------------------- modification business logic --------------------
 
-    public void setPropertyFromItemStack(ItemStack stack) {
 
-        // security
+    public void setWheelsFromItemStack(ItemStack stack) {
         if(this.world == null || this.getKartEntity() == null) return;
-
-        // get item
         Item item = stack.getItem();
 
-        // ----- select what modification to apply -----
-
-        // wheels
+        WheelType wheelType = WheelType.NONE;
         if(item instanceof WheelsItem) {
-            WheelType wheelType = WheelType.NONE;
             if(item == ModItems.WHEELS_STREET) wheelType = WheelType.STREET;
             else if(item == ModItems.WHEELS_DRIFT) wheelType = WheelType.DRIFT;
             else if(item == ModItems.WHEELS_OFFROAD) wheelType = WheelType.OFFROAD;
-            storedKart.setWheelType(wheelType);
         }
+        storedKart.setWheelType(wheelType);
+    }
 
-        // engines
-        else if(item instanceof EngineItem) {
-            EngineType engineType = EngineType.ENGINE_NONE;
+    public void setEngineFromItemStack(ItemStack stack) {
+        if(this.world == null || this.getKartEntity() == null) return;
+        Item item = stack.getItem();
+
+        EngineType engineType = EngineType.ENGINE_NONE;
+        if(item instanceof EngineItem) {
             if(item == ModItems.ENGINE_COPPER) engineType = EngineType.ENGINE_COPPER;
             else if(item == ModItems.ENGINE_IRON) engineType = EngineType.ENGINE_IRON;
             else if(item == ModItems.ENGINE_GOLD) engineType = EngineType.ENGINE_GOLD;
             else if(item == ModItems.ENGINE_DIAMOND) engineType = EngineType.ENGINE_DIAMOND;
             else if(item == ModItems.ENGINE_NETHERITE) engineType = EngineType.ENGINE_NETHERITE;
-            storedKart.setEngineType(engineType);
         }
+        storedKart.setEngineType(engineType);
+    }
 
-        // spoilers
-        else if(item instanceof SpoilerItem) {
-            SpoilerType spoilerType = SpoilerType.NONE;
+    public void setSpoilerFromItemStack(ItemStack stack) {
+        if(this.world == null || this.getKartEntity() == null) return;
+        Item item = stack.getItem();
+
+        SpoilerType spoilerType = SpoilerType.NONE;
+        if(item instanceof SpoilerItem) {
             if(item == ModItems.SPOILER_STREET) spoilerType = SpoilerType.STREET;
             else if(item == ModItems.SPOILER_STREET_CARBON) spoilerType = SpoilerType.STREET_CARBON;
             else if(item == ModItems.SPOILER_RACE) spoilerType = SpoilerType.RACE;
             else if(item == ModItems.SPOILER_RACE_CARBON) spoilerType = SpoilerType.RACE_CARBON;
-            storedKart.setSpoilerType(spoilerType);
         }
-
-        // aero kits
-        else if(item instanceof AeroItem) {
-            AeroType aeroType = AeroType.NONE;
-            if(item == ModItems.AERO_RACE)  aeroType = AeroType.RACE;
-            else if(item == ModItems.AERO_RACE_CARBON)  aeroType = AeroType.RACE_CARBON;
-            storedKart.setAeroType(aeroType);
-        }
-
-        // livery
-        else if(item == ModItems.LIVERY_TEMPLATE) {
-            BodyType bodyType = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_BODY_TYPE, BodyType.NONE);
-            int bodyColor = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_BODY_COLOR, 0xFFFFFFFF);
-            int wheelColor = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR, 0xFFFFFFFF);
-            storedKart.setBodyType(bodyType);
-            storedKart.setBodyColor(bodyColor);
-            storedKart.setWheelColor(wheelColor);
-        }
-        // TODO: upgrades ...
-
-        // and sync
-        this.syncKartData();
+        storedKart.setSpoilerType(spoilerType);
     }
 
-    public void removePropertyFromItemStack(ItemStack stack) {
-
-        // security
+    public void setAeroFromItemStack(ItemStack stack) {
         if(this.world == null || this.getKartEntity() == null) return;
-
-        // get item
         Item item = stack.getItem();
 
-        if(item instanceof WheelsItem) {
-            storedKart.setWheelType(WheelType.NONE);
+        AeroType aeroType = AeroType.NONE;
+        if(item instanceof AeroItem) {
+            if(item == ModItems.AERO_RACE)  aeroType = AeroType.RACE;
+            else if(item == ModItems.AERO_RACE_CARBON)  aeroType = AeroType.RACE_CARBON;
         }
-        else if(item instanceof EngineItem) {
-            storedKart.setEngineType(EngineType.ENGINE_NONE);
-        }
-        else if(item instanceof SpoilerItem) {
-            storedKart.setSpoilerType(SpoilerType.NONE);
-        }
-        else if(item instanceof AeroItem) {
-            storedKart.setAeroType(AeroType.NONE);
-        }
-        else if(item == ModItems.LIVERY_TEMPLATE) {
-            storedKart.setBodyType(BodyType.NONE);
-            storedKart.setBodyColor(0xFFFFFFFF);
-            storedKart.setWheelColor(0xFFFFFFFF);
-        }
-        // TODO: upgrades
+        storedKart.setAeroType(aeroType);
+    }
 
-        // and sync
+    public void setLiveryFromItemStack(ItemStack stack) {
+        if(this.world == null || this.getKartEntity() == null) return;
+        Item item = stack.getItem();
+
+        BodyType bodyType = BodyType.NONE;
+        int bodyColor = 0xFFFFFFFF;
+        int wheelColor = 0xFFFFFFFF;
+        if(item == ModItems.LIVERY_TEMPLATE) {
+            bodyType = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_BODY_TYPE, BodyType.NONE);
+            bodyColor = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_BODY_COLOR, 0xFFFFFFFF);
+            wheelColor = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR, 0xFFFFFFFF);
+        }
+        storedKart.setBodyType(bodyType);
+        storedKart.setBodyColor(bodyColor);
+        storedKart.setWheelColor(wheelColor);
+    }
+
+    public void setRaceNumber(int num) {
+        if(this.world == null || this.getKartEntity() == null) return;
+
+        int raceNumber = 0;
+        if(KartEntity.isValidRaceNumber(num)) raceNumber = num;
+
+        storedKart.setRaceNumber(raceNumber);
         this.syncKartData();
     }
 

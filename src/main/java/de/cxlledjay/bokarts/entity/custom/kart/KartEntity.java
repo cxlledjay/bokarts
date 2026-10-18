@@ -805,7 +805,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     }
 
 
-    public static boolean isVlalidRaceNumber(int raceNumber) {
+    public static boolean isValidRaceNumber(int raceNumber) {
         return (raceNumber >= 1 && raceNumber <= 99);
     }
 

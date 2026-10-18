@@ -1,5 +1,6 @@
 package de.cxlledjay.bokarts.screen.custom;
 
+import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.block.entity.custom.KartLiftBlockEntity;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
@@ -13,43 +14,20 @@ public class KartLiftInventory extends SimpleInventory {
         this.kartLiftBlockEntity = kartLiftBlockEntity;
     }
 
-    // called when stack changes
     @Override
-    public void setStack(int slot, ItemStack newStack) {
-        // get stack before change
-        ItemStack oldStack = this.getStack(slot);
+    public void markDirty() {
+        super.markDirty();
 
-        // remove from kart
-        if (!oldStack.isEmpty() && !ItemStack.areEqual(oldStack, newStack)) {
-            this.kartLiftBlockEntity.removePropertyFromItemStack(oldStack);
-        }
+        if(this.kartLiftBlockEntity != null && kartLiftBlockEntity.getKartEntity() != null) {
+            // apply tuning
+            kartLiftBlockEntity.setWheelsFromItemStack(this.getStack(0));
+            kartLiftBlockEntity.setEngineFromItemStack(this.getStack(1));
+            kartLiftBlockEntity.setSpoilerFromItemStack(this.getStack(2));
+            kartLiftBlockEntity.setAeroFromItemStack(this.getStack(3));
+            kartLiftBlockEntity.setLiveryFromItemStack(this.getStack(4));
 
-        // perform swap
-        super.setStack(slot, newStack);
-
-        // apply new stack to kart
-        if (!newStack.isEmpty() && !ItemStack.areEqual(oldStack, newStack)) {
-            this.kartLiftBlockEntity.setPropertyFromItemStack(newStack);
+            // and sync data
+            kartLiftBlockEntity.syncKartData();
         }
     }
-
-    // --- 2. Intercepting Standard Extractions (e.g. Shift-Clicking) ---
-    @Override
-    public ItemStack removeStack(int slot, int amount) {
-        ItemStack oldStack = super.removeStack(slot, amount);
-        if (!oldStack.isEmpty()) {
-            this.kartLiftBlockEntity.removePropertyFromItemStack(oldStack);
-        }
-        return oldStack;
-    }
-
-    @Override
-    public ItemStack removeStack(int slot) {
-        ItemStack oldStack = super.removeStack(slot);
-        if (!oldStack.isEmpty()) {
-            this.kartLiftBlockEntity.removePropertyFromItemStack(oldStack);
-        }
-        return oldStack;
-    }
-
 }
