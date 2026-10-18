@@ -3,6 +3,7 @@ package de.cxlledjay.bokarts.item;
 import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.item.custom.KartItem;
 import de.cxlledjay.bokarts.item.custom.KartItemv2;
+import de.cxlledjay.bokarts.item.custom.KartKey;
 import de.cxlledjay.bokarts.item.custom.LiveryTemplate;
 import de.cxlledjay.bokarts.item.custom.modification.AeroItem;
 import de.cxlledjay.bokarts.item.custom.modification.EngineItem;
@@ -51,7 +52,7 @@ public class ModItems {
 
     // accessories
     public static final Item KEY_BLANK = registerItem("key_blank", new Item(new Item.Settings()));
-    public static final Item KEY_PAIRED = registerItem("key_paired", new Item(
+    public static final Item KEY_PAIRED = registerItem("key_paired", new KartKey(
             new Item.Settings()
                     .component(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true)
                     .maxCount(1)

@@ -18,6 +18,7 @@ import net.minecraft.entity.*;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.item.Item;
@@ -40,6 +41,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.text.DecimalFormat;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public class KartEntity extends BoatEntity implements RideableInventory{
 
@@ -49,13 +52,16 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     private static final float ENGINE_ACCELERATION = 0.1f;
 
     // -------------------- tracked data --------------------
+    // stats
     private static final TrackedData<HornType> HORN_TYPE = DataTracker.registerData(KartEntity.class, ModTrackedDataHandlers.HORN_TYPE_TRACKED_DATA_HANDLER);
     private static final TrackedData<Float> FUEL = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
     private static final TrackedData<Float> ODO = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
+
+    // animation
     private static final TrackedData<Float> ENGINE_REVS = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
     private static final TrackedData<Float> STEERING_ANGLE = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
 
-    // v2
+    // modification
     private static final TrackedData<WheelType> WHEEL_TYPE = DataTracker.registerData(KartEntity.class, ModTrackedDataHandlers.WHEEL_TYPE_TRACKED_DATA_HANDLER);
     private static final TrackedData<EngineType> ENGINE_TYPE = DataTracker.registerData(KartEntity.class, ModTrackedDataHandlers.ENGINE_TYPE_TRACKED_DATA_HANDLER);
     private static final TrackedData<BodyType> BODY_TYPE = DataTracker.registerData(KartEntity.class, ModTrackedDataHandlers.BODY_TYPE_TRACKED_DATA_HANDLER);
@@ -65,6 +71,10 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     private static final TrackedData<Integer> WHEEL_COLOR = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<Integer> BODY_COLOR = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<Integer> RACE_NUMBER = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.INTEGER);
+
+    // key
+    private static final TrackedData<Boolean> HAS_KEY = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    protected static final TrackedData<Optional<UUID>> KEY_UUID = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.OPTIONAL_UUID);
 
     // -------------------- attributes --------------------
 
@@ -357,6 +367,10 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         if(name == null) name = "Kart";
         stack.set(DataComponentTypes.CUSTOM_NAME, Text.literal(name).styled(style -> style.withItalic(false)));
 
+        // save key data
+        stack.set(ModDataComponentTypes.KART_ITEM_HAS_KEY, this.isKeyInIgnition());
+        stack.set(ModDataComponentTypes.KART_KEY_PAIRED_UUID, this.getKeyUuid());
+
         return stack;
     }
 
@@ -455,7 +469,8 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
         // no fuel = no drive
         boolean isOutOfFuel = this.currentFuel <= 0.0f;
-        if (isOutOfFuel) {
+        boolean ignitionDeniesDriving = !this.isKeyInIgnition() && this.getKeyUuid() != null; //temp code for testing
+        if (isOutOfFuel | ignitionDeniesDriving) {
             super.setInputs(false, false, false, false);
         }
 
@@ -824,7 +839,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         builder.add(ENGINE_REVS, 0.0f);
         builder.add(STEERING_ANGLE, STEERING_CENTER);
 
-        // v2
+        // v2 model
         builder.add(HORN_TYPE, HornType.HORN1);
         builder.add(WHEEL_TYPE, WheelType.NONE);
         builder.add(ENGINE_TYPE, EngineType.ENGINE_NONE);
@@ -834,6 +849,10 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         builder.add(BODY_COLOR, 0xFFFFFFFF);
         builder.add(WHEEL_COLOR, 0xFFFFFFFF);
         builder.add(RACE_NUMBER, 0);
+
+        // key
+        builder.add(HAS_KEY, false);
+        builder.add(KEY_UUID, Optional.empty());
     }
 
     @Override
@@ -846,7 +865,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         nbt.putFloat("EngineRevs", this.getEngineRevs());
         nbt.putFloat("SteeringAngle", this.getSteeringAngle());
 
-        // v2
+        // v2 model
         nbt.putInt("HornType", this.getHornType().getId());
         nbt.putInt("WheelType", this.getWheelType().getId());
         nbt.putInt("EngineType", this.getEngineType().getId());
@@ -856,6 +875,12 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         nbt.putInt("BodyColor", this.getBodyColor());
         nbt.putInt("WheelColor", this.getWheelColor());
         nbt.putInt("RaceNumber", this.getRaceNumber());
+
+        nbt.putBoolean("HasKey", this.isKeyInIgnition());
+        // key
+        if (this.getKeyUuid() != null) {
+            nbt.putUuid("KeyUuid", this.getKeyUuid());
+        }
     }
 
     @Override
@@ -920,6 +945,20 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         if (nbt.contains("BodyColor")) this.setBodyColor(nbt.getInt("BodyColor"));
         if (nbt.contains("WheelColor")) this.setWheelColor(nbt.getInt("WheelColor"));
         if (nbt.contains("RaceNumber")) this.setRaceNumber(nbt.getInt("RaceNumber"));
+
+
+        // key
+        if (nbt.contains("HasKey")) this.setKeyInIgnition(nbt.getBoolean("HasKey"));
+        UUID keyUuid;
+        if (nbt.containsUuid("KeyUuid")) {
+            keyUuid = nbt.getUuid("KeyUuid");
+        } else {
+            keyUuid = null;
+        }
+
+        if (keyUuid != null) {
+            this.setKeyUuid(keyUuid);
+        }
     }
 
     @Override
@@ -1028,5 +1067,9 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         this.dataTracker.set(RACE_NUMBER, type);
     }
 
-
+    // key stuff
+    public boolean isKeyInIgnition () { return this.dataTracker.get(HAS_KEY); }
+    public void setKeyInIgnition (boolean value) { this.dataTracker.set(HAS_KEY, value); }
+    public UUID getKeyUuid() { return this.dataTracker.get(KEY_UUID).orElse(null); }
+    public void setKeyUuid(@Nullable UUID uuid) { this.dataTracker.set(KEY_UUID, Optional.ofNullable(uuid)); }
 }

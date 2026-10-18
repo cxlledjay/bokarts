@@ -1,6 +1,9 @@
 package de.cxlledjay.bokarts.screen.custom;
 
+import de.cxlledjay.bokarts.component.ModDataComponentTypes;
 import de.cxlledjay.bokarts.entity.custom.kart.KartEntity;
+import de.cxlledjay.bokarts.item.ModItems;
+import de.cxlledjay.bokarts.item.custom.KartKey;
 import de.cxlledjay.bokarts.screen.ModScreenHandlers;
 import de.cxlledjay.bokarts.util.KartFuelItems;
 import net.minecraft.entity.player.PlayerEntity;
@@ -11,12 +14,31 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 
+import java.util.UUID;
+
 public class KartInventoryScreenHandler extends ScreenHandler {
 
-    private final Inventory fuelInventory = new SimpleInventory(2);
+    KartEntity kartEntity = null;
+
+    private final Inventory fuelInventory = new SimpleInventory(2) {
+        @Override
+        public void markDirty() {
+            super.markDirty();
+
+            // update key
+            if(kartEntity != null) {
+                kartEntity.setKeyInIgnition(!this.getStack(1).isEmpty());
+            }
+        }
+    };
 
     public KartInventoryScreenHandler(int syncId, PlayerInventory playerInventory) {
         super(ModScreenHandlers.KART_INVENTORY_SCREEN_HANDLER, syncId);
+
+        // remember kart of player
+        if(playerInventory.player.getVehicle() instanceof KartEntity kart) {
+            this.kartEntity = kart;
+        }
 
         // fuel slot
         this.addSlot(
@@ -33,10 +55,33 @@ public class KartInventoryScreenHandler extends ScreenHandler {
                 new Slot(this.fuelInventory, 1, 26, 54) {
                     @Override
                     public boolean canInsert(ItemStack stack) {
+                        if(stack.getItem() instanceof KartKey) {
+                            UUID keyUuid = stack.getOrDefault(ModDataComponentTypes.KART_KEY_PAIRED_UUID, null);
+                            if(keyUuid != null) {
+                                if(kartEntity != null) {
+                                    UUID kartKeyUuid = kartEntity.getKeyUuid();
+
+                                    return kartKeyUuid != null && kartKeyUuid.equals(keyUuid);
+                                }
+                            }
+                        }
                         return false;
                     }
                 }
         );
+
+        // prefill ignition slot, if kart has key
+        if(this.kartEntity != null) {
+            if(this.kartEntity.isKeyInIgnition()) {
+                UUID keyUuid = this.kartEntity.getKeyUuid();
+                if(keyUuid != null) {
+                    ItemStack pairedKey = new ItemStack(ModItems.KEY_PAIRED);
+                    pairedKey.setCount(1);
+                    pairedKey.set(ModDataComponentTypes.KART_KEY_PAIRED_UUID, keyUuid);
+                    this.getSlot(1).setStack(pairedKey);
+                }
+            }
+        }
 
         // player inventory
         addPlayerInventory(playerInventory);
@@ -52,7 +97,7 @@ public class KartInventoryScreenHandler extends ScreenHandler {
     public void onClosed(PlayerEntity player) {
         super.onClosed(player);
         // drop fuel item
-        this.dropInventory(player, this.fuelInventory);
+        player.getInventory().offerOrDrop(this.getSlot(0).getStack().copy());
     }
 
     // boilerplate shift click code

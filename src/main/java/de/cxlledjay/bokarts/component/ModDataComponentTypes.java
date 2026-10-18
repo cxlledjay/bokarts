@@ -6,7 +6,10 @@ import de.cxlledjay.bokarts.entity.custom.kart.property.*;
 import net.minecraft.component.ComponentType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.util.Uuids;
 
+import java.util.Optional;
+import java.util.UUID;
 import java.util.function.UnaryOperator;
 
 public class ModDataComponentTypes {
@@ -24,6 +27,10 @@ public class ModDataComponentTypes {
     public static final ComponentType<Integer> KART_ITEM_BODY_COLOR = register("kart_item_body_color", builder -> builder.codec(Codec.INT));
     public static final ComponentType<Integer> KART_ITEM_WHEEL_COLOR = register("kart_item_wheel_color", builder -> builder.codec(Codec.INT));
     public static final ComponentType<Integer> KART_ITEM_RACE_NUMBER = register("kart_item_race_number", builder -> builder.codec(Codec.INT));
+
+    // key uuid tracking
+    public static final ComponentType<Boolean> KART_ITEM_HAS_KEY = register("kart_item_has_key", builder -> builder.codec(Codec.BOOL));
+    public static final ComponentType<UUID> KART_KEY_PAIRED_UUID = register("kart_key_paired_uuid", builder -> builder.codec(Uuids.CODEC));
 
 
     private static <T>ComponentType<T> register(String name, UnaryOperator<ComponentType.Builder<T>> builderOperator) {

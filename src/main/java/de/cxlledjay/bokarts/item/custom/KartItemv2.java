@@ -24,6 +24,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 public class KartItemv2 extends Item {
@@ -276,6 +277,10 @@ public class KartItemv2 extends Item {
         kart.setBodyColor(itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_BODY_COLOR, 0xFFFFFFFF));
         kart.setWheelColor(itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR, 0xFFFFFFFF));
         kart.setRaceNumber(itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_RACE_NUMBER, 0));
+
+        // key data
+        kart.setKeyInIgnition(itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_HAS_KEY, false));
+        kart.setKeyUuid(itemStack.getOrDefault(ModDataComponentTypes.KART_KEY_PAIRED_UUID, null));
     }
 
     // create entity helper
