@@ -3,7 +3,6 @@ package de.cxlledjay.bokarts.item;
 import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.block.ModBlocks;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
@@ -21,7 +20,7 @@ public class ModItemGroups {
                     .entries((displayContext, entries) -> {
 
                         // the kart
-                        entries.add(new ItemStack(ModItems.KART_ITEM));
+                        //entries.add(new ItemStack(ModItems.KART_ITEM));
 
                         // ----- crafting ingredients -----
                         // chassis
@@ -53,7 +52,9 @@ public class ModItemGroups {
                         entries.add(new ItemStack(ModItems.LIVERY_TEMPLATE));
 
                         // ----- accessories -----
-                        entries.add(new ItemStack(ModItems.KEY));
+                        entries.add(new ItemStack(ModItems.KEY_BLANK));
+                        //entries.add(new ItemStack(ModItems.KEY_PAIRED));
+                        entries.add(new ItemStack(ModItems.KEY_PAIRING_TOOL));
 
                         // blocks
                         entries.add(new ItemStack(ModBlocks.KART_LIFT));

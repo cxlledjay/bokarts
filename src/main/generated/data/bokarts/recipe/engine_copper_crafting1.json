@@ -10,11 +10,14 @@
     },
     "H": {
       "item": "minecraft:hopper"
+    },
+    "P": {
+      "item": "minecraft:piston"
     }
   },
   "pattern": [
-    "H ",
-    "FC"
+    "PP ",
+    "HFC"
   ],
   "result": {
     "count": 1,

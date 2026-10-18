@@ -8,9 +8,11 @@ import de.cxlledjay.bokarts.item.custom.modification.AeroItem;
 import de.cxlledjay.bokarts.item.custom.modification.EngineItem;
 import de.cxlledjay.bokarts.item.custom.modification.SpoilerItem;
 import de.cxlledjay.bokarts.item.custom.modification.WheelsItem;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.util.Rarity;
 
 import static de.cxlledjay.bokarts.item.custom.KartItem.defaultKartSettings;
 
@@ -48,7 +50,15 @@ public class ModItems {
 
 
     // accessories
-    public static final Item KEY = registerItem("key", new Item(new Item.Settings()));
+    public static final Item KEY_BLANK = registerItem("key_blank", new Item(new Item.Settings()));
+    public static final Item KEY_PAIRED = registerItem("key_paired", new Item(
+            new Item.Settings()
+                    .component(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true)
+                    .maxCount(1)
+                    .rarity(Rarity.UNCOMMON)
+            )
+    );
+    public static final Item KEY_PAIRING_TOOL = registerItem("key_pairing_tool", new Item(new Item.Settings()));
 
 
 

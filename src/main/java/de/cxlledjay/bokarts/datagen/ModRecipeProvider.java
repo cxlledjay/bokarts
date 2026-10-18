@@ -2,12 +2,10 @@ package de.cxlledjay.bokarts.datagen;
 
 import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.block.ModBlocks;
-import de.cxlledjay.bokarts.item.ModItemGroups;
 import de.cxlledjay.bokarts.item.ModItems;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.minecraft.data.server.recipe.RecipeExporter;
-import net.minecraft.data.server.recipe.RecipeProvider;
 import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
 import net.minecraft.data.server.recipe.SmithingTransformRecipeJsonBuilder;
 import net.minecraft.item.Items;
@@ -248,7 +246,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
 
 
         // --- key ---
-        ShapedRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, ModItems.KEY)
+        ShapedRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, ModItems.KEY_BLANK)
                 .pattern("II ")
                 .pattern(" I ")
                 .pattern(" F ")

@@ -1,4 +1,4 @@
-// 1.21.1	2026-10-16T18:24:26.4312431	BoKarts/Model Definitions
+// 1.21.1	2026-10-18T18:26:05.5893459	BoKarts/Model Definitions
 14de8e2434d9b71547201005eb0f30d797b94542 assets\bokarts\models\item\wheels_offroad.json
 01883cde6d6b844888369b8c187694aae09284ae assets\bokarts\models\item\aero_race.json
 751e0dcd1490da8231f53fd734bebae94487c482 assets\bokarts\models\item\engine_copper.json
@@ -8,6 +8,7 @@ ee7f5e371199b1fa3211465226fae6a9f01e62d9 assets\bokarts\models\item\seat.json
 f3b4c38cf3b68d672942c24d43a535da5d0b5296 assets\bokarts\models\item\spoiler_race_carbon.json
 1128c0435201e81c0389a3069218a7ed8b2dc299 assets\bokarts\models\item\wheels_drift.json
 1223410c29992642147c859cdd3b799d9629e184 assets\bokarts\models\item\spoiler_street.json
+e91d428592c0959940ce2236f5239587a8215539 assets\bokarts\models\item\key_pairing_tool.json
 b6dc1f296a5db55e712c8d883d2df0647ea9e301 assets\bokarts\models\item\spoiler_street_carbon.json
 12901fa3bad912eea88249a9982a5b9e7d1b4a1f assets\bokarts\models\item\aero_race_carbon.json
 54380095b7d19c0f72b01acaef5f2d02acb99103 assets\bokarts\models\item\wheels_street.json
@@ -15,5 +16,4 @@ b6dc1f296a5db55e712c8d883d2df0647ea9e301 assets\bokarts\models\item\spoiler_stre
 8d677eab65e78c8b7b02cf18c8f22f92e325e92e assets\bokarts\models\item\spoiler_race.json
 266a6dd402d6934e8cdffcdfa07415ccb5ecf9b3 assets\bokarts\models\item\steering_wheel.json
 c933f04d97d5302bee2909ebd72b8e00b660a16e assets\bokarts\models\item\engine_iron.json
-d1a02b68d80f63172fde6dc513e366c1a9c3e0c8 assets\bokarts\models\item\key.json
 d6eedc19f3f301e6468610b2f63a40097ec1f3fd assets\bokarts\models\item\engine_gold.json

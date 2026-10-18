@@ -115,13 +115,13 @@ public class KartLiftScreenHandler extends ScreenHandler {
         this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 5, 131, 48, KartLiftTab.KEY, this) {
             @Override
             public boolean canInsert(ItemStack stack) {
-                return (stack.getItem() == ModItems.KEY);
+                return (stack.getItem() == ModItems.KEY_BLANK);
             }
         });
         this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 6, 152, 48, KartLiftTab.KEY, this) {
             @Override
             public boolean canInsert(ItemStack stack) {
-                return (stack.getItem() == ModItems.KEY); // TODO: change to key programming tool item
+                return (stack.getItem() == ModItems.KEY_PAIRING_TOOL);
             }
         });
         this.addSlot(new TabbedKartLiftSlot(this.liftInventory, 7, 198, 48, KartLiftTab.KEY, this) {

@@ -45,6 +45,6 @@ public class ModModelProvider extends FabricModelProvider {
         itemModelGenerator.register(ModItems.AERO_RACE_CARBON, Models.GENERATED);
 
         // accessories
-        itemModelGenerator.register(ModItems.KEY, Models.GENERATED);
+        itemModelGenerator.register(ModItems.KEY_PAIRING_TOOL, Models.GENERATED);
     }
 }

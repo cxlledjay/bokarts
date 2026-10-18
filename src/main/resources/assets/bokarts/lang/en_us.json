@@ -26,7 +26,9 @@
 
   "item.bokarts.livery_template" : "Livery Template",
 
-  "item.bokarts.key" : "Kart Key",
+  "item.bokarts.key_blank" : "Blank Key",
+  "item.bokarts.key_paired" : "Kart Key",
+  "item.bokarts.key_pairing_tool" : "Key Pairing Chip",
 
 
 

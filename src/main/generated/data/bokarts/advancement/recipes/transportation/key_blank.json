@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "bokarts:key"
+        "recipe": "bokarts:key_blank"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -37,7 +37,7 @@
   ],
   "rewards": {
     "recipes": [
-      "bokarts:key"
+      "bokarts:key_blank"
     ]
   }
 }
