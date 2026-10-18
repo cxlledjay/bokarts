@@ -14,6 +14,3 @@ summon bokarts:kart ~0 ~ ~4 {BodyColor:-1,WheelColor:-10526881,Fuel:12000,WheelT
 summon bokarts:kart ~2 ~ ~4 {BodyColor:-1,WheelColor:-10526881,Fuel:12000,WheelType:2,EngineType:4,SpoilerType:4,AeroType:2,BodyType:13}
 summon bokarts:kart ~4 ~ ~4 {BodyColor:-1,WheelColor:-10526881,Fuel:12000,WheelType:2,EngineType:4,SpoilerType:4,AeroType:2,BodyType:14}
 summon bokarts:kart ~6 ~ ~4 {BodyColor:-1,WheelColor:-10526881,Fuel:12000,WheelType:2,EngineType:4,SpoilerType:4,AeroType:2,BodyType:15}
-summon bokarts:kart ~8 ~ ~4 {BodyColor:-1,WheelColor:-10526881,Fuel:12000,WheelType:2,EngineType:4,SpoilerType:4,AeroType:2,BodyType:16}
-summon bokarts:kart ~10 ~ ~4 {BodyColor:-1,WheelColor:-10526881,Fuel:12000,WheelType:2,EngineType:4,SpoilerType:4,AeroType:2,BodyType:17}
-summon bokarts:kart ~12 ~ ~4 {BodyColor:-1,WheelColor:-10526881,Fuel:12000,WheelType:2,EngineType:4,SpoilerType:4,AeroType:2,BodyType:18}

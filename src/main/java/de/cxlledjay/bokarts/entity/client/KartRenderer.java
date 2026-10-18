@@ -128,22 +128,31 @@ public class KartRenderer extends EntityRenderer<KartEntity> {
         // animate model
         this.modelChassis.setAngles(entity, tickDelta, 0.0f, -0.1f, 0.0f, 0.0f);
 
+        // get body type info
+        BodyType bodyType = entity.getBodyType();
+
         // ----- draw base texture -----
         VertexConsumer baseConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityCutoutNoCull(TEXTURE_CHASSIS));
         this.modelChassis.render(matrices, baseConsumer, light, OverlayTexture.DEFAULT_UV, 0xFFFFFFFF);
 
-        BodyType bodyType = entity.getBodyType();
+        // stop if it has no body type
         if (bodyType == BodyType.NONE) return;
 
-        // ----- draw overlay texture -----
+        // ----- draw solid color overlay texture -----
+        Identifier colorOverlayTexture = BodyType.SOLID_COLOR_OVERLAY.getTexture();
+        int overlayColor = entity.getBodyColor() | 0xFF000000;
+
+        VertexConsumer colorOverlayConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityTranslucent(colorOverlayTexture));
+        this.modelChassis.render(matrices, colorOverlayConsumer, light, OverlayTexture.DEFAULT_UV, overlayColor);
+
+        // stop if it is "only" solid color overlay
+        if(bodyType == BodyType.SOLID_COLOR_OVERLAY) return;
+
+        // ----- draw livery overlay texture -----
         Identifier overlayTexture = bodyType.getTexture();
-        int overlayColor = 0xFFFFFFFF;
-        if(bodyType == BodyType.SOLID_COLOR_OVERLAY) {
-            // apply custom color
-            overlayColor = entity.getBodyColor() | 0xFF000000;
-        }
+
         VertexConsumer liveryConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityTranslucent(overlayTexture));
-        this.modelChassis.render(matrices, liveryConsumer, light, OverlayTexture.DEFAULT_UV, overlayColor);
+        this.modelChassis.render(matrices, liveryConsumer, light, OverlayTexture.DEFAULT_UV, 0xFFFFFFFF);
     }
 
     private void renderWheels(KartEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
