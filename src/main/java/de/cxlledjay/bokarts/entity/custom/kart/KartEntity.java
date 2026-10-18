@@ -474,10 +474,8 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     @Override
     public void tick() {
 
-        // no fuel = no drive
-        boolean isOutOfFuel = this.currentFuel <= 0.0f;
-        boolean ignitionDeniesDriving = !this.isKeyInIgnition() && this.getKeyUuid() != null;
-        if (isOutOfFuel | ignitionDeniesDriving) {
+        // no drive ?
+        if (this.canNotDrive()) {
             super.setInputs(false, false, false, false);
         }
 
@@ -565,8 +563,8 @@ public class KartEntity extends BoatEntity implements RideableInventory{
             this.steeringAngle = this.getSteeringAngle();
 
 
-            // do no animations or sound when out of fuel or no key is in ignition
-            if(!(isOutOfFuel | ignitionDeniesDriving)) {
+            // no driving animation if cant drive
+            if(!this.canNotDrive()) {
                 // kart speed calculation
                 double yawRad = Math.toRadians(this.getYaw());
                 double forwardX = -Math.sin(yawRad);
@@ -625,6 +623,10 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
 
     // ==================== tick() helpers ====================
+
+    public boolean canNotDrive() {
+        return this.currentFuel <= 0.0f || (!this.isKeyInIgnition() && this.getKeyUuid() != null);
+    }
 
     private void calculateSteeringAngle() {
 
