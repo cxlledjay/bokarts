@@ -28,7 +28,7 @@ public class KartInventoryScreen extends HandledScreen<KartInventoryScreenHandle
     private KartEntity kart;
 
     private static final Identifier BACKGROUND_TEXTURE = BoKarts.id("textures/gui/kart_inventory/kart_inventory.png");
-    private static final Identifier IGNITION_LOCKED_OVERLAY = BoKarts.id("textures/gui/kart_inventory/ignition_locked_overlay.png");
+    private static final Identifier LOCKED_OVERLAY = BoKarts.id("textures/gui/kart_inventory/locked_overlay.png");
 
 
     ButtonTextures REFUEL_BUTTON_TEXTURES = new ButtonTextures(
@@ -131,11 +131,15 @@ public class KartInventoryScreen extends HandledScreen<KartInventoryScreenHandle
         int furnaceY = this.y + 54;
         context.drawTexture(furnaceTexture, furnaceX, furnaceY, 0, 0, 16, 16, 16, 16);
 
+        // ----- locked icons -----
         // render lock overlay if key not used
         if(kart != null && kart.getKeyUuid() == null) {
-            context.drawTexture(IGNITION_LOCKED_OVERLAY, this.x + 25, this.y + 53, 0, 0, 18, 17, 18, 17);
+            context.drawTexture(LOCKED_OVERLAY, this.x + 25, this.y + 53, 0, 0, 18, 17, 18, 17);
         }
+        context.drawTexture(LOCKED_OVERLAY, this.x + 43, this.y + 53, 0, 0, 18, 17, 18, 17);
+        context.drawTexture(LOCKED_OVERLAY, this.x + 61, this.y + 53, 0, 0, 18, 17, 18, 17);
 
+        // ----- kart entity -----
         // render kart like horses
         drawKart(context, i + 52, j + 42, 21, mouseX, mouseY, this.kart);
     }
