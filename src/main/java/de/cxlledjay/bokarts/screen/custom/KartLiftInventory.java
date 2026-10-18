@@ -3,10 +3,14 @@ package de.cxlledjay.bokarts.screen.custom;
 import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.block.entity.custom.KartLiftBlockEntity;
 import de.cxlledjay.bokarts.component.ModDataComponentTypes;
+import de.cxlledjay.bokarts.entity.custom.kart.KartEntity;
 import de.cxlledjay.bokarts.item.ModItems;
+import de.cxlledjay.bokarts.item.custom.KartKey;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class KartLiftInventory extends SimpleInventory {
@@ -37,6 +41,9 @@ public class KartLiftInventory extends SimpleInventory {
                     && this.getStack(6).isOf(ModItems.KEY_PAIRING_TOOL)
                     && this.getStack(6).getCount() == 1
             ) {
+                // safety
+                if(kartLiftBlockEntity.getKartEntity() == null) return;
+
                 this.setStack(5, ItemStack.EMPTY);
                 this.setStack(6, ItemStack.EMPTY);
 
@@ -44,9 +51,7 @@ public class KartLiftInventory extends SimpleInventory {
                 UUID pairedUuid = UUID.randomUUID();
 
                 // create paired key
-                ItemStack pairedKey = new ItemStack(ModItems.KEY_PAIRED);
-                pairedKey.setCount(1);
-                pairedKey.set(ModDataComponentTypes.KART_KEY_PAIRED_UUID, pairedUuid);
+                ItemStack pairedKey = KartKey.createPairedKey(pairedUuid, kartLiftBlockEntity.getKartEntity());
                 this.setStack(7, pairedKey);
 
                 // pair the kart and remove old key

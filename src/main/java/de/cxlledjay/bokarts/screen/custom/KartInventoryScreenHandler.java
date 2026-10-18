@@ -6,6 +6,7 @@ import de.cxlledjay.bokarts.item.ModItems;
 import de.cxlledjay.bokarts.item.custom.KartKey;
 import de.cxlledjay.bokarts.screen.ModScreenHandlers;
 import de.cxlledjay.bokarts.util.KartFuelItems;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -14,6 +15,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class KartInventoryScreenHandler extends ScreenHandler {
@@ -75,9 +77,7 @@ public class KartInventoryScreenHandler extends ScreenHandler {
             if(this.kartEntity.isKeyInIgnition()) {
                 UUID keyUuid = this.kartEntity.getKeyUuid();
                 if(keyUuid != null) {
-                    ItemStack pairedKey = new ItemStack(ModItems.KEY_PAIRED);
-                    pairedKey.setCount(1);
-                    pairedKey.set(ModDataComponentTypes.KART_KEY_PAIRED_UUID, keyUuid);
+                    ItemStack pairedKey = KartKey.createPairedKey(keyUuid, this.kartEntity);
                     this.getSlot(1).setStack(pairedKey);
                 }
             }

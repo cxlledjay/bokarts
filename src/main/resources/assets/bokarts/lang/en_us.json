@@ -59,6 +59,10 @@
   "tooltip.bokarts.livery_template.body_color":     " §b[*] §fBody Color §7>> §f",
   "tooltip.bokarts.livery_template.wheel_color":    " §b[*] §fWheel Color §7>> §f",
 
+  "tooltip.bokarts.kart_key.shift": "§7Press §f[SHIFT] §7to reveal details",
+  "tooltip.bokarts.kart_key.info": "§7Pairing Info: §f",
+  "tooltip.bokarts.kart_key.no_info": "§c<no information available>",
+
 
   "message.bokarts.kart_item.use_no_engine": "§cCan't place Kart. It has no engine :(",
   "message.bokarts.kart_item.use_no_wheels": "§cCan't place Kart. It has no wheels :(",
