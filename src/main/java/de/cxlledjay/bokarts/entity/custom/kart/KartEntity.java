@@ -7,6 +7,7 @@ import de.cxlledjay.bokarts.entity.ModEntities;
 import de.cxlledjay.bokarts.entity.custom.ModTrackedDataHandlers;
 import de.cxlledjay.bokarts.entity.custom.kart.property.*;
 import de.cxlledjay.bokarts.item.ModItems;
+import de.cxlledjay.bokarts.item.custom.KartItemv2;
 import de.cxlledjay.bokarts.networking.packet.KartEntityInputPayloadC2S;
 import de.cxlledjay.bokarts.screen.custom.KartInventoryScreenHandler;
 import de.cxlledjay.bokarts.sound.KartEngineSound;
@@ -30,6 +31,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
@@ -370,21 +372,18 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         stack.set(ModDataComponentTypes.KART_ITEM_RACE_NUMBER, this.getRaceNumber());
 
         // set name with livery
-        String name = sanitize("Kart (" + this.getBodyType().getDisplayName() + ")");
-        if(name == null) name = "Kart";
-        stack.set(DataComponentTypes.CUSTOM_NAME, Text.literal(name).styled(style -> style.withItalic(false)));
+        MutableText name = Text.literal("Kart [").formatted(Formatting.WHITE)
+                .append(KartItemv2.getFormattedLiveryName(this.getBodyType(), this.getBodyColor())
+                .append(Text.literal("]")))
+                .styled(style -> style.withItalic(false));
+
+        stack.set(DataComponentTypes.CUSTOM_NAME, name);
 
         // save key data
         stack.set(ModDataComponentTypes.KART_ITEM_HAS_KEY, this.isKeyInIgnition());
         stack.set(ModDataComponentTypes.KART_KEY_PAIRED_UUID, this.getKeyUuid());
 
         return stack;
-    }
-
-    @Nullable
-    private static String sanitize(String name) {
-        String string = StringHelper.stripInvalidChars(name);
-        return string.length() <= 50 ? string : null;
     }
 
     // override creative middle click
@@ -766,7 +765,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         Identifier oldSoundId = this.getHornType().getSoundEvent().getId();
         player.networkHandler.sendPacket(new StopSoundS2CPacket(oldSoundId, SoundCategory.PLAYERS));
         player.playSoundToPlayer(newHorn.getSoundEvent(), SoundCategory.PLAYERS, BoKartsConfig.hornPreviewVolume, 1.0f);
-        String msg = "[" + (newHorn.getId() + 1) + "/" + HornType.values().length + "] " + newHorn.getDisplayName();
+        String msg = getFormattedHornName(newHorn);
         player.sendMessage(Text.literal(msg).formatted(Formatting.YELLOW), true);
 
         // set HornSound for Kart
@@ -867,6 +866,10 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         return decimalFormat1.format(fuelCapacity / 1000.0f) + "L/" + decimalFormat1.format(ClientSyncedConfig.getMaxFuelCapacity() / 1000.0f) + "L";
     }
 
+    public static String getFormattedHornName(HornType hornType) {
+        return "[" + (hornType.getId() + 1) + "/" + HornType.values().length + "] " + hornType.getDisplayName();
+    }
+
 
     public static boolean isValidRaceNumber(int raceNumber) {
         return (raceNumber >= 1 && raceNumber <= 99);
@@ -894,8 +897,8 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         builder.add(BODY_TYPE, BodyType.NONE);
         builder.add(SPOILER_TYPE, SpoilerType.NONE);
         builder.add(AERO_TYPE, AeroType.NONE);
-        builder.add(BODY_COLOR, 0xFFFFFFFF);
-        builder.add(WHEEL_COLOR, 0xFFFFFFFF);
+        builder.add(BODY_COLOR, 0xFFFFFF);
+        builder.add(WHEEL_COLOR, 0xFFFFFF);
         builder.add(RACE_NUMBER, 0);
 
         // key
@@ -946,30 +949,30 @@ public class KartEntity extends BoatEntity implements RideableInventory{
             };
 
             int bodyColor = switch (oldPaintColorAttribute) {
-                case "orange" -> 0xFFF9801D;
-                case "magenta" -> 0xFFC74EBD;
-                case "light_blue" -> 0xFF3AB3DA;
-                case "yellow" -> 0xFFFED83D;
-                case "lime" -> 0xFF80C71F;
-                case "pink" -> 0xFFF38BAA;
-                case "gray" -> 0xFF474F52;
-                case "light_gray" -> 0xFF9D9D97;
-                case "cyan" -> 0xFF169C9C;
-                case "purple" -> 0xFF8932B8;
-                case "blue" -> 0xFF3C44AA;
-                case "brown" -> 0xFF835432;
-                case "green" -> 0xFF5E7C16;
-                case "red" -> 0xFFB02E26;
-                case "black" -> 0xFF1D1D21;
-                case "purple_gold" -> 0xFF70569C;
-                case "default" -> 0xFFA086D3;
-                default -> 0xFFFFFFFF;
+                case "orange" -> 0xF9801D;
+                case "magenta" -> 0xC74EBD;
+                case "light_blue" -> 0x3AB3DA;
+                case "yellow" -> 0xFED83D;
+                case "lime" -> 0x80C71F;
+                case "pink" -> 0xF38BAA;
+                case "gray" -> 0x474F52;
+                case "light_gray" -> 0x9D9D97;
+                case "cyan" -> 0x169C9C;
+                case "purple" -> 0x8932B8;
+                case "blue" -> 0x3C44AA;
+                case "brown" -> 0x835432;
+                case "green" -> 0x5E7C16;
+                case "red" -> 0xB02E26;
+                case "black" -> 0x1D1D21;
+                case "purple_gold" -> 0x70569C;
+                case "default" -> 0xA086D3;
+                default -> 0xFFFFFF;
             };
 
             int wheelColor = switch (oldPaintColorAttribute) {
-                case "purple_gold" -> 0xFFC0996F;
-                case "fade" -> 0xFFA43148;
-                default -> 0xFFFFFFFF;
+                case "purple_gold" -> 0xC0996F;
+                case "fade" -> 0xA43148;
+                default -> 0xFFFFFF;
             };
 
             this.setBodyType(bodyType);

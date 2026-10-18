@@ -69,6 +69,14 @@ public class KartInventoryScreenHandler extends ScreenHandler {
                         }
                         return false;
                     }
+
+                    @Override
+                    public boolean isEnabled() {
+                        if(kartEntity != null) {
+                            return kartEntity.getKeyUuid() != null;
+                        }
+                        return false;
+                    }
                 }
         );
 

@@ -20,16 +20,16 @@ public class LiveryTemplate extends Item {
 
         // livery tracks the livery/body type and both colors
         getDefaultStack().set(ModDataComponentTypes.KART_ITEM_BODY_TYPE, BodyType.SOLID_COLOR_OVERLAY);
-        getDefaultStack().set(ModDataComponentTypes.KART_ITEM_BODY_COLOR, 0xFFFFFFFF);
-        getDefaultStack().set(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR, 0xFFFFFFFF);
+        getDefaultStack().set(ModDataComponentTypes.KART_ITEM_BODY_COLOR, 0xFFFFFF);
+        getDefaultStack().set(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR, 0xFFFFFF);
     }
 
     public static Item.Settings defaultLiverySettings() {
         return new Item.Settings()
                 .maxCount(1)
                 .component(ModDataComponentTypes.KART_ITEM_BODY_TYPE, BodyType.SOLID_COLOR_OVERLAY)
-                .component(ModDataComponentTypes.KART_ITEM_BODY_COLOR, 0xFFFFFFFF)
-                .component(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR, 0xFFFFFFFF);
+                .component(ModDataComponentTypes.KART_ITEM_BODY_COLOR, 0xFFFFFF)
+                .component(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR, 0xFFFFFF);
     }
 
     @Override
@@ -43,16 +43,16 @@ public class LiveryTemplate extends Item {
         else {
             // retrieve data
             BodyType bodyType = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_BODY_TYPE, BodyType.SOLID_COLOR_OVERLAY);
-            int bodyColor = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_BODY_COLOR, 0xFFFFFFFF);
-            int wheelColor = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR, 0xFFFFFFFF);
+            int bodyColor = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_BODY_COLOR, 0xFFFFFF);
+            int wheelColor = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR, 0xFFFFFF);
 
             // build strings
             String bodyTypeString = Text.translatable("tooltip.bokarts.livery_template.body_type").getString()
                     + bodyType.getDisplayName();
             String bodyColorString = Text.translatable("tooltip.bokarts.livery_template.body_color").getString()
-                    + String.format("#%06X", (bodyColor & 0x00FFFFFF));
+                    + String.format("#%06X", (bodyColor & 0xFFFFFF));
             String wheelColorString = Text.translatable("tooltip.bokarts.livery_template.wheel_color").getString()
-                    + String.format("#%06X", (wheelColor & 0x00FFFFFF));
+                    + String.format("#%06X", (wheelColor & 0xFFFFFF));
 
             // add to tooltip
             tooltip.add(Text.literal(bodyTypeString));

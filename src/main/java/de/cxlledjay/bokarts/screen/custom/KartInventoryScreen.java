@@ -28,6 +28,9 @@ public class KartInventoryScreen extends HandledScreen<KartInventoryScreenHandle
     private KartEntity kart;
 
     private static final Identifier BACKGROUND_TEXTURE = BoKarts.id("textures/gui/kart_inventory/kart_inventory.png");
+    private static final Identifier IGNITION_LOCKED_OVERLAY = BoKarts.id("textures/gui/kart_inventory/ignition_locked_overlay.png");
+
+
     ButtonTextures REFUEL_BUTTON_TEXTURES = new ButtonTextures(
             BoKarts.id("kart_inventory/refuel"),
             BoKarts.id("kart_inventory/refuel_highlighted")
@@ -127,6 +130,11 @@ public class KartInventoryScreen extends HandledScreen<KartInventoryScreenHandle
         int furnaceX = this.x + 8;
         int furnaceY = this.y + 54;
         context.drawTexture(furnaceTexture, furnaceX, furnaceY, 0, 0, 16, 16, 16, 16);
+
+        // render lock overlay if key not used
+        if(kart != null && kart.getKeyUuid() == null) {
+            context.drawTexture(IGNITION_LOCKED_OVERLAY, this.x + 25, this.y + 53, 0, 0, 18, 17, 18, 17);
+        }
 
         // render kart like horses
         drawKart(context, i + 52, j + 42, 21, mouseX, mouseY, this.kart);

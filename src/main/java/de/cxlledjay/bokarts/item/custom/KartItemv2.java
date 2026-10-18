@@ -14,6 +14,7 @@ import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.stat.Stats;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.*;
 import net.minecraft.util.hit.HitResult;
@@ -22,6 +23,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -45,8 +47,8 @@ public class KartItemv2 extends Item {
         getDefaultStack().set(ModDataComponentTypes.KART_ITEM_ENGINE_TYPE, EngineType.ENGINE_NONE);
         getDefaultStack().set(ModDataComponentTypes.KART_ITEM_SPOILER_TYPE, SpoilerType.NONE);
         getDefaultStack().set(ModDataComponentTypes.KART_ITEM_AERO_TYPE, AeroType.NONE);
-        getDefaultStack().set(ModDataComponentTypes.KART_ITEM_BODY_COLOR, 0xFFFFFFFF);
-        getDefaultStack().set(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR, 0xFFFFFFFF);
+        getDefaultStack().set(ModDataComponentTypes.KART_ITEM_BODY_COLOR, 0xFFFFFF);
+        getDefaultStack().set(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR, 0xFFFFFF);
         getDefaultStack().set(ModDataComponentTypes.KART_ITEM_RACE_NUMBER, 0);
     }
 
@@ -67,8 +69,8 @@ public class KartItemv2 extends Item {
                 .component(ModDataComponentTypes.KART_ITEM_ENGINE_TYPE, EngineType.ENGINE_NONE)
                 .component(ModDataComponentTypes.KART_ITEM_SPOILER_TYPE, SpoilerType.NONE)
                 .component(ModDataComponentTypes.KART_ITEM_AERO_TYPE, AeroType.NONE)
-                .component(ModDataComponentTypes.KART_ITEM_BODY_COLOR, 0xFFFFFFFF)
-                .component(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR, 0xFFFFFFFF)
+                .component(ModDataComponentTypes.KART_ITEM_BODY_COLOR, 0xFFFFFF)
+                .component(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR, 0xFFFFFF)
                 .component(ModDataComponentTypes.KART_ITEM_RACE_NUMBER, 0);
     }
 
@@ -87,16 +89,11 @@ public class KartItemv2 extends Item {
             tooltip.add(Text.translatable("tooltip.bokarts.kart_item.shift_heading"));
             // livery + opt color
             BodyType bodyType = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_BODY_TYPE, BodyType.SOLID_COLOR_OVERLAY);
-            int bodyColor = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_BODY_COLOR, 0xFFFFFFFF);
+            int bodyColor = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_BODY_COLOR, 0xFFFFFF);
 
             if (bodyType != null) {
-                String s = Text.translatable("tooltip.bokarts.kart_item.shift1_livery").getString()
-                        + bodyType.getDisplayName();
-                // add color
-                if (bodyType == BodyType.SOLID_COLOR_OVERLAY) {
-                    s += String.format(" (#%06X)", (bodyColor & 0x00FFFFFF));
-                }
-                tooltip.add(Text.literal(s));
+                tooltip.add(Text.translatable("tooltip.bokarts.kart_item.shift1_livery")
+                        .append(getFormattedLiveryName(bodyType, bodyColor)));
             }
             tooltip.add(Text.translatable("tooltip.bokarts.kart_item.shift_heading2"));
 
@@ -108,16 +105,20 @@ public class KartItemv2 extends Item {
 
             // wheels, + opt color
             WheelType wheelType = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_WHEEL_TYPE, WheelType.NONE);
-            int wheelColor = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR,  0xFFFFFFFF);
+            int wheelColor = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR,  0xFFFFFF);
 
             if (wheelType != null) {
-                String s = Text.translatable("tooltip.bokarts.kart_item.shift2_wheels").getString()
-                        + wheelType.getDisplayName();
+
+                MutableText text = Text.translatable("tooltip.bokarts.kart_item.shift2_wheels")
+                        .append(Text.literal(wheelType.getDisplayName()));
                 // add color
                 if (wheelType != WheelType.NONE) {
-                    s += String.format(" (Color: #%06X)", (wheelColor & 0x00FFFFFF));
+                    text
+                            .append(Text.literal(" (").formatted(Formatting.WHITE))
+                            .append(getColoredColorString(wheelColor))
+                            .append(Text.literal(")").formatted(Formatting.WHITE));
                 }
-                tooltip.add(Text.literal(s));
+                tooltip.add(text);
             }
 
             // engine
@@ -162,7 +163,7 @@ public class KartItemv2 extends Item {
             HornType hornType = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_HORN_TYPE, HornType.HORN1);
             if (hornType != null) {
                 String s = Text.translatable("tooltip.bokarts.kart_item.shift3_horn").getString()
-                        + hornType.getDisplayName();
+                        + KartEntity.getFormattedHornName(hornType);
                 tooltip.add(Text.literal(s));
             }
 
@@ -193,6 +194,27 @@ public class KartItemv2 extends Item {
         }
 
         super.appendTooltip(stack, context, tooltip, type);
+    }
+
+
+    public static MutableText getFormattedLiveryName(BodyType bodyType, int bodyColor) {
+        // get name
+        MutableText result = Text.literal(bodyType.getDisplayName()).formatted(Formatting.WHITE);
+
+        // get color, if applicable
+        if(bodyType != BodyType.NONE) {
+            result
+                    .append(Text.literal(" (").formatted(Formatting.WHITE))
+                    .append(getColoredColorString(bodyColor))
+                    .append(Text.literal(")").formatted(Formatting.WHITE));
+        }
+
+        return result;
+    }
+
+    private static MutableText getColoredColorString (int color) {
+        String colorAsHex = "#" + String.format("%06x", (color & 0xFFFFFF)).toUpperCase();
+        return Text.literal(colorAsHex).withColor(color);
     }
 
 
@@ -274,8 +296,8 @@ public class KartItemv2 extends Item {
         kart.setEngineType(itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_ENGINE_TYPE, EngineType.ENGINE_NONE));
         kart.setSpoilerType(itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_SPOILER_TYPE, SpoilerType.NONE));
         kart.setAeroType(itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_AERO_TYPE, AeroType.NONE));
-        kart.setBodyColor(itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_BODY_COLOR, 0xFFFFFFFF));
-        kart.setWheelColor(itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR, 0xFFFFFFFF));
+        kart.setBodyColor(itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_BODY_COLOR, 0xFFFFFF));
+        kart.setWheelColor(itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR, 0xFFFFFF));
         kart.setRaceNumber(itemStack.getOrDefault(ModDataComponentTypes.KART_ITEM_RACE_NUMBER, 0));
 
         // key data
