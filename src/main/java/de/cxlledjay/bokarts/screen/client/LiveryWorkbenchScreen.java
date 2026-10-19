@@ -1,6 +1,10 @@
 package de.cxlledjay.bokarts.screen.client;
 
 import de.cxlledjay.bokarts.BoKarts;
+import de.cxlledjay.bokarts.component.ModDataComponentTypes;
+import de.cxlledjay.bokarts.entity.ModEntities;
+import de.cxlledjay.bokarts.entity.custom.kart.KartEntity;
+import de.cxlledjay.bokarts.entity.custom.kart.property.*;
 import de.cxlledjay.bokarts.screen.custom.LiveryWorkbenchScreenHandler;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -14,6 +18,8 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
+import java.util.Random;
+
 // basically a stonecutter
 
 @Environment(EnvType.CLIENT)
@@ -23,14 +29,17 @@ public class LiveryWorkbenchScreen extends HandledScreen<LiveryWorkbenchScreenHa
     private static final Identifier BACKGROUND_TEXTURE = BoKarts.id("textures/gui/livery_workbench/background.png");
     private static final Identifier SCROLLER_TEXTURE = Identifier.ofVanilla("container/stonecutter/scroller");
     private static final Identifier SCROLLER_DISABLED_TEXTURE = Identifier.ofVanilla("container/stonecutter/scroller_disabled");
-    private static final Identifier LIVERY_SELECTED_TEXTURE = BoKarts.id("textures/gui/sprites/livery_workbench/livery_option_selected.png");
-    private static final Identifier LIVERY_HIGHLIGHTED_TEXTURE = BoKarts.id("textures/gui/sprites/livery_workbench/livery_option_highlighted.png");
-    private static final Identifier LIVERY_TEXTURE = BoKarts.id("textures/gui/sprites/livery_workbench/livery_option.png");
+    private static final Identifier LIVERY_SELECTED_TEXTURE = BoKarts.id("textures/gui/livery_workbench/livery_option_selected.png");
+    private static final Identifier LIVERY_HIGHLIGHTED_TEXTURE = BoKarts.id("textures/gui/livery_workbench/livery_option_highlighted.png");
+    private static final Identifier LIVERY_TEXTURE = BoKarts.id("textures/gui/livery_workbench/livery_option.png");
 
     // scrolling
     private float scrollAmount; // percentage of travel (0.0f -- 1.0f)
     private int scrollOffset;
     private boolean mouseClicked;
+
+    // client sided entity preview
+    private final KartEntity kartPreview;
 
     public LiveryWorkbenchScreen(LiveryWorkbenchScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
@@ -44,6 +53,14 @@ public class LiveryWorkbenchScreen extends HandledScreen<LiveryWorkbenchScreenHa
         this.scrollAmount = 0.0f;
         this.scrollOffset = 0;
         this.mouseClicked = false;
+
+        // init random preview kart
+        this.kartPreview = new KartEntity(ModEntities.KART_ENTITY_TYPE, inventory.player.getWorld());
+        Random rng = new Random();
+        this.kartPreview.setWheelType(WheelType.fromId(rng.nextInt(WheelType.values().length)));
+        this.kartPreview.setEngineType(EngineType.fromId(rng.nextInt(EngineType.values().length)));
+        this.kartPreview.setSpoilerType(SpoilerType.fromId(rng.nextInt(SpoilerType.values().length)));
+        this.kartPreview.setAeroType(AeroType.fromId(rng.nextInt(AeroType.values().length)));
     }
 
 
@@ -122,19 +139,68 @@ public class LiveryWorkbenchScreen extends HandledScreen<LiveryWorkbenchScreenHa
         context.drawTexture(BACKGROUND_TEXTURE, this.x, this.y, 0, 0, this.backgroundWidth, this.backgroundHeight);
 
         // scroll bar
+        if(!this.handler.canCraft()) {
+            this.scrollOffset = 0;
+            this.scrollAmount = 0.0f;
+        }
         int progress = (int) (45.0f * this.scrollAmount); //< scroll Amount is between 0.0 and 1.0 => multiply by max allowed travel
         Identifier identifier = this.shouldScroll() ? SCROLLER_TEXTURE : SCROLLER_DISABLED_TEXTURE;
         context.drawGuiTexture(identifier, this.x + 156, this.y + 72 + progress, 12, 15);
 
-        // livery selectors
-        int l = this.x + 52;
-        int m = this.y + 14;
-        int n = this.scrollOffset + 4;
-        // this.renderRecipeBackground(context, mouseX, mouseY, l, m, n);
-        // this.renderRecipeIcons(context, l, m, n);
 
-        // TODO: render entity
+        // stop rendering here, if there is nothing to craft
+        if(!this.handler.canCraft()) return;
+
+        // livery selectors
+        int boxStartX = this.x + 8;
+        int boxStartY = this.y + 72;
+        int currentMaxVisibleId = this.scrollOffset + 4;
+        this.renderLiveryOptionsBackground(context, mouseX, mouseY, boxStartX, boxStartY, currentMaxVisibleId);
+        this.renderLiveryOptionName(context, boxStartX, boxStartY, currentMaxVisibleId);
+
+        // render entity
+        if(this.kartPreview == null) return; // safety
+        BodyType previewBodyType = BodyType.NONE;
+        if(this.handler.getLiveryItem() != null) {
+            this.kartPreview.setBodyColor(this.handler.getLiveryItem().getOrDefault(ModDataComponentTypes.KART_ITEM_BODY_COLOR, 0xFFFFFF));
+            this.kartPreview.setWheelColor(this.handler.getLiveryItem().getOrDefault(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR, 0xFFFFFF));
+            if(this.handler.getSelectedLiveryId() == -1) previewBodyType = this.handler.getLiveryItem().getOrDefault(ModDataComponentTypes.KART_ITEM_BODY_TYPE, BodyType.NONE);
+        }
+        if(this.handler.getSelectedLiveryId() != -1) previewBodyType = LiveryWorkbenchScreenHandler.LIVERIES_SORTED.get(this.handler.getSelectedLiveryId());
+        this.kartPreview.setBodyType(previewBodyType);
+
+        KartInventoryScreen.drawKart(context,this.x + 128, this.y + 48, 27, mouseX, mouseY, this.kartPreview);
     }
+
+    private void renderLiveryOptionsBackground(DrawContext context, int mouseX, int mouseY, int selectBoxStartX, int selectBoxStartY, int maxOffset) {
+        for (int currentId = this.scrollOffset; currentId < maxOffset && currentId < LiveryWorkbenchScreenHandler.LIVERY_AMOUNT; currentId++) {
+            int slotIdx = currentId - this.scrollOffset;
+
+            double dX = mouseX - selectBoxStartX;
+            double dY = mouseY - (selectBoxStartY + (slotIdx * 15));
+
+            Identifier identifier;
+            if (currentId == this.handler.getSelectedLiveryId()) {
+                identifier = LIVERY_SELECTED_TEXTURE;
+            } else if (dX >= 0.0 && dY >= 0.0 && dX < 143.0 && dY < 15.0) {
+                identifier = LIVERY_HIGHLIGHTED_TEXTURE;
+            } else {
+                identifier = LIVERY_TEXTURE;
+            }
+
+            context.drawTexture(identifier, selectBoxStartX, selectBoxStartY + slotIdx * 15, 0, 0, 143, 15, 143, 15);
+        }
+    }
+
+    private void renderLiveryOptionName(DrawContext context, int x, int y, int maxOffset) {
+        for (int currentId = this.scrollOffset; currentId < maxOffset && currentId < LiveryWorkbenchScreenHandler.LIVERY_AMOUNT; currentId++) {
+            int slotIdx = currentId - this.scrollOffset;
+            int dX = x + 5;
+            int dY = y + slotIdx * 15 + 3;
+            context.drawText(this.textRenderer, LiveryWorkbenchScreenHandler.LIVERIES_SORTED.get(currentId).getDisplayName(), dX, dY, 0xFFFFFFFF, true);
+        }
+    }
+
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {

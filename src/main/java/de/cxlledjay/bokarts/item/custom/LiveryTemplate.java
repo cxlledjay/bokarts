@@ -19,7 +19,7 @@ public class LiveryTemplate extends Item {
         super(settings);
 
         // livery tracks the livery/body type and both colors
-        getDefaultStack().set(ModDataComponentTypes.KART_ITEM_BODY_TYPE, BodyType.SOLID_COLOR_OVERLAY);
+        getDefaultStack().set(ModDataComponentTypes.KART_ITEM_BODY_TYPE, BodyType.NONE);
         getDefaultStack().set(ModDataComponentTypes.KART_ITEM_BODY_COLOR, 0xFFFFFF);
         getDefaultStack().set(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR, 0xFFFFFF);
     }
@@ -27,7 +27,7 @@ public class LiveryTemplate extends Item {
     public static Item.Settings defaultLiverySettings() {
         return new Item.Settings()
                 .maxCount(1)
-                .component(ModDataComponentTypes.KART_ITEM_BODY_TYPE, BodyType.SOLID_COLOR_OVERLAY)
+                .component(ModDataComponentTypes.KART_ITEM_BODY_TYPE, BodyType.NONE)
                 .component(ModDataComponentTypes.KART_ITEM_BODY_COLOR, 0xFFFFFF)
                 .component(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR, 0xFFFFFF);
     }
@@ -42,7 +42,7 @@ public class LiveryTemplate extends Item {
         // shift pressed tooltip
         else {
             // retrieve data
-            BodyType bodyType = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_BODY_TYPE, BodyType.SOLID_COLOR_OVERLAY);
+            BodyType bodyType = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_BODY_TYPE, BodyType.NONE);
             int bodyColor = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_BODY_COLOR, 0xFFFFFF);
             int wheelColor = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR, 0xFFFFFF);
 

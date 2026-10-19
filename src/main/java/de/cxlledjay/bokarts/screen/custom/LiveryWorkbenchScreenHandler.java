@@ -2,6 +2,7 @@ package de.cxlledjay.bokarts.screen.custom;
 
 import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.block.ModBlocks;
+import de.cxlledjay.bokarts.component.ModDataComponentTypes;
 import de.cxlledjay.bokarts.entity.custom.kart.property.BodyType;
 import de.cxlledjay.bokarts.item.ModItems;
 import de.cxlledjay.bokarts.screen.ModScreenHandlers;
@@ -15,6 +16,10 @@ import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+
 public class LiveryWorkbenchScreenHandler extends ScreenHandler {
 
     private final ScreenHandlerContext context;
@@ -23,8 +28,8 @@ public class LiveryWorkbenchScreenHandler extends ScreenHandler {
     private boolean hasLiveryTemplateInSlot0;
     private int selectedLiveryId;
 
-    public static int LIVERY_AMOUNT = BodyType.values().length;
-
+    public static final int LIVERY_AMOUNT = BodyType.values().length - 1;
+    public static final List<BodyType> LIVERIES_SORTED = Arrays.stream(BodyType.values()).filter(e -> e != BodyType.NONE).sorted(Comparator.comparing(BodyType::getDisplayName)).toList();
 
     public LiveryWorkbenchScreenHandler(int syncId, PlayerInventory inventory) {
         this(syncId, inventory, ScreenHandlerContext.EMPTY);
@@ -36,15 +41,18 @@ public class LiveryWorkbenchScreenHandler extends ScreenHandler {
 
         this.context = context;
         this.hasLiveryTemplateInSlot0 = false;
-        this.selectedLiveryId = 0;
+        this.selectedLiveryId = -1;
 
         this.workbenchInventory = new SimpleInventory(2) {
             @Override
             public void markDirty() {
                 super.markDirty();
-
                 // update status of item in slot 0
                 hasLiveryTemplateInSlot0 = this.getStack(0).isOf(ModItems.LIVERY_TEMPLATE);
+                if(hasLiveryTemplateInSlot0 && selectedLiveryId == -1) {
+                    BodyType bodyType = this.getStack(0).getOrDefault(ModDataComponentTypes.KART_ITEM_BODY_TYPE, BodyType.NONE);
+                    if(bodyType != BodyType.NONE) selectedLiveryId = LIVERIES_SORTED.indexOf(bodyType);
+                }
             }
         };
 
@@ -53,6 +61,13 @@ public class LiveryWorkbenchScreenHandler extends ScreenHandler {
             @Override
             public boolean canInsert(ItemStack stack) {
                 return stack.isOf(ModItems.LIVERY_TEMPLATE);
+            }
+
+            @Override
+            public void onTakeItem(PlayerEntity player, ItemStack stack) {
+                workbenchInventory.clear();
+                selectedLiveryId = -1;
+                super.onTakeItem(player, stack);
             }
         });
 
@@ -65,7 +80,9 @@ public class LiveryWorkbenchScreenHandler extends ScreenHandler {
 
             @Override
             public void onTakeItem(PlayerEntity player, ItemStack stack) {
-                // overwrite taking item
+                workbenchInventory.clear();
+                selectedLiveryId = -1;
+                super.onTakeItem(player, stack);
             }
         });
 
@@ -91,18 +108,28 @@ public class LiveryWorkbenchScreenHandler extends ScreenHandler {
         return hasLiveryTemplateInSlot0;
     }
 
+    public ItemStack getLiveryItem() {
+        if(this.getSlot(0).getStack().isEmpty()) return ItemStack.EMPTY;
+        return this.getSlot(0).getStack();
+    }
+
     public int getSelectedLiveryId() {
         return selectedLiveryId;
     }
 
     @Override
     public boolean onButtonClick(PlayerEntity player, int id) {
+        // set selection
+        this.selectedLiveryId = id;
 
-        BoKarts.LOGGER.info("Clicked Livery ID: {}", id);
+        if(this.getSlot(0).getStack().isEmpty()) return false; // safety
 
+        // create outputStack
+        ItemStack outputStack = this.getSlot(0).getStack().copy();
+        outputStack.set(ModDataComponentTypes.KART_ITEM_BODY_TYPE, LIVERIES_SORTED.get(this.selectedLiveryId));
+        this.getSlot(1).setStack(outputStack);
         return true;
     }
-
 
     // -------------------- vanilla logic --------------------
 
@@ -117,6 +144,7 @@ public class LiveryWorkbenchScreenHandler extends ScreenHandler {
                 if (!this.insertItem(originalStack, this.workbenchInventory.size(), this.slots.size(), false)) {
                     return ItemStack.EMPTY;
                 }
+                this.getSlot(invSlot).onTakeItem(player, originalStack);
             } else if (!this.insertItem(originalStack, 0, this.workbenchInventory.size(), false)) {
                 return ItemStack.EMPTY;
             }
