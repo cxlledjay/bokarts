@@ -1,4 +1,4 @@
-package de.cxlledjay.bokarts.screen.custom;
+package de.cxlledjay.bokarts.screen.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import de.cxlledjay.bokarts.BoKarts;
@@ -6,6 +6,7 @@ import de.cxlledjay.bokarts.config.ClientSyncedConfig;
 import de.cxlledjay.bokarts.entity.custom.kart.KartEntity;
 import de.cxlledjay.bokarts.networking.packet.KartEntityAddFuelPayloadC2S;
 import de.cxlledjay.bokarts.networking.packet.HornCyclePayloadC2S;
+import de.cxlledjay.bokarts.screen.custom.KartInventoryScreenHandler;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;

@@ -1,10 +1,11 @@
-package de.cxlledjay.bokarts.screen.custom;
+package de.cxlledjay.bokarts.screen.client;
 
 import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.block.entity.custom.KartLiftBlockEntity;
 import de.cxlledjay.bokarts.entity.custom.kart.KartEntity;
 import de.cxlledjay.bokarts.networking.packet.KartLiftChangeStateC2S;
 import de.cxlledjay.bokarts.networking.packet.KartLiftModifyRaceNumberC2S;
+import de.cxlledjay.bokarts.screen.custom.KartLiftScreenHandler;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;

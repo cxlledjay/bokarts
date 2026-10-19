@@ -4,21 +4,14 @@ import de.cxlledjay.bokarts.block.entity.ModBlockEntities;
 import de.cxlledjay.bokarts.block.entity.client.KartLiftArmsModel;
 import de.cxlledjay.bokarts.block.entity.client.KartLiftBlockEntityRenderer;
 import de.cxlledjay.bokarts.config.ClientSyncedConfig;
-import de.cxlledjay.bokarts.entity.ModEntities;
-import de.cxlledjay.bokarts.entity.client.KartModel;
-import de.cxlledjay.bokarts.entity.client.KartRenderer;
 import de.cxlledjay.bokarts.entity.client.ModEntityLayers;
 import de.cxlledjay.bokarts.event.ModClientEvents;
 import de.cxlledjay.bokarts.item.client.KartItemColorProvider;
 import de.cxlledjay.bokarts.keymapping.ModKeyMappings;
 import de.cxlledjay.bokarts.networking.ModPackets;
-import de.cxlledjay.bokarts.screen.ModScreenHandlers;
-import de.cxlledjay.bokarts.screen.custom.KartInventoryScreen;
-import de.cxlledjay.bokarts.screen.custom.KartLiftScreen;
+import de.cxlledjay.bokarts.screen.client.ModScreens;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
-import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 
 public class BoKartsClient implements ClientModInitializer {
@@ -38,8 +31,7 @@ public class BoKartsClient implements ClientModInitializer {
         ModPackets.registerS2CPackets();
 
         // screens
-        HandledScreens.register(ModScreenHandlers.KART_INVENTORY_SCREEN_HANDLER, KartInventoryScreen::new);
-        HandledScreens.register(ModScreenHandlers.KART_LIFT_SCREEN_HANDLER, KartLiftScreen::new);
+        ModScreens.register();
 
         // kart lift rendering
         EntityModelLayerRegistry.registerModelLayer(KartLiftArmsModel.KART_LIFT_ARMS_LAYER, KartLiftArmsModel::getTexturedModelData);
