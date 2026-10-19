@@ -1,8 +1,7 @@
 package de.cxlledjay.bokarts.block;
 
 import de.cxlledjay.bokarts.BoKarts;
-import de.cxlledjay.bokarts.block.custom.KartLiftCoreBlock;
-import de.cxlledjay.bokarts.block.custom.KartLiftDummyBlock;
+import de.cxlledjay.bokarts.block.custom.*;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.piston.PistonBehavior;
@@ -18,7 +17,7 @@ import java.util.List;
 
 public class ModBlocks {
 
-    // 1. Register Blocks
+    // kart lift
     public static final Block KART_LIFT = registerBlock("kart_lift_block", new KartLiftCoreBlock(AbstractBlock.Settings.create().strength(3.0f).requiresTool().nonOpaque().pistonBehavior(PistonBehavior.BLOCK)) {
         @Override
         public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
@@ -28,6 +27,32 @@ public class ModBlocks {
         }
     });
     public static final Block KART_LIFT_DUMMY = registerBlockWithoutBlockItem("kart_lift_dummy_block", new KartLiftDummyBlock(AbstractBlock.Settings.create().strength(3.0f).requiresTool().nonOpaque().pistonBehavior(PistonBehavior.BLOCK)));
+
+
+    // workbenches
+    public static final Block LIVERY_WORKBENCH = registerBlock("livery_workbench", new LiveryWorkbench(
+            AbstractBlock.Settings.create()
+                    .strength(4.0f)
+                    .requiresTool()
+                    .nonOpaque()
+                    .pistonBehavior(PistonBehavior.BLOCK)
+    ));
+    public static final Block PAINT_BUCKET = registerBlock("paint_bucket", new PaintBucket(
+            AbstractBlock.Settings.create()
+                    .strength(2.5f)
+                    .requiresTool()
+                    .nonOpaque()
+                    .pistonBehavior(PistonBehavior.BLOCK)
+    ));
+
+    // trophy
+    public static final Block TROPHY = registerBlock("trophy", new Trophy(
+            AbstractBlock.Settings.create()
+                    .strength(1.5f)
+                    .requiresTool()
+                    .nonOpaque()
+                    .pistonBehavior(PistonBehavior.BLOCK)
+    ));
 
 
 

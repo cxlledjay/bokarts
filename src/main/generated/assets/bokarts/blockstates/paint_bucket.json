@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "bokarts:block/paint_bucket",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "bokarts:block/paint_bucket"
+    },
+    "facing=south": {
+      "model": "bokarts:block/paint_bucket",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "bokarts:block/paint_bucket",
+      "y": 270
+    }
+  }
+}

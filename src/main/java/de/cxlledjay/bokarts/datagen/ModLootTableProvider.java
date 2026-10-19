@@ -16,5 +16,8 @@ public class ModLootTableProvider extends FabricBlockLootTableProvider {
     @Override
     public void generate() {
         addDrop(ModBlocks.KART_LIFT);
+        addDrop(ModBlocks.LIVERY_WORKBENCH);
+        addDrop(ModBlocks.PAINT_BUCKET);
+        addDrop(ModBlocks.TROPHY);
     }
 }

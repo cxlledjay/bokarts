@@ -1,5 +1,6 @@
 package de.cxlledjay.bokarts.datagen;
 
+import de.cxlledjay.bokarts.block.ModBlocks;
 import de.cxlledjay.bokarts.item.ModItems;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
@@ -15,7 +16,9 @@ public class ModModelProvider extends FabricModelProvider {
 
     @Override
     public void generateBlockStateModels(BlockStateModelGenerator blockStateModelGenerator) {
-
+        blockStateModelGenerator.registerNorthDefaultHorizontalRotation(ModBlocks.LIVERY_WORKBENCH);
+        blockStateModelGenerator.registerNorthDefaultHorizontalRotation(ModBlocks.PAINT_BUCKET);
+        blockStateModelGenerator.registerNorthDefaultHorizontalRotation(ModBlocks.TROPHY);
     }
 
     @Override

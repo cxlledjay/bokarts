@@ -74,6 +74,11 @@
   "tooltip.bokarts.kart_lift_block.setup": "§7Place two Lift Blocks facing each other with two blocks space",
   "block.bokarts.kart_lift_block": "Kart Lift",
 
+
+  "block.bokarts.livery_workbench": "Livery Workbench",
+  "block.bokarts.paint_bucket": "Paint Bucket",
+  "block.bokarts.trophy": "Trophy",
+
   "entity.bokarts.kart" : "Kart",
   "sounds.bokarts.kart_engine": "Kart Engine",
   "sounds.bokarts.horn": "Kart Horn",

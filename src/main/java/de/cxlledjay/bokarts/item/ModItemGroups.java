@@ -58,6 +58,9 @@ public class ModItemGroups {
 
                         // blocks
                         entries.add(new ItemStack(ModBlocks.KART_LIFT));
+                        entries.add(new ItemStack(ModBlocks.LIVERY_WORKBENCH));
+                        entries.add(new ItemStack(ModBlocks.PAINT_BUCKET));
+                        entries.add(new ItemStack(ModBlocks.TROPHY));
                     }).build());
 
     public static void registerItemGroups() {

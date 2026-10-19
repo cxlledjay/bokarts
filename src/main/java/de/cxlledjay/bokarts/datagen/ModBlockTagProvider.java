@@ -18,10 +18,16 @@ public class ModBlockTagProvider extends FabricTagProvider.BlockTagProvider {
     protected void configure(RegistryWrapper.WrapperLookup lookup) {
         getOrCreateTagBuilder(BlockTags.PICKAXE_MINEABLE)
                 .add(ModBlocks.KART_LIFT)
-                .add(ModBlocks.KART_LIFT_DUMMY);
+                .add(ModBlocks.KART_LIFT_DUMMY)
+                .add(ModBlocks.LIVERY_WORKBENCH)
+                .add(ModBlocks.PAINT_BUCKET)
+                .add(ModBlocks.TROPHY);
 
         getOrCreateTagBuilder(BlockTags.NEEDS_IRON_TOOL)
                 .add(ModBlocks.KART_LIFT)
-                .add(ModBlocks.KART_LIFT_DUMMY);
+                .add(ModBlocks.KART_LIFT_DUMMY)
+                .add(ModBlocks.LIVERY_WORKBENCH)
+                .add(ModBlocks.PAINT_BUCKET)
+                .add(ModBlocks.TROPHY);
     }
 }
