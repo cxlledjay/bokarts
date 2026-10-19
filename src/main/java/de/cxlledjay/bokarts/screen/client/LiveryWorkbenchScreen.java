@@ -4,11 +4,15 @@ import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.screen.custom.LiveryWorkbenchScreenHandler;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.MathHelper;
 
 // basically a stonecutter
 
@@ -23,6 +27,11 @@ public class LiveryWorkbenchScreen extends HandledScreen<LiveryWorkbenchScreenHa
     private static final Identifier LIVERY_HIGHLIGHTED_TEXTURE = BoKarts.id("textures/gui/sprites/livery_workbench/livery_option_highlighted.png");
     private static final Identifier LIVERY_TEXTURE = BoKarts.id("textures/gui/sprites/livery_workbench/livery_option.png");
 
+    // scrolling
+    private float scrollAmount; // percentage of travel (0.0f -- 1.0f)
+    private int scrollOffset;
+    private boolean mouseClicked;
+
     public LiveryWorkbenchScreen(LiveryWorkbenchScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
 
@@ -31,12 +40,107 @@ public class LiveryWorkbenchScreen extends HandledScreen<LiveryWorkbenchScreenHa
         this.backgroundWidth = 176;
         this.backgroundHeight = 230;
         this.playerInventoryTitleY = 136;
+
+        this.scrollAmount = 0.0f;
+        this.scrollOffset = 0;
+        this.mouseClicked = false;
     }
+
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        this.mouseClicked = false;
+        if (this.handler.canCraft()) {
+            int selectBoxStartX = this.x + 8;
+            int selectBoxStartY = this.y + 72;
+            int currentlyShownMaxId = this.scrollOffset + 4;
+
+            for (int shownId = this.scrollOffset; shownId < currentlyShownMaxId; shownId++) {
+                int slotIdx = shownId - this.scrollOffset; //< slot index; 0 - 3 (4 possible slots)
+                double dX = mouseX - selectBoxStartX;
+                double dY = mouseY - (selectBoxStartY + (slotIdx * 15));
+                if (dX >= 0.0 && dY >= 0.0 && dX < 143.0 && dY < 15.0 && this.handler.onButtonClick(this.client.player, shownId)) {
+                    MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_LOOM_SELECT_PATTERN, 1.0F));
+                    this.client.interactionManager.clickButton(this.handler.syncId, shownId);
+                    return true;
+                }
+            }
+
+            selectBoxStartX = this.x + 156;
+            selectBoxStartY = this.y + 72;
+            if (mouseX >= selectBoxStartX && mouseX < selectBoxStartX + 12 && mouseY >= selectBoxStartY && mouseY < selectBoxStartY + 60) {
+                this.mouseClicked = true;
+            }
+        }
+
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        if (this.mouseClicked && this.shouldScroll()) {
+            int scrollbarTopY = this.y + 72;
+            int scrollbarBottomY = scrollbarTopY + 60;
+            this.scrollAmount = ((float)mouseY - scrollbarTopY - 7.5F) / (scrollbarBottomY - scrollbarTopY - 15.0F);
+            this.scrollAmount = MathHelper.clamp(this.scrollAmount, 0.0F, 1.0F);
+            this.scrollOffset = (int)(this.scrollAmount * this.getMaxScroll() + 0.5);
+            return true;
+        } else {
+            return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+        }
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        if (this.shouldScroll()) {
+            int i = this.getMaxScroll();
+            float f = (float)verticalAmount / i;
+            this.scrollAmount = MathHelper.clamp(this.scrollAmount - f, 0.0F, 1.0F);
+            this.scrollOffset = (int)(this.scrollAmount * i + 0.5);
+        }
+
+        return true;
+    }
+
+
+
+
+
+    private boolean shouldScroll() {
+        return this.handler.canCraft() && LiveryWorkbenchScreenHandler.LIVERY_AMOUNT > 4;
+    }
+
+    private int getMaxScroll() {
+        return LiveryWorkbenchScreenHandler.LIVERY_AMOUNT - 4;
+    }
+
 
     @Override
     protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
 
         // background
         context.drawTexture(BACKGROUND_TEXTURE, this.x, this.y, 0, 0, this.backgroundWidth, this.backgroundHeight);
+
+        // scroll bar
+        int progress = (int) (45.0f * this.scrollAmount); //< scroll Amount is between 0.0 and 1.0 => multiply by max allowed travel
+        Identifier identifier = this.shouldScroll() ? SCROLLER_TEXTURE : SCROLLER_DISABLED_TEXTURE;
+        context.drawGuiTexture(identifier, this.x + 156, this.y + 72 + progress, 12, 15);
+
+        // livery selectors
+        int l = this.x + 52;
+        int m = this.y + 14;
+        int n = this.scrollOffset + 4;
+        // this.renderRecipeBackground(context, mouseX, mouseY, l, m, n);
+        // this.renderRecipeIcons(context, l, m, n);
+
+        // TODO: render entity
     }
+
+    @Override
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        super.render(context, mouseX, mouseY, delta);
+        this.drawMouseoverTooltip(context, mouseX, mouseY);
+    }
+
+
 }
