@@ -32,17 +32,17 @@ public class KartInventoryScreen extends HandledScreen<KartInventoryScreenHandle
     private static final Identifier LOCKED_OVERLAY = BoKarts.id("textures/gui/kart_inventory/locked_overlay.png");
 
 
-    ButtonTextures REFUEL_BUTTON_TEXTURES = new ButtonTextures(
+    private static final ButtonTextures REFUEL_BUTTON_TEXTURES = new ButtonTextures(
             BoKarts.id("kart_inventory/refuel"),
             BoKarts.id("kart_inventory/refuel_highlighted")
     );
     private static final Identifier FURNACE_UNLIT = Identifier.of("minecraft", "textures/block/furnace_front.png");
     private static final Identifier FURNACE_LIT = Identifier.of("minecraft", "textures/block/furnace_front_on.png");
-    ButtonTextures HORN_PREVIOUS_TEXTURES = new ButtonTextures(
+    private static final ButtonTextures HORN_PREVIOUS_TEXTURES = new ButtonTextures(
             BoKarts.id("kart_inventory/horn_prev"),
             BoKarts.id("kart_inventory/horn_prev_highlighted")
     );
-    ButtonTextures HORN_NEXT_TEXTURES = new ButtonTextures(
+    private static final ButtonTextures HORN_NEXT_TEXTURES = new ButtonTextures(
             BoKarts.id("kart_inventory/horn_next"),
             BoKarts.id("kart_inventory/horn_next_highlighted")
     );

@@ -2,14 +2,19 @@ package de.cxlledjay.bokarts.block.custom;
 
 import com.mojang.serialization.MapCodec;
 import de.cxlledjay.bokarts.BoKarts;
+import de.cxlledjay.bokarts.screen.custom.LiveryWorkbenchScreenHandler;
+import de.cxlledjay.bokarts.screen.custom.PaintBucketScreenHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HorizontalFacingBlock;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -61,11 +66,22 @@ public class PaintBucket extends HorizontalFacingBlock {
 
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+        if (!world.isClient()) {
+            NamedScreenHandlerFactory screenHandlerFactory = state.createScreenHandlerFactory(world, pos);
 
-        if(!world.isClient()) {
-            BoKarts.LOGGER.info("player clicked the paint bucket");
+            if (screenHandlerFactory != null) {
+                // open paint bucket screen
+                player.openHandledScreen(screenHandlerFactory);
+            }
         }
+        return ActionResult.SUCCESS;
+    }
 
-        return super.onUse(state, world, pos, player, hit);
+    @Override
+    protected NamedScreenHandlerFactory createScreenHandlerFactory(BlockState state, World world, BlockPos pos) {
+        return new SimpleNamedScreenHandlerFactory(
+                (syncId, playerInventory, player1) ->
+                        new PaintBucketScreenHandler(syncId, playerInventory), Text.translatable("block.bokarts.paint_bucket")
+        );
     }
 }

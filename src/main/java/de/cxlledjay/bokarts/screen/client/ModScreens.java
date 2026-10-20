@@ -11,6 +11,7 @@ public class ModScreens {
         HandledScreens.register(ModScreenHandlers.KART_INVENTORY_SCREEN_HANDLER, KartInventoryScreen::new);
         HandledScreens.register(ModScreenHandlers.KART_LIFT_SCREEN_HANDLER, KartLiftScreen::new);
         HandledScreens.register(ModScreenHandlers.LIVERY_WORKBENCH_SCREEN_HANDLER, LiveryWorkbenchScreen::new);
+        HandledScreens.register(ModScreenHandlers.PAINT_BUCKET_SCREEN_HANDLER, PaintBucketScreen::new);
     }
 
 

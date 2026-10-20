@@ -4,6 +4,7 @@ import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.screen.custom.KartInventoryScreenHandler;
 import de.cxlledjay.bokarts.screen.custom.KartLiftScreenHandler;
 import de.cxlledjay.bokarts.screen.custom.LiveryWorkbenchScreenHandler;
+import de.cxlledjay.bokarts.screen.custom.PaintBucketScreenHandler;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
@@ -36,6 +37,14 @@ public class ModScreenHandlers {
                     Registries.SCREEN_HANDLER,
                     BoKarts.id("livery_workbench_screen_handler"),
                     new ScreenHandlerType<>(LiveryWorkbenchScreenHandler::new, FeatureSet.empty())
+            );
+
+    // paint bucket
+    public static final ScreenHandlerType<PaintBucketScreenHandler> PAINT_BUCKET_SCREEN_HANDLER =
+            Registry.register(
+                    Registries.SCREEN_HANDLER,
+                    BoKarts.id("paint_bucket_screen_handler"),
+                    new ScreenHandlerType<>(PaintBucketScreenHandler::new, FeatureSet.empty())
             );
 
 

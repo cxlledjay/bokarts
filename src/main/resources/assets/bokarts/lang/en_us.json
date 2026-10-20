@@ -74,6 +74,10 @@
   "tooltip.bokarts.kart_lift_block.setup": "§7Place two Lift Blocks facing each other with two blocks space",
   "block.bokarts.kart_lift_block": "Kart Lift",
 
+  "gui.bokarts.paint_bucket.hue": "H",
+  "gui.bokarts.paint_bucket.saturation": "S",
+  "gui.bokarts.paint_bucket.value": "V",
+
 
   "block.bokarts.livery_workbench": "Livery Workbench",
   "block.bokarts.paint_bucket": "Paint Bucket",

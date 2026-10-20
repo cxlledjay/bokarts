@@ -37,24 +37,24 @@ public class KartLiftScreen extends HandledScreen<KartLiftScreenHandler> {
     private static final Identifier TAB_OVERLAY_KEY = BoKarts.id("textures/gui/kart_lift/tab_key_selected.png");
 
     // tab buttons
-    ButtonTextures TAB_BUTTON_MODIFICATION_TEXTURES = new ButtonTextures(
+    private static final ButtonTextures TAB_BUTTON_MODIFICATION_TEXTURES = new ButtonTextures(
             BoKarts.id("kart_lift/tab/tab_modification_unhovered"),
             BoKarts.id("kart_lift/tab/tab_modification_hovered")
     );
-    ButtonTextures TAB_BUTTON_CUSTOMIZATION_TEXTURES = new ButtonTextures(
+    private static final ButtonTextures TAB_BUTTON_CUSTOMIZATION_TEXTURES = new ButtonTextures(
             BoKarts.id("kart_lift/tab/tab_customization_unhovered"),
             BoKarts.id("kart_lift/tab/tab_customization_hovered")
     );
-    ButtonTextures TAB_BUTTON_KEY_TEXTURES = new ButtonTextures(
+    private static final ButtonTextures TAB_BUTTON_KEY_TEXTURES = new ButtonTextures(
             BoKarts.id("kart_lift/tab/tab_key_unhovered"),
             BoKarts.id("kart_lift/tab/tab_key_hovered")
     );
     // lift control buttons
-    ButtonTextures LIFT_CONTROL_UP_TEXTURES = new ButtonTextures(
+    private static final ButtonTextures LIFT_CONTROL_UP_TEXTURES = new ButtonTextures(
             BoKarts.id("kart_lift/lift_control/lift_up_unhovered"),
             BoKarts.id("kart_lift/lift_control/lift_up_hovered")
     );
-    ButtonTextures LIFT_CONTROL_DOWN_TEXTURES = new ButtonTextures(
+    private static final ButtonTextures LIFT_CONTROL_DOWN_TEXTURES = new ButtonTextures(
             BoKarts.id("kart_lift/lift_control/lift_down_unhovered"),
             BoKarts.id("kart_lift/lift_control/lift_down_hovered")
     );
@@ -63,7 +63,7 @@ public class KartLiftScreen extends HandledScreen<KartLiftScreenHandler> {
     private KartLiftScreenHandler.KartLiftTab currentTab;
 
     // race number text widget
-    TextFieldWidget raceNumberInputWidget;
+    private TextFieldWidget raceNumberInputWidget;
 
     // ----- positioning -----
     // tabs
