@@ -1,7 +1,8 @@
 package de.cxlledjay.bokarts.screen.custom;
 
-import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.block.ModBlocks;
+import de.cxlledjay.bokarts.component.ModDataComponentTypes;
+import de.cxlledjay.bokarts.entity.custom.kart.property.BodyType;
 import de.cxlledjay.bokarts.item.ModItems;
 import de.cxlledjay.bokarts.screen.ModScreenHandlers;
 import net.minecraft.entity.player.PlayerEntity;
@@ -10,6 +11,7 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.DyeItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.slot.Slot;
@@ -46,6 +48,17 @@ public class PaintBucketScreenHandler extends ScreenHandler {
             @Override
             public void markDirty() {
                 super.markDirty();
+
+                // create output livery if not yet created
+                if(!liveryInputSlot.getStack().isEmpty() && !colorMixInputSlot.getStack().isEmpty() && outputSlot.getStack().isEmpty()) {
+                    ItemStack originalItem = liveryInputSlot.getStack();
+                    ItemStack outputItemStack = originalItem.copy();
+                    outputItemStack.setCount(1);
+                    outputItemStack.set(ModDataComponentTypes.KART_ITEM_BODY_TYPE, originalItem.getOrDefault(ModDataComponentTypes.KART_ITEM_BODY_TYPE, BodyType.NONE));
+                    outputItemStack.set(ModDataComponentTypes.KART_ITEM_BODY_COLOR, bodyColor);
+                    outputItemStack.set(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR, wheelColor);
+                    outputSlot.setStack(outputItemStack);
+                }
             }
         };
 
@@ -54,8 +67,41 @@ public class PaintBucketScreenHandler extends ScreenHandler {
             public boolean canInsert(ItemStack stack) {
                 return stack.isOf(ModItems.LIVERY_TEMPLATE);
             }
+
+            @Override
+            public void setStack(ItemStack stack) {
+                bodyColor = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_BODY_COLOR, 0xFFFFFF);
+                wheelColor = stack.getOrDefault(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR, 0xFFFFFF);
+                onColorUpdated.run(); //< update client
+                super.setStack(stack);
+            }
+
+            @Override
+            public void onTakeItem(PlayerEntity player, ItemStack stack) {
+                outputSlot.setStack(ItemStack.EMPTY);
+                bodyColor = 0xFFFFFF;
+                wheelColor = 0xFFFFFF;
+                onColorUpdated.run(); //< update client
+                super.onTakeItem(player, stack);
+            }
         });
-        this.colorMixInputSlot = this.addSlot(new Slot(inventory, 1, 65, 72));
+        this.colorMixInputSlot = this.addSlot(new Slot(inventory, 1, 65, 72) {
+            @Override
+            public boolean canInsert(ItemStack stack) {
+                return stack.isOf(Items.CLAY_BALL);
+            }
+
+            @Override
+            public int getMaxItemCount() {
+                return 1;
+            }
+
+            @Override
+            public void onTakeItem(PlayerEntity player, ItemStack stack) {
+                outputSlot.setStack(ItemStack.EMPTY);
+                super.onTakeItem(player, stack);
+            }
+        });
         this.dyeStealerSlot = this.addSlot(new Slot(inventory, 2, 86, 72) {
             @Override
             public boolean canInsert(ItemStack stack) {
@@ -63,18 +109,32 @@ public class PaintBucketScreenHandler extends ScreenHandler {
             }
 
             @Override
+            public int getMaxItemCount() {
+                return 1;
+            }
+
+            @Override
             public void setStack(ItemStack stack) {
-                super.setStack(stack);
                 if(stack.getItem() instanceof DyeItem) {
                     setActiveColor(((DyeItem) stack.getItem()).getColor().getEntityColor() & 0xFFFFFF);
                     onColorUpdated.run(); //< update client
                 }
+                super.setStack(stack);
             }
         });
         this.outputSlot = this.addSlot(new Slot(inventory, 3, 179, 72) {
             @Override
             public boolean canInsert(ItemStack stack) {
                 return false;
+            }
+
+            @Override
+            public void onTakeItem(PlayerEntity player, ItemStack stack) {
+                liveryInputSlot.setStack(ItemStack.EMPTY);
+                colorMixInputSlot.setStack(ItemStack.EMPTY);
+                outputSlot.setStack(ItemStack.EMPTY);
+
+                super.onTakeItem(player, stack);
             }
         });
 
@@ -133,6 +193,21 @@ public class PaintBucketScreenHandler extends ScreenHandler {
 
     public void setOnColorUpdated(Runnable callback) {
         this.onColorUpdated = callback;
+    }
+
+
+    // this should only be called by the server callback of the received update payload from the screen
+    public void setActiveColorServerBound(int color) {
+        this.setActiveColor(color);
+
+        // also update output here (ON THE SERVER)
+        this.setColorOfOutputItem();
+    }
+
+    public void setColorOfOutputItem() {
+        if(this.outputSlot.getStack().isEmpty()) return; // do nothing
+        this.outputSlot.getStack().set(ModDataComponentTypes.KART_ITEM_BODY_COLOR, bodyColor);
+        this.outputSlot.getStack().set(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR, wheelColor);
     }
 
     // -------------------- vanilla logic --------------------

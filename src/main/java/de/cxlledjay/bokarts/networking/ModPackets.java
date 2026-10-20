@@ -19,6 +19,7 @@ public class ModPackets {
         PayloadTypeRegistry.playC2S().register(KartEntityInputPayloadC2S.ID, KartEntityInputPayloadC2S.STREAM_CODEC);
         PayloadTypeRegistry.playC2S().register(KartLiftChangeStateC2S.ID, KartLiftChangeStateC2S.STREAM_CODEC);
         PayloadTypeRegistry.playC2S().register(KartLiftModifyRaceNumberC2S.ID, KartLiftModifyRaceNumberC2S.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(PaintBucketSetActiveColorC2S.ID, PaintBucketSetActiveColorC2S.STREAM_CODEC);
     }
 
 
@@ -29,6 +30,7 @@ public class ModPackets {
         ServerPlayNetworking.registerGlobalReceiver(KartEntityInputPayloadC2S.ID, KartEntityInputPayloadC2S::receive);
         ServerPlayNetworking.registerGlobalReceiver(KartLiftChangeStateC2S.ID, KartLiftChangeStateC2S::receive);
         ServerPlayNetworking.registerGlobalReceiver(KartLiftModifyRaceNumberC2S.ID, KartLiftModifyRaceNumberC2S::receive);
+        ServerPlayNetworking.registerGlobalReceiver(PaintBucketSetActiveColorC2S.ID, PaintBucketSetActiveColorC2S::receive);
     }
 
     public static void registerS2CPackets(){

@@ -5,7 +5,9 @@ import de.cxlledjay.bokarts.component.ModDataComponentTypes;
 import de.cxlledjay.bokarts.entity.ModEntities;
 import de.cxlledjay.bokarts.entity.custom.kart.KartEntity;
 import de.cxlledjay.bokarts.entity.custom.kart.property.*;
+import de.cxlledjay.bokarts.networking.packet.PaintBucketSetActiveColorC2S;
 import de.cxlledjay.bokarts.screen.custom.PaintBucketScreenHandler;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ButtonTextures;
@@ -16,6 +18,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
 import java.util.Random;
@@ -77,6 +80,7 @@ public class PaintBucketScreen extends HandledScreen<PaintBucketScreenHandler> {
         // update color locally
         this.localColor = Color.HSBtoRGB((float)h/360.0f, (float)s/100.0f, (float)v/100.0f);
         this.handler.setActiveColor(this.localColor);
+        this.handler.setColorOfOutputItem();
 
         // set to text widget without causing updates
         String hexString = String.format("%06X", this.localColor & 0xFFFFFF);
@@ -96,6 +100,7 @@ public class PaintBucketScreen extends HandledScreen<PaintBucketScreenHandler> {
         // conversion was successful
         this.localColor = col;
         this.handler.setActiveColor(this.localColor);
+        this.handler.setColorOfOutputItem();
 
         // update sliders
         float[] hsbVals = new float[3];
@@ -111,8 +116,9 @@ public class PaintBucketScreen extends HandledScreen<PaintBucketScreenHandler> {
 
     private void sendUpdateToServer() {
         if(this.localColor != this.localColorPrev) {
-            // TODO: send update
-            BoKarts.LOGGER.info("Sending update to server");
+            // send packet to sync server
+            PaintBucketSetActiveColorC2S payload = new PaintBucketSetActiveColorC2S(this.localColor);
+            ClientPlayNetworking.send(payload);
 
             // and set prev to current
             this.localColorPrev = this.localColor;
@@ -145,7 +151,6 @@ public class PaintBucketScreen extends HandledScreen<PaintBucketScreenHandler> {
 
 
     private void onModeChange(PaintBucketScreenHandler.ActiveSelection mode) {
-        BoKarts.LOGGER.info("Mode changed to: {}", mode.toString());
         this.setWidgetsOnly(this.handler.getActiveColor());
     }
 
@@ -243,6 +248,24 @@ public class PaintBucketScreen extends HandledScreen<PaintBucketScreenHandler> {
         return super.mouseReleased(mouseX, mouseY, button);
     }
 
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+
+        // escape always closes
+        if(keyCode == GLFW.GLFW_KEY_ESCAPE) {
+            this.close();
+            return true;
+        }
+
+        // when clicked into hex text prevent from closing when pressing e (or for me: c -- i know... i am a bit... different xd)
+        if(this.hexStringInputWidget.isFocused()) {
+            this.hexStringInputWidget.keyPressed(keyCode, scanCode, modifiers);
+            return true;
+        }
+
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
     // window resize protection
     @Override
     public void resize(MinecraftClient client, int width, int height) {
@@ -257,6 +280,12 @@ public class PaintBucketScreen extends HandledScreen<PaintBucketScreenHandler> {
         this.hueSlider.setValue(h);
         this.saturationSlider.setValue(s);
         this.valueSlider.setValue(v);
+    }
+
+    @Override
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        super.render(context, mouseX, mouseY, delta);
+        this.drawMouseoverTooltip(context, mouseX, mouseY);
     }
 
 
