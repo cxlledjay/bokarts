@@ -208,7 +208,7 @@ public class KartLiftScreenHandler extends ScreenHandler {
             newStack = originalStack.copy();
             if (invSlot < TOTAL_LIFT_INVENTORY_SIZE) {
                 // clicking on item inside lift (=> into player inventory)
-                if (!this.insertItem(originalStack, TOTAL_LIFT_INVENTORY_SIZE, this.slots.size(), false)) {
+                if (!this.insertItem(originalStack, TOTAL_LIFT_INVENTORY_SIZE, this.slots.size(), true)) {
                     return ItemStack.EMPTY;
                 }
             }

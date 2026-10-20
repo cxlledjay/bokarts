@@ -200,12 +200,12 @@ public class PaintBucketScreen extends HandledScreen<PaintBucketScreenHandler> {
         // hex value input
         this.hexStringInputWidget = new TextFieldWidget(
                 this.textRenderer,
-                this.x + 114, this.y + 73,
-                52, 14,
+                this.x + 118, this.y + 76,
+                48, 9,
                 Text.literal("Color input as Hex String")
         );
         this.hexStringInputWidget.setMaxLength(6);
-        this.hexStringInputWidget.setDrawsBackground(true);
+        this.hexStringInputWidget.setDrawsBackground(false);
         this.isUpdatingFromSlider = true;
         this.hexStringInputWidget.setText(String.format("%06X", this.localColor));
         this.isUpdatingFromSlider = false;
@@ -270,6 +270,8 @@ public class PaintBucketScreen extends HandledScreen<PaintBucketScreenHandler> {
     @Override
     public void resize(MinecraftClient client, int width, int height) {
         int h, s, v;
+        String string =  this.hexStringInputWidget.getText();
+        PaintBucketScreenHandler.ActiveSelection mode = this.handler.getMode();
         h = hueSlider.getValue();
         s = saturationSlider.getValue();
         v = valueSlider.getValue();
@@ -280,6 +282,10 @@ public class PaintBucketScreen extends HandledScreen<PaintBucketScreenHandler> {
         this.hueSlider.setValue(h);
         this.saturationSlider.setValue(s);
         this.valueSlider.setValue(v);
+        this.isUpdatingFromSlider = true;
+        this.hexStringInputWidget.setText(string);
+        this.isUpdatingFromSlider = false;
+        this.handler.setMode(mode);
     }
 
     @Override

@@ -141,7 +141,7 @@ public class LiveryWorkbenchScreenHandler extends ScreenHandler {
             ItemStack originalStack = slot.getStack();
             newStack = originalStack.copy();
             if (invSlot < this.workbenchInventory.size()) {
-                if (!this.insertItem(originalStack, this.workbenchInventory.size(), this.slots.size(), false)) {
+                if (!this.insertItem(originalStack, this.workbenchInventory.size(), this.slots.size(), true)) {
                     return ItemStack.EMPTY;
                 }
                 this.getSlot(invSlot).onTakeItem(player, originalStack);
@@ -156,6 +156,7 @@ public class LiveryWorkbenchScreenHandler extends ScreenHandler {
         }
         return newStack;
     }
+
     @Override
     public boolean canUse(PlayerEntity player) {
         return canUse(this.context, player, ModBlocks.LIVERY_WORKBENCH);

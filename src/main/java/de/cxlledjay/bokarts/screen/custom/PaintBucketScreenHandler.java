@@ -117,6 +117,7 @@ public class PaintBucketScreenHandler extends ScreenHandler {
             public void setStack(ItemStack stack) {
                 if(stack.getItem() instanceof DyeItem) {
                     setActiveColor(((DyeItem) stack.getItem()).getColor().getEntityColor() & 0xFFFFFF);
+                    setColorOfOutputItem(); //< set color of output item too!
                     onColorUpdated.run(); //< update client
                 }
                 super.setStack(stack);
@@ -169,7 +170,7 @@ public class PaintBucketScreenHandler extends ScreenHandler {
         return this.mode;
     }
 
-    private void setMode(ActiveSelection mode) {
+    public void setMode(ActiveSelection mode) {
         this.mode = mode;
     }
 
@@ -229,8 +230,31 @@ public class PaintBucketScreenHandler extends ScreenHandler {
     }
 
     @Override
-    public ItemStack quickMove(PlayerEntity player, int slot) {
-        return ItemStack.EMPTY;
+    public ItemStack quickMove(PlayerEntity player, int invSlot) {
+        ItemStack newStack = ItemStack.EMPTY;
+        Slot slot = this.slots.get(invSlot);
+        if (slot.hasStack()) {
+            ItemStack originalStack = slot.getStack();
+            newStack = originalStack.copy();
+            if (invSlot < this.inventory.size()) {
+                // shift clicking to the player inv
+                if (!this.insertItem(originalStack, this.inventory.size(), this.slots.size(), true)) {
+                    return ItemStack.EMPTY;
+                }
+                slot.onTakeItem(player, originalStack); //< call take code
+            } else if (!this.insertItem(originalStack, 0, this.inventory.size(), false)) {
+                return ItemStack.EMPTY;
+            } else {
+                // successful shift clicking to the screen handler inv
+                slot.setStack(originalStack); //< call set code
+            }
+            if (originalStack.isEmpty()) {
+                slot.setStack(ItemStack.EMPTY);
+            } else {
+                slot.markDirty();
+            }
+        }
+        return newStack;
     }
 
     @Override
