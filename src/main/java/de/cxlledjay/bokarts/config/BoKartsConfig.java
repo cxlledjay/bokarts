@@ -14,6 +14,32 @@ public class BoKartsConfig extends MidnightConfig {
     public static float hornPreviewVolume = 0.5f;
 
 
+    // HUD SETTINGS
+    @Entry(category = "hud")
+    public static boolean enableKartHud = false;
+
+    @Entry(category = "hud", min = 0.1f, max = 2.0f, isSlider = true)
+    public static float kartHudScale = 1.0f;
+
+    @Entry(category = "hud")
+    public static int kartHudPadding = 10;
+
+    @Entry(category = "hud", min = 0.1f, max = 1.0f, isSlider = true)
+    public static float kartHudTransparency = 0.8f;
+
+    @Entry(category = "hud", isColor = true)
+    public static int kartHudTextColor = 0x54B3F2;
+
+    @Entry(category = "hud")
+    public static KartSpeedUnit kartHudSpeedUnit = KartSpeedUnit.BLOCKS_PER_SECOND;
+
+    public enum KartSpeedUnit {
+        BLOCKS_PER_SECOND,
+        KILOMETRES_PER_HOUR,
+        BURGERS_PER_FREEDOM
+    }
+
+
 
 
 

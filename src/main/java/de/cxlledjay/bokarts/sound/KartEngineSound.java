@@ -14,15 +14,10 @@ public class KartEngineSound extends MovingSoundInstance {
     // tracked entity
     private final KartEntity kart;
 
-    /*
-    Scaling:        Volume     Pitch
-        Idle:       0.5f       0.9f
-        MaxSpeed:   0.8f       1.25f
-     */
     private static final float volumeIdle = 0.40f;
     private static final float volumeMaxSpeed = 0.9f;
     private static final float pitchIdle = 0.9f;
-    private static final float pitchMaxSpeed = 1.25f;
+    private static final float pitchMaxSpeed = 1.35f;
 
     public KartEngineSound(KartEntity kartEntity) {
         super(ModSounds.KART_ENGINE, SoundCategory.PLAYERS, Random.create());
@@ -53,8 +48,10 @@ public class KartEngineSound extends MovingSoundInstance {
         this.y = this.kart.getY();
         this.z = this.kart.getZ();
 
+        // old calc:
         // get sound scaling from kart entity. min value: 0; max value: kart max speed * 5 + engine max speed * 10 = 1.5 * 5 + 2.5 * 10 = 7.5 + 25 = 32.5
-        final float maxScaling = 32.5f;
+
+        final float maxScaling = KartEntity.ENGINE_REVS_MAX;
         float scaling = this.kart.getSoundScaling();
 
         // calculate pitch + volume

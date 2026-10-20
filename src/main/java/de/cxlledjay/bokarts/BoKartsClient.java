@@ -6,6 +6,7 @@ import de.cxlledjay.bokarts.block.entity.client.KartLiftBlockEntityRenderer;
 import de.cxlledjay.bokarts.config.ClientSyncedConfig;
 import de.cxlledjay.bokarts.entity.client.ModEntityLayers;
 import de.cxlledjay.bokarts.event.ModClientEvents;
+import de.cxlledjay.bokarts.hud.ModHuds;
 import de.cxlledjay.bokarts.item.client.KartItemColorProvider;
 import de.cxlledjay.bokarts.keymapping.ModKeyMappings;
 import de.cxlledjay.bokarts.networking.ModPackets;
@@ -39,5 +40,8 @@ public class BoKartsClient implements ClientModInitializer {
 
         // init config sync server sided
         ClientSyncedConfig.initSyncedConfigClientEvent();
+
+        // register kart hud
+        ModHuds.register();
     }
 }

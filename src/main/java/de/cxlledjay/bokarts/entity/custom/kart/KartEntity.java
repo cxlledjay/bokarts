@@ -52,7 +52,9 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     // -------------------- constants --------------------
     private static final float STEERING_SPEED = 20.0f;
     private static final float STEERING_CENTER = 0.0f;
-    private static final float ENGINE_ACCELERATION = 0.1f;
+    private static final float ENGINE_ACCELERATION = 4.2f;
+    public static final float ENGINE_REVS_MAX = 100.0f;
+    public static final float ENGINE_REVS_MIN = -42.0f;
     private static final int HORN_COOLDOWN = 10;
     private static final int KEY_FOB_DURATION = 100;
 
@@ -112,7 +114,9 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     public float rearAxleRotationPrev = 0.0f;
     public float steeringAngle = STEERING_CENTER;
     public float steeringAnglePrev = STEERING_CENTER;
-    private float engineRevs = 0.0f;
+    public float engineRevsPrev = 0.0f;
+    public float engineRevs = 0.0f;
+    public double distanceThisTick = 0.0f;
 
     // key fob tracking
     private int keyFobTimer = 0;
@@ -496,7 +500,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
                 this.getX() - this.lastTickX,
                 this.getY() - this.lastTickY,
                 this.getZ() - this.lastTickZ);
-        double distanceThisTick = movementThisTick.length();
+        this.distanceThisTick = movementThisTick.length();
 
         // update position tracking
         this.lastTickX = this.getX();
@@ -511,7 +515,10 @@ public class KartEntity extends BoatEntity implements RideableInventory{
             // we are accelerating: consume fuel!
             this.currentFuel = Math.max(0, this.currentFuel - ClientSyncedConfig.getFuelConsumptionPerTick()); // prevent going under 0
         }
-        this.currentOdometer += (float) distanceThisTick;
+        this.currentOdometer += (float) this.distanceThisTick;
+
+        // calculate engine revs in shared code
+        calculateEngineRevs();
 
 
 
@@ -523,7 +530,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         if (!this.getWorld().isClient()) {
 
             // ---------------- collisions ----------------
-            this.handleKartCollisions(movementThisTick.normalize(), distanceThisTick);
+            this.handleKartCollisions(movementThisTick.normalize(), this.distanceThisTick);
 
 
             // ---------------- fuel and odo sync ----------------
@@ -535,9 +542,6 @@ public class KartEntity extends BoatEntity implements RideableInventory{
             }
 
             // ---------------- calculate values for animation ----------------
-
-            // engine revs
-            calculateEngineRevs();
 
             // steering angle
             calculateSteeringAngle();
@@ -572,7 +576,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
                 // resulting rotation
                 float frontAxleRotationThisTick = (float) (forwardSpeed * 5.34);
-                float backAxleRotationThisTick = frontAxleRotationThisTick + this.getEngineRevs();
+                float backAxleRotationThisTick = frontAxleRotationThisTick + this.getEngineRevs() / 33;
 
 
 
@@ -595,7 +599,8 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
                 // ---------------- sounds ----------------
 
-                this.setSoundScaling(((float) forwardSpeed * 5) + (Math.abs(this.getEngineRevs()) * 10));
+                //this.setSoundScaling(((float) forwardSpeed * 5) + (Math.abs(this.getEngineRevs()) / 5));
+                this.setSoundScaling(Math.abs(this.getEngineRevs()));
 
                 if (this.getWorld().isClient) {
                     if (this.hasPassengers() && !this.engineSoundStarted) {
@@ -662,30 +667,31 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     }
 
     private void calculateEngineRevs() {
-        if (pressingForward) {
-            // positive acceleration
-            this.engineRevs += ENGINE_ACCELERATION;
-        } else if (pressingBack) {
-            // negative acceleration
-            this.engineRevs -= ENGINE_ACCELERATION;
+        this.engineRevsPrev = this.engineRevs;
+
+        if(pressingForward) {
+            float dMax = 1.0f - (this.engineRevs / ENGINE_REVS_MAX);
+            float dynamicAccel = ENGINE_ACCELERATION * Math.max(0.2f, dMax);
+            this.engineRevs += dynamicAccel;
+        } else if(pressingBack) {
+            float distanceToMin = 1.0f - (this.engineRevs / ENGINE_REVS_MIN);
+            float dynamicAccel = ENGINE_ACCELERATION * Math.max(0.2f, distanceToMin);
+            this.engineRevs -= dynamicAccel;
         } else {
-            // no button pressed => slow return to idle
             this.engineRevs = applyEngineFlywheel(this.engineRevs);
         }
-        this.engineRevs = MathHelper.clamp(this.engineRevs, 0 - (ENGINE_ACCELERATION * 25), 0 + (ENGINE_ACCELERATION * 25));
+        this.engineRevs = MathHelper.clamp(this.engineRevs, ENGINE_REVS_MIN, ENGINE_REVS_MAX);
     }
 
-    private float applyEngineFlywheel(float engineRotationDelta) {
-        if(engineRotationDelta < (0 + ENGINE_ACCELERATION * 2) && engineRotationDelta > (0 - ENGINE_ACCELERATION * 2)) {
-            engineRotationDelta = 0;
-        } else if(engineRotationDelta > 0) {
-            engineRotationDelta -= ENGINE_ACCELERATION * 2;
-        } else if(engineRotationDelta < 0) {
-            engineRotationDelta += ENGINE_ACCELERATION * 2;
+    private float applyEngineFlywheel(float currentRevs) {
+        currentRevs *= 0.90f;
+        if (Math.abs(currentRevs) < (ENGINE_ACCELERATION * 0.1f)) {
+            return 0.0f;
         }
-
-        return engineRotationDelta;
+        return currentRevs;
     }
+
+
 
     private void tickKeyFob() {
         // only do something when active
