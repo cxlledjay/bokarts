@@ -3,6 +3,7 @@ package de.cxlledjay.bokarts.hud.custom;
 import com.mojang.blaze3d.systems.RenderSystem;
 import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.config.BoKartsConfig;
+import de.cxlledjay.bokarts.config.ClientSyncedConfig;
 import de.cxlledjay.bokarts.entity.custom.kart.KartEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -12,7 +13,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 
-import java.util.EnumMap;
 import java.util.Map;
 
 public class KartHudOverlay {
@@ -20,11 +20,15 @@ public class KartHudOverlay {
     // textures
     private final static Identifier SPEEDOMETER_TEXTURE = BoKarts.id("textures/gui/kart_hud/speedometer.png");
     private final static Identifier SPEEDOMETER_NEEDLE = BoKarts.id("textures/gui/kart_hud/speedometer_needle.png");
+    private final static Identifier FUEL_GAUGE_TEXTURE = BoKarts.id("textures/gui/kart_hud/fuel_gauge.png");
+    private final static Identifier FUEL_GAUGE_NEEDLE = BoKarts.id("textures/gui/kart_hud/fuel_gauge_needle.png");
 
     // animations
-    private final static float NEEDLE_ROTATION_OFF = -120.0f;
-    private final static float NEEDLE_ROTATION_IDLE = -93.0f;
-    private final static float NEEDLE_ROTATION_MAX = 42.0f;
+    private final static float SPEEDO_NEEDLE_ROTATION_OFF = -120.0f;
+    private final static float SPEEDO_NEEDLE_ROTATION_IDLE = -93.0f;
+    private final static float SPEEDO_NEEDLE_ROTATION_MAX = 42.0f;
+    private final static float FUEL_GAUGE_NEEDLE_ROTATION_MIN = -60.0f;
+    private final static float FUEL_GAUGE_NEEDLE_ROTATION_MAX = 60.0f;
 
     // speed calculation
     private static final Map<BoKartsConfig.KartSpeedUnit, Float> SPEED_CONVERSION_MAP = Map.of(
@@ -50,13 +54,14 @@ public class KartHudOverlay {
             int screenWidth = context.getScaledWindowWidth();
             int screenHeight = context.getScaledWindowHeight();
 
+            // lerping
+            float delta = tickCounter.getTickDelta(true);
+
             // ----- render speedometer -----
             int speedoSize = (int) (BoKartsConfig.kartHudScale * ((float) screenHeight / 3));
             int speedoX = screenWidth - speedoSize - BoKartsConfig.kartHudPadding;
             int speedoY = screenHeight - speedoSize - BoKartsConfig.kartHudPadding;
 
-            // lerping
-            float delta = tickCounter.getTickDelta(true);
 
             // speedo
             RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, BoKartsConfig.kartHudTransparency);
@@ -71,13 +76,14 @@ public class KartHudOverlay {
 
             // get needle rotation
             float smoothRevs = MathHelper.lerp(delta, kart.engineRevsPrev, kart.engineRevs);
-            float needleRotation= NEEDLE_ROTATION_OFF;
-            if(!kart.canNotDrive()) needleRotation = NEEDLE_ROTATION_IDLE + Math.abs(smoothRevs / KartEntity.ENGINE_REVS_MAX) * (NEEDLE_ROTATION_MAX - NEEDLE_ROTATION_IDLE);
+            float speedoNeedleRotation= SPEEDO_NEEDLE_ROTATION_OFF;
+            if(!kart.canNotDrive()) speedoNeedleRotation =
+                    SPEEDO_NEEDLE_ROTATION_IDLE + Math.abs(smoothRevs / KartEntity.ENGINE_REVS_MAX) * (SPEEDO_NEEDLE_ROTATION_MAX - SPEEDO_NEEDLE_ROTATION_IDLE);
 
             // render rotated needle
             context.getMatrices().push();
             context.getMatrices().translate(speedoX + ((float) speedoSize / 2), speedoY + ((float) speedoSize / 2), 0);
-            context.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(needleRotation));
+            context.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(speedoNeedleRotation));
             context.drawTexture(
                     SPEEDOMETER_NEEDLE,
                     (int) ((float) -speedoSize / 2), (int) ((float) -speedoSize / 2),
@@ -88,7 +94,9 @@ public class KartHudOverlay {
             context.getMatrices().pop();
 
             // calculate speed
-            float speed = ((float) kart.distanceThisTick) * SPEED_CONVERSION_MAP.get(BoKartsConfig.kartHudSpeedUnit);
+            BoKartsConfig.KartSpeedUnit unit = BoKartsConfig.kartHudSpeedUnit;
+            if(unit == null) unit =  BoKartsConfig.KartSpeedUnit.BLOCKS_PER_SECOND;
+            float speed = ((float) kart.distanceThisTick) * SPEED_CONVERSION_MAP.get(unit);
             String speedString = String.format("%05.1f", speed);
             int speedStringX = speedoX + (int) (speedoSize / (64.0f/19.0f));
             int speedStringY = speedoY + (int) (speedoSize / (64.0f/44.0f));
@@ -106,6 +114,48 @@ public class KartHudOverlay {
                     false
             );
             context.getMatrices().pop();
+
+
+            // ----- render fuel gauge -----
+
+            // fuel gauge
+            int fuelGaugeSize = speedoSize / 2;
+            int fuelGaugeX = speedoX - (fuelGaugeSize) - BoKartsConfig.kartHudPadding * 2;
+            int fuelGaugeY = speedoY + (fuelGaugeSize);
+
+            // draw fuel gauge
+            RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, BoKartsConfig.kartHudTransparency);
+            RenderSystem.enableBlend();
+            context.drawTexture(
+                    FUEL_GAUGE_TEXTURE,
+                    fuelGaugeX, fuelGaugeY,
+                    0, 0,
+                    fuelGaugeSize, fuelGaugeSize,
+                    fuelGaugeSize, fuelGaugeSize
+            );
+
+            // get needle rotation
+            float fuelLevelPercentage = kart.getFuelSynced() / ClientSyncedConfig.getMaxFuelCapacity();
+            float fuelNeedleRotation = FUEL_GAUGE_NEEDLE_ROTATION_MIN + fuelLevelPercentage * (FUEL_GAUGE_NEEDLE_ROTATION_MAX - FUEL_GAUGE_NEEDLE_ROTATION_MIN);
+
+
+            // render rotated needle
+            context.getMatrices().push();
+            context.getMatrices().translate(
+                    fuelGaugeX + ((float) fuelGaugeSize / 2),
+                    fuelGaugeY + ((float) fuelGaugeSize / 1.4f),
+                    0
+            );
+            context.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(fuelNeedleRotation));
+            context.drawTexture(
+                    FUEL_GAUGE_NEEDLE,
+                    (int) ((float) -fuelGaugeSize / 2), (int) ((float) -fuelGaugeSize / 2),
+                    0, 0,
+                    fuelGaugeSize, fuelGaugeSize,
+                    fuelGaugeSize, fuelGaugeSize
+            );
+            context.getMatrices().pop();
+
 
 
             // set transparency back to normal...
