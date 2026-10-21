@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "minecraft:gold_block"
+    },
+    "G": {
+      "item": "minecraft:gray_concrete"
+    },
+    "I": {
+      "item": "minecraft:gold_ingot"
+    }
+  },
+  "pattern": [
+    "IBI",
+    " I ",
+    "GGG"
+  ],
+  "result": {
+    "count": 1,
+    "id": "bokarts:trophy"
+  }
+}

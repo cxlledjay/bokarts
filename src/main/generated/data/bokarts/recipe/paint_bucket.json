@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "minecraft:bucket"
+    },
+    "D": {
+      "item": "bokarts:dye_mix"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    }
+  },
+  "pattern": [
+    " D ",
+    "IBI",
+    " I "
+  ],
+  "result": {
+    "count": 1,
+    "id": "bokarts:paint_bucket"
+  }
+}

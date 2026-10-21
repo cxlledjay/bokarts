@@ -28,6 +28,7 @@ public class ModModelProvider extends FabricModelProvider {
         itemModelGenerator.register(ModItems.CHASSIS_BLUEPRINT, Models.GENERATED);
         itemModelGenerator.register(ModItems.STEERING_WHEEL, Models.GENERATED);
         itemModelGenerator.register(ModItems.SEAT, Models.GENERATED);
+        itemModelGenerator.register(ModItems.DYE_MIX, Models.GENERATED);
         // wheels
         itemModelGenerator.register(ModItems.WHEELS_STREET, Models.GENERATED);
         itemModelGenerator.register(ModItems.WHEELS_DRIFT, Models.GENERATED);

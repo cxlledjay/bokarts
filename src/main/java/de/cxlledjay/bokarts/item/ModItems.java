@@ -1,10 +1,7 @@
 package de.cxlledjay.bokarts.item;
 
 import de.cxlledjay.bokarts.BoKarts;
-import de.cxlledjay.bokarts.item.custom.KartItem;
-import de.cxlledjay.bokarts.item.custom.KartItemv2;
-import de.cxlledjay.bokarts.item.custom.KartKey;
-import de.cxlledjay.bokarts.item.custom.LiveryTemplate;
+import de.cxlledjay.bokarts.item.custom.*;
 import de.cxlledjay.bokarts.item.custom.modification.AeroItem;
 import de.cxlledjay.bokarts.item.custom.modification.EngineItem;
 import de.cxlledjay.bokarts.item.custom.modification.SpoilerItem;
@@ -48,6 +45,11 @@ public class ModItems {
 
     // customization
     public static final Item LIVERY_TEMPLATE = registerItem("livery_template", new LiveryTemplate(LiveryTemplate.defaultLiverySettings()));
+    public static final Item DYE_MIX = registerItem("dye_mix", new Item(new Item.Settings()));
+
+    // racing
+    public static final Item RACE_REPORT = registerItem("race_report", new RaceReport(new Item.Settings()));
+
 
 
     // accessories

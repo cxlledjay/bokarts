@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "G": {
+      "item": "minecraft:gray_carpet"
+    },
+    "I": {
+      "item": "minecraft:iron_block"
+    },
+    "L": {
+      "item": "bokarts:livery_template"
+    },
+    "R": {
+      "item": "minecraft:red_concrete"
+    }
+  },
+  "pattern": [
+    "GGG",
+    "RLR",
+    "III"
+  ],
+  "result": {
+    "count": 1,
+    "id": "bokarts:livery_workbench"
+  }
+}

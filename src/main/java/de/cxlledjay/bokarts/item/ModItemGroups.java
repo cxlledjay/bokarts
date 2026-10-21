@@ -23,10 +23,11 @@ public class ModItemGroups {
                         //entries.add(new ItemStack(ModItems.KART_ITEM));
 
                         // ----- crafting ingredients -----
-                        // chassis
+                        // crafting
                         entries.add(new ItemStack(ModItems.CHASSIS_BLUEPRINT));
                         entries.add(new ItemStack(ModItems.STEERING_WHEEL));
                         entries.add(new ItemStack(ModItems.SEAT));
+                        entries.add(new ItemStack(ModItems.DYE_MIX));
                         // wheels
                         entries.add(new ItemStack(ModItems.WHEELS_STREET));
                         entries.add(new ItemStack(ModItems.WHEELS_DRIFT));

@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.minecraft.data.server.recipe.RecipeExporter;
 import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
+import net.minecraft.data.server.recipe.ShapelessRecipeJsonBuilder;
 import net.minecraft.data.server.recipe.SmithingTransformRecipeJsonBuilder;
 import net.minecraft.item.Items;
 import net.minecraft.recipe.Ingredient;
@@ -244,6 +245,15 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .criterion(hasItem(Items.PAPER), conditionsFromItem(Items.PAPER))
                 .offerTo(exporter);
 
+        ShapelessRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, ModItems.DYE_MIX)
+                .input(Items.RED_DYE)
+                .input(Items.GREEN_DYE)
+                .input(Items.BLUE_DYE)
+                .criterion(hasItem(Items.RED_DYE), conditionsFromItem(Items.RED_DYE))
+                .criterion(hasItem(Items.GREEN_DYE), conditionsFromItem(Items.GREEN_DYE))
+                .criterion(hasItem(Items.BLUE_DYE), conditionsFromItem(Items.BLUE_DYE))
+                .offerTo(exporter);
+
 
         // --- key ---
         ShapedRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, ModItems.KEY_BLANK)
@@ -255,6 +265,23 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .criterion(hasItem(Items.IRON_INGOT), conditionsFromItem(Items.IRON_INGOT))
                 .criterion(hasItem(Items.BLACK_DYE), conditionsFromItem(Items.BLACK_DYE))
                 .offerTo(exporter);
+        ShapedRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, ModItems.KEY_PAIRING_TOOL)
+                .pattern("IDI")
+                .pattern("CKC")
+                .pattern("IDI")
+                .input('I', Items.IRON_INGOT)
+                .input('C', Items.COMPARATOR)
+                .input('D', Items.DIAMOND)
+                .input('K', ModItems.KEY_BLANK)
+                .criterion(hasItem(Items.IRON_INGOT), conditionsFromItem(Items.IRON_INGOT))
+                .criterion(hasItem(Items.COMPARATOR), conditionsFromItem(Items.COMPARATOR))
+                .criterion(hasItem(Items.DIAMOND), conditionsFromItem(Items.DIAMOND))
+                .criterion(hasItem(ModItems.KEY_BLANK), conditionsFromItem(ModItems.KEY_BLANK))
+                .offerTo(exporter);
+
+
+
+        // ========== blocks ==========
 
 
         // --- lift ---
@@ -284,5 +311,45 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .criterion(hasItem(Items.LEVER), conditionsFromItem(Items.LEVER))
                 .criterion(hasItem(Items.WAXED_OXIDIZED_COPPER), conditionsFromItem(Items.WAXED_OXIDIZED_COPPER))
                 .offerTo(exporter, BoKarts.id("kart_lift_crafting1"));
+
+        // workbenches for liveries
+        ShapedRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, ModBlocks.LIVERY_WORKBENCH)
+                .pattern("GGG")
+                .pattern("RLR")
+                .pattern("III")
+                .input('G', Items.GRAY_CARPET)
+                .input('R', Items.RED_CONCRETE)
+                .input('I', Items.IRON_BLOCK)
+                .input('L', ModItems.LIVERY_TEMPLATE)
+                .criterion(hasItem(Items.GRAY_CARPET), conditionsFromItem(Items.GRAY_CARPET))
+                .criterion(hasItem(Items.RED_CONCRETE), conditionsFromItem(Items.RED_CONCRETE))
+                .criterion(hasItem(Items.IRON_BLOCK), conditionsFromItem(Items.IRON_BLOCK))
+                .criterion(hasItem(ModItems.LIVERY_TEMPLATE), conditionsFromItem(ModItems.LIVERY_TEMPLATE))
+                .offerTo(exporter);
+        ShapedRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, ModBlocks.PAINT_BUCKET)
+                .pattern(" D ")
+                .pattern("IBI")
+                .pattern(" I ")
+                .input('B', Items.BUCKET)
+                .input('I', Items.IRON_INGOT)
+                .input('D', ModItems.DYE_MIX)
+                .criterion(hasItem(Items.BUCKET), conditionsFromItem(Items.BUCKET))
+                .criterion(hasItem(Items.IRON_INGOT), conditionsFromItem(Items.IRON_INGOT))
+                .criterion(hasItem(ModItems.DYE_MIX), conditionsFromItem(ModItems.DYE_MIX))
+                .offerTo(exporter);
+
+        // trophy
+        ShapedRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, ModBlocks.TROPHY)
+                .pattern("IBI")
+                .pattern(" I ")
+                .pattern("GGG")
+                .input('B', Items.GOLD_BLOCK)
+                .input('I', Items.GOLD_INGOT)
+                .input('G', Items.GRAY_CONCRETE)
+                .criterion(hasItem(Items.GOLD_BLOCK), conditionsFromItem(Items.GOLD_BLOCK))
+                .criterion(hasItem(Items.GOLD_INGOT), conditionsFromItem(Items.GOLD_INGOT))
+                .criterion(hasItem(Items.GRAY_CONCRETE), conditionsFromItem(Items.GRAY_CONCRETE))
+                .offerTo(exporter);
+
     }
 }
