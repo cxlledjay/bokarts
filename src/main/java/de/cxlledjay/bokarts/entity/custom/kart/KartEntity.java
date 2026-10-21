@@ -191,21 +191,21 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         BlockState groundBlock = this.getWorld().getBlockState(this.getSteppingPos());
 
         // calculated ice boat slipperiness
-        float slipperiness = ClientSyncedConfig.getSlipperinessNoPassenger(); //< default: no passenger
+        float slipperiness = 0.6f; //< default: no passenger
 
         // check if a player is controlling it
         if(hasControllingPassenger() && getControllingPassenger() instanceof PlayerEntity) {
             if(pressingSlow) {
                 // player wants to go slow (maneuvering)
-                slipperiness = ClientSyncedConfig.getSlipperinessSlowed();
+                slipperiness = 0.75f;
             } else {
                 // normal driving => check block
                 if(isDrivableBlock(groundBlock)) {
                     // on a road
-                    slipperiness = ClientSyncedConfig.getSlipperinessDriveable();
+                    slipperiness = 0.98f;
                 } else {
                     // off-road
-                    slipperiness = ClientSyncedConfig.getSlipperinessNonDriveable();
+                    slipperiness = 0.9f;
                 }
             }
         }
@@ -513,7 +513,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
         if(this.pressingForward || this.pressingBack) {
             // we are accelerating: consume fuel!
-            this.currentFuel = Math.max(0, this.currentFuel - ClientSyncedConfig.getFuelConsumptionPerTick()); // prevent going under 0
+            this.currentFuel = Math.max(0, this.currentFuel - 0.7625f); // prevent going under 0
         }
         this.currentOdometer += (float) this.distanceThisTick;
 

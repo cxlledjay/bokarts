@@ -88,7 +88,7 @@ public class PaintBucketScreenHandler extends ScreenHandler {
         this.colorMixInputSlot = this.addSlot(new Slot(inventory, 1, 65, 72) {
             @Override
             public boolean canInsert(ItemStack stack) {
-                return stack.isOf(Items.CLAY_BALL);
+                return stack.isOf(ModItems.DYE_MIX);
             }
 
             @Override

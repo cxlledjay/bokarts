@@ -12,13 +12,8 @@ public class ClientSyncedConfig {
             // Grab the server's authoritative config value
             ConfigSyncS2C payload = new ConfigSyncS2C(
                     BoKartsConfig.maxFuelCapacity,
-                    BoKartsConfig.fuelConsumptionPerTick,
                     BoKartsConfig.fuelTimeToRangeConversion,
-                    BoKartsConfig.maxTicksInWater,
-                    BoKartsConfig.slipperinessDriveable,
-                    BoKartsConfig.slipperinessNonDriveable,
-                    BoKartsConfig.slipperinessSlowed,
-                    BoKartsConfig.slipperinessNoPassenger
+                    BoKartsConfig.maxTicksInWater
             );
 
             // Send it to the player who just joined
@@ -48,11 +43,6 @@ public class ClientSyncedConfig {
         return (isUsingServerConfig) ? (activeMaxFuelCapacity) : (BoKartsConfig.maxFuelCapacity);
     }
 
-    public static float activeFuelConsumptionPerTick = BoKartsConfig.fuelConsumptionPerTick;
-    public static float getFuelConsumptionPerTick() {
-        return (isUsingServerConfig) ? (activeFuelConsumptionPerTick) : (BoKartsConfig.fuelConsumptionPerTick);
-    }
-
     public static float activeFuelTimeToRangeConversion = BoKartsConfig.fuelTimeToRangeConversion;
     public static float getFuelTimeToRangeConversion() {
         return (isUsingServerConfig) ? (activeFuelTimeToRangeConversion) : (BoKartsConfig.fuelTimeToRangeConversion);
@@ -61,26 +51,6 @@ public class ClientSyncedConfig {
     public static int activeMaxTicksInWater = BoKartsConfig.maxTicksInWater;
     public static int getMaxTicksInWater() {
         return (isUsingServerConfig) ? (activeMaxTicksInWater) : (BoKartsConfig.maxTicksInWater);
-    }
-
-    public static float activeSlipperinessDriveable = BoKartsConfig.slipperinessDriveable;
-    public static float getSlipperinessDriveable() {
-        return (isUsingServerConfig) ? (activeSlipperinessDriveable) : (BoKartsConfig.slipperinessDriveable);
-    }
-
-    public static float activeSlipperinessNonDriveable = BoKartsConfig.slipperinessNonDriveable;
-    public static float getSlipperinessNonDriveable() {
-        return (isUsingServerConfig) ? (activeSlipperinessNonDriveable) : (BoKartsConfig.slipperinessNonDriveable);
-    }
-
-    public static float activeSlipperinessSlowed = BoKartsConfig.slipperinessSlowed;
-    public static float getSlipperinessSlowed() {
-        return (isUsingServerConfig) ? (activeSlipperinessSlowed) : (BoKartsConfig.slipperinessSlowed);
-    }
-
-    public static float activeSlipperinessNoPassenger = BoKartsConfig.slipperinessNoPassenger;
-    public static float getSlipperinessNoPassenger() {
-        return (isUsingServerConfig) ? (activeSlipperinessNoPassenger) : (BoKartsConfig.slipperinessNoPassenger);
     }
 
 }

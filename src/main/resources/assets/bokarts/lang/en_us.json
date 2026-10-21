@@ -107,37 +107,34 @@
 
 
 
-  "bokarts.midnightconfig.title": "BoKart Settings",
-
   "bokarts.midnightconfig.category.server": "Server Settings",
-  "bokarts.midnightconfig.category.client": "Cient Settings",
+  "bokarts.midnightconfig.category.client": "Client Settings",
 
-  "bokarts.midnightconfig.hornPreviewVolume": "Horn Preview Volume",
-  "bokarts.midnightconfig.hornPreviewVolume.tooltip": "To disable preview, set to 0.0f. 1.0f is as loud as the normal horn",
+  "bokarts.midnightconfig.headingHud": "Kart HUD Settings",
 
-  "bokarts.midnightconfig.maxFuelCapacity": "Maximum Fuel Capacity (mL)",
-  "bokarts.midnightconfig.maxFuelCapacity.tooltip": "The maximum amount of fuel a Kart can carry",
+  "bokarts.midnightconfig.enableKartHud": "Enable HUD",
+  "bokarts.midnightconfig.kartHudScale": "Scale",
+  "bokarts.midnightconfig.kartHudPadding": "Padding",
+  "bokarts.midnightconfig.kartHudPadding.tooltip": "Distance (in pixels) from the edge of the screen",
+  "bokarts.midnightconfig.kartHudTransparency": "Opacity",
+  "bokarts.midnightconfig.kartHudTextColor": "Text color",
+  "bokarts.midnightconfig.kartHudSpeedUnit": "Unit",
 
-  "bokarts.midnightconfig.fuelConsumptionPerTick": "Fuel Consumption Per Tick (mL)",
-  "bokarts.midnightconfig.fuelConsumptionPerTick.tooltip": "The amount of fuel consumed when accelerating (per Tick)",
+  "bokarts.midnightconfig.enum.KartSpeedUnit.BLOCKS_PER_SECOND": "Blocks per Second (bps)",
+  "bokarts.midnightconfig.enum.KartSpeedUnit.KILOMETRES_PER_HOUR": "Kilometers per Hour (kph)",
+  "bokarts.midnightconfig.enum.KartSpeedUnit.BURGERS_PER_FREEDOM": "Burgers per Freedom (mph)",
 
-  "bokarts.midnightconfig.fuelTimeToRangeConversion": "Furnace Burn Time Multiplier",
-  "bokarts.midnightconfig.fuelTimeToRangeConversion.tooltip": "Multiplier for converting vanilla furnace burn time into fuel amount in mL (e.g. Coal burns for 1600 ticks --> fuel = multiplier * 1600; e.g. with multiplier = 0.5: fuel = 0.5 * 1600 = 800 (mL))",
+  "bokarts.midnightconfig.headingSounds": "Sound Settings",
+  "bokarts.midnightconfig.hornPreviewVolume": "Horn preview volume",
 
-  "bokarts.midnightconfig.maxTicksInWater": "Maximum Time allowed in Water",
-  "bokarts.midnightconfig.maxTicksInWater.tooltip": "Time (in Ticks) until Kart is destroyed in Water",
+  "bokarts.midnightconfig.headingFuel": "Fuel Settings",
+  "bokarts.midnightconfig.maxFuelCapacity": "Fuel tank size (in mL)",
+  "bokarts.midnightconfig.fuelTimeToRangeConversion": "Furnace burn time multiplier",
+  "bokarts.midnightconfig.fuelTimeToRangeConversion.tooltip": "Multiplier for converting vanilla furnace burn time into fuel amount in mL (e.g. coal burns for 1600 ticks --> fuel = multiplier * 1600; e.g. with multiplier = 0.5: fuel = 0.5 * 1600 = 800 (mL))",
 
-  "bokarts.midnightconfig.physicsWarning": "§cExpert only Settings",
 
-  "bokarts.midnightconfig.slipperinessDriveable": "Slipperiness Constant (Driveable Blocks)",
-  "bokarts.midnightconfig.slipperinessDriveable.tooltip": "Applied when Kart is on blocks marked with tag #bokarts:driveable_block. To mimic Packed Ice: 0.98; To mimic Blue Ice: 0.989",
+  "bokarts.midnightconfig.headingOther": "Other settings",
 
-  "bokarts.midnightconfig.slipperinessNonDriveable": "Slipperiness Constant (Off-Road)",
-  "bokarts.midnightconfig.slipperinessNonDriveable.tooltip": "Applied when Kart is on blocks NOT marked with tag #bokarts:driveable_block",
-
-  "bokarts.midnightconfig.slipperinessSlowed": "Slipperiness Constant (Slowed)",
-  "bokarts.midnightconfig.slipperinessSlowed.tooltip": "Applied when Kart is actively slowed by the player (via the jump key)",
-
-  "bokarts.midnightconfig.slipperinessNoPassenger": "Slipperiness Constant (Empty Kart)",
-  "bokarts.midnightconfig.slipperinessNoPassenger.tooltip": "Applied when Kart has no driver"
+  "bokarts.midnightconfig.maxTicksInWater": "Maximum time allowed in water",
+  "bokarts.midnightconfig.maxTicksInWater.tooltip": "Time (in ticks) until kart is destroyed in water"
 }

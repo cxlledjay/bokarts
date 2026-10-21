@@ -10,13 +10,8 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 public record ConfigSyncS2C(
         float maxFuelCapacity,
-        float fuelConsumptionPerTick,
         float fuelTimeToRangeConversion,
-        int maxTicksInWater,
-        float slipperinessDriveable,
-        float slipperinessNonDriveable,
-        float slipperinessSlowed,
-        float slipperinessNoPassenger
+        int maxTicksInWater
 ) implements CustomPayload {
 
     public static final CustomPayload.Id<ConfigSyncS2C> ID = new CustomPayload.Id<>(BoKarts.id("config_sync"));
@@ -33,25 +28,15 @@ public record ConfigSyncS2C(
 
     private void write(RegistryByteBuf buf) {
         buf.writeFloat(this.maxFuelCapacity);
-        buf.writeFloat(this.fuelConsumptionPerTick);
         buf.writeFloat(this.fuelTimeToRangeConversion);
         buf.writeInt(this.maxTicksInWater);
-        buf.writeFloat(this.slipperinessDriveable);
-        buf.writeFloat(this.slipperinessNonDriveable);
-        buf.writeFloat(this.slipperinessSlowed);
-        buf.writeFloat(this.slipperinessNoPassenger);
     }
 
     private static ConfigSyncS2C read(RegistryByteBuf buf) {
         return new ConfigSyncS2C(
                 buf.readFloat(),
                 buf.readFloat(),
-                buf.readFloat(),
-                buf.readInt(),
-                buf.readFloat(),
-                buf.readFloat(),
-                buf.readFloat(),
-                buf.readFloat()
+                buf.readInt()
         );
     }
 
@@ -60,13 +45,8 @@ public record ConfigSyncS2C(
         ctx.client().execute(() -> {
             ClientSyncedConfig.isUsingServerConfig = true;
             ClientSyncedConfig.activeMaxFuelCapacity = payload.maxFuelCapacity();
-            ClientSyncedConfig.activeFuelConsumptionPerTick = payload.fuelConsumptionPerTick();
             ClientSyncedConfig.activeFuelTimeToRangeConversion = payload.fuelTimeToRangeConversion();
             ClientSyncedConfig.activeMaxTicksInWater = payload.maxTicksInWater();
-            ClientSyncedConfig.activeSlipperinessDriveable = payload.slipperinessDriveable();
-            ClientSyncedConfig.activeSlipperinessNonDriveable = payload.slipperinessNonDriveable();
-            ClientSyncedConfig.activeSlipperinessSlowed = payload.slipperinessSlowed();
-            ClientSyncedConfig.activeSlipperinessNoPassenger = payload.slipperinessNoPassenger();
         });
     }
 }
