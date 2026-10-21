@@ -73,6 +73,22 @@ public class ModBlocks {
     ));
 
     // racing weekend blocks
+    public static final Block TRACK_TIMER_BLOCK = registerBlock("track_timer_block", new TrackTimer(
+            AbstractBlock.Settings.create()
+                    .mapColor(MapColor.DEEPSLATE_GRAY)
+                    .sounds(BlockSoundGroup.TRIAL_SPAWNER)
+                    .strength(2.5f)
+                    .requiresTool()
+                    .pistonBehavior(PistonBehavior.BLOCK)
+    ));
+    public static final Block TRACK_TIMER_REFLECTOR_BLOCK = registerBlock("track_timer_reflector_block", new TrackTimerReflector(
+            AbstractBlock.Settings.create()
+                    .mapColor(MapColor.DEEPSLATE_GRAY)
+                    .sounds(BlockSoundGroup.TRIAL_SPAWNER)
+                    .strength(2.5f)
+                    .requiresTool()
+                    .pistonBehavior(PistonBehavior.BLOCK)
+    ));
 
 
 

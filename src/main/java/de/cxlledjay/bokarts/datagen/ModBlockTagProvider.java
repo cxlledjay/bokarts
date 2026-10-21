@@ -21,14 +21,19 @@ public class ModBlockTagProvider extends FabricTagProvider.BlockTagProvider {
                 .add(ModBlocks.KART_LIFT_DUMMY)
                 .add(ModBlocks.LIVERY_WORKBENCH)
                 .add(ModBlocks.PAINT_BUCKET)
-                .add(ModBlocks.TROPHY);
+                .add(ModBlocks.TROPHY)
+                .add(ModBlocks.TRACK_TIMER_BLOCK)
+                .add(ModBlocks.TRACK_TIMER_REFLECTOR_BLOCK);
 
         getOrCreateTagBuilder(BlockTags.NEEDS_IRON_TOOL)
                 .add(ModBlocks.KART_LIFT)
                 .add(ModBlocks.KART_LIFT_DUMMY)
                 .add(ModBlocks.LIVERY_WORKBENCH)
                 .add(ModBlocks.PAINT_BUCKET)
-                .add(ModBlocks.TROPHY);
+                .add(ModBlocks.TROPHY)
+                .add(ModBlocks.TRACK_TIMER_BLOCK)
+                .add(ModBlocks.TRACK_TIMER_REFLECTOR_BLOCK);
+
 
         getOrCreateTagBuilder(BlockTags.AXE_MINEABLE)
                 .add(ModBlocks.HORN_BLOCK);

@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "bokarts:item/track_report_layer0",
+    "layer1": "bokarts:item/track_report_layer1"
+  }
+}

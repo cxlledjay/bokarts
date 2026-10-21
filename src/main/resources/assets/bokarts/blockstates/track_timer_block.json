@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "bokarts:block/track_timer_block"
+    }
+  }
+}

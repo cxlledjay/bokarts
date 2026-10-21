@@ -48,7 +48,7 @@ public class ModItems {
     public static final Item DYE_MIX = registerItem("dye_mix", new Item(new Item.Settings()));
 
     // racing
-    public static final Item RACE_REPORT = registerItem("race_report", new RaceReport(new Item.Settings()));
+    public static final Item TRACK_REPORT = registerItem("track_report", new TrackReport(new Item.Settings()));
 
 
 

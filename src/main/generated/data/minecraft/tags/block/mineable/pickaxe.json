@@ -4,6 +4,8 @@
     "bokarts:kart_lift_dummy_block",
     "bokarts:livery_workbench",
     "bokarts:paint_bucket",
-    "bokarts:trophy"
+    "bokarts:trophy",
+    "bokarts:track_timer_block",
+    "bokarts:track_timer_reflector_block"
   ]
 }

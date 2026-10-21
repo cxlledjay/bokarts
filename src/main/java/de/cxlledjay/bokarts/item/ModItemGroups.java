@@ -63,6 +63,9 @@ public class ModItemGroups {
                         entries.add(new ItemStack(ModBlocks.PAINT_BUCKET));
                         entries.add(new ItemStack(ModBlocks.TROPHY));
                         entries.add(new ItemStack(ModBlocks.HORN_BLOCK));
+                        entries.add(new ItemStack(ModBlocks.TRACK_TIMER_BLOCK));
+                        entries.add(new ItemStack(ModBlocks.TRACK_TIMER_REFLECTOR_BLOCK));
+
                     }).build());
 
     public static void registerItemGroups() {
