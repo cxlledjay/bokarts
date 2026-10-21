@@ -22,6 +22,7 @@ public class KartHudOverlay {
     private final static Identifier SPEEDOMETER_NEEDLE = BoKarts.id("textures/gui/kart_hud/speedometer_needle.png");
     private final static Identifier FUEL_GAUGE_TEXTURE = BoKarts.id("textures/gui/kart_hud/fuel_gauge.png");
     private final static Identifier FUEL_GAUGE_NEEDLE = BoKarts.id("textures/gui/kart_hud/fuel_gauge_needle.png");
+    private final static Identifier LOW_FUEL_WARNING_TEXTURE = BoKarts.id("textures/gui/kart_hud/low_fuel_warning.png");
 
     // animations
     private final static float SPEEDO_NEEDLE_ROTATION_OFF = -120.0f;
@@ -155,6 +156,25 @@ public class KartHudOverlay {
                     fuelGaugeSize, fuelGaugeSize
             );
             context.getMatrices().pop();
+
+
+            // -------------------- low fuel warning --------------------
+            if(fuelLevelPercentage < 1f/6f) {
+                int lowFuelWarningSize = (int) (BoKartsConfig.kartHudScale * ((float) screenHeight / 8));
+                int lowFuelWarningX = screenWidth - lowFuelWarningSize - BoKartsConfig.kartHudPadding;
+                int lowFuelWarningY = BoKartsConfig.kartHudPadding;
+
+                // draw low fuel warning
+                RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, BoKartsConfig.kartHudTransparency);
+                RenderSystem.enableBlend();
+                context.drawTexture(
+                        LOW_FUEL_WARNING_TEXTURE,
+                        lowFuelWarningX, lowFuelWarningY,
+                        0, 0,
+                        lowFuelWarningSize, lowFuelWarningSize,
+                        lowFuelWarningSize, lowFuelWarningSize
+                );
+            }
 
 
 

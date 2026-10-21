@@ -750,7 +750,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
                 this.getX(), this.getY(), this.getZ(),
                 this.getHornType().getSoundEvent(),
                 SoundCategory.PLAYERS,
-                0.8f, // Volume
+                0.75f, // Volume
                 1.0f  // Pitch
         );
     }
