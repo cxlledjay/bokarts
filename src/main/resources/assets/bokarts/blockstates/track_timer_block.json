@@ -1,7 +1,19 @@
 {
   "variants": {
-    "": {
+    "facing=east": {
+      "model": "bokarts:block/track_timer_block",
+      "y": 90
+    },
+    "facing=north": {
       "model": "bokarts:block/track_timer_block"
+    },
+    "facing=south": {
+      "model": "bokarts:block/track_timer_block",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "bokarts:block/track_timer_block",
+      "y": 270
     }
   }
 }

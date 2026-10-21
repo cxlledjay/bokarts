@@ -10,7 +10,6 @@ import de.cxlledjay.bokarts.entity.custom.ModTrackedDataHandlers;
 import de.cxlledjay.bokarts.item.ModItemGroups;
 import de.cxlledjay.bokarts.item.ModItems;
 import de.cxlledjay.bokarts.networking.ModPackets;
-import de.cxlledjay.bokarts.recipes.ModRecipes;
 import de.cxlledjay.bokarts.screen.ModScreenHandlers;
 import de.cxlledjay.bokarts.sound.ModSounds;
 import de.cxlledjay.bokarts.stats.ModStats;
@@ -38,7 +37,6 @@ public class BoKarts implements ModInitializer {
 		ModScreenHandlers.register();
 		ModStats.register();
 		ModDataComponentTypes.register();
-		ModRecipes.register();
 		ModBlocks.register();
 		ModBlockEntities.registerBlockEntities();
 		ModItemGroups.registerItemGroups();

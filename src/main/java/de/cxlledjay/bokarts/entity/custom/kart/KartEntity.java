@@ -981,9 +981,14 @@ public class KartEntity extends BoatEntity implements RideableInventory{
                 default -> 0xFFFFFF;
             };
 
+            WheelType wheelType = WheelType.DRIFT;
+            EngineType engineType = EngineType.ENGINE_COPPER;
+
             this.setBodyType(bodyType);
             this.setBodyColor(bodyColor);
             this.setWheelColor(wheelColor);
+            this.setWheelType(wheelType);
+            this.setEngineType(engineType);
         }
 
         if (nbt.contains("Fuel")) this.setFuelSynced(nbt.getFloat("Fuel"));

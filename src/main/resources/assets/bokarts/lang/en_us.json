@@ -86,6 +86,8 @@
   "block.bokarts.paint_bucket": "Paint Bucket",
   "block.bokarts.trophy": "Trophy",
   "block.bokarts.horn_block": "Horn Block",
+  "block.bokarts.track_timer_block": "Track Timer (Console)",
+  "block.bokarts.track_timer_reflector_block": "Track Timer (Reflector)",
 
   "entity.bokarts.kart" : "Kart",
   "sounds.bokarts.kart_engine": "Kart Engine",

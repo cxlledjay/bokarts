@@ -22,6 +22,19 @@ public class ModItemGroups {
                         // the kart
                         //entries.add(new ItemStack(ModItems.KART_ITEM));
 
+                        // normal blocks
+                        entries.add(new ItemStack(ModBlocks.HORN_BLOCK));
+                        entries.add(new ItemStack(ModBlocks.TRACK_TIMER_BLOCK));
+                        entries.add(new ItemStack(ModBlocks.TRACK_TIMER_REFLECTOR_BLOCK));
+
+                        // custom block models
+                        entries.add(new ItemStack(ModBlocks.KART_LIFT));
+                        entries.add(new ItemStack(ModBlocks.LIVERY_WORKBENCH));
+                        entries.add(new ItemStack(ModBlocks.PAINT_BUCKET));
+                        entries.add(new ItemStack(ModBlocks.TROPHY));
+
+                        // items
+
                         // ----- crafting ingredients -----
                         // crafting
                         entries.add(new ItemStack(ModItems.CHASSIS_BLUEPRINT));
@@ -56,15 +69,6 @@ public class ModItemGroups {
                         entries.add(new ItemStack(ModItems.KEY_BLANK));
                         //entries.add(new ItemStack(ModItems.KEY_PAIRED));
                         entries.add(new ItemStack(ModItems.KEY_PAIRING_TOOL));
-
-                        // blocks
-                        entries.add(new ItemStack(ModBlocks.KART_LIFT));
-                        entries.add(new ItemStack(ModBlocks.LIVERY_WORKBENCH));
-                        entries.add(new ItemStack(ModBlocks.PAINT_BUCKET));
-                        entries.add(new ItemStack(ModBlocks.TROPHY));
-                        entries.add(new ItemStack(ModBlocks.HORN_BLOCK));
-                        entries.add(new ItemStack(ModBlocks.TRACK_TIMER_BLOCK));
-                        entries.add(new ItemStack(ModBlocks.TRACK_TIMER_REFLECTOR_BLOCK));
 
                     }).build());
 
