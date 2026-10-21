@@ -62,6 +62,7 @@ public class ModItemGroups {
                         entries.add(new ItemStack(ModBlocks.LIVERY_WORKBENCH));
                         entries.add(new ItemStack(ModBlocks.PAINT_BUCKET));
                         entries.add(new ItemStack(ModBlocks.TROPHY));
+                        entries.add(new ItemStack(ModBlocks.HORN_BLOCK));
                     }).build());
 
     public static void registerItemGroups() {

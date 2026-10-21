@@ -351,5 +351,15 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .criterion(hasItem(Items.GRAY_CONCRETE), conditionsFromItem(Items.GRAY_CONCRETE))
                 .offerTo(exporter);
 
+
+        // silly blocks
+        ShapelessRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, ModBlocks.HORN_BLOCK)
+                .input(Items.NOTE_BLOCK)
+                .input(ModItems.STEERING_WHEEL)
+                .criterion(hasItem(Items.NOTE_BLOCK), conditionsFromItem(Items.NOTE_BLOCK))
+                .criterion(hasItem(ModItems.STEERING_WHEEL), conditionsFromItem(ModItems.STEERING_WHEEL))
+                .offerTo(exporter);
+
+
     }
 }

@@ -4,6 +4,8 @@ import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.block.custom.*;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
+import net.minecraft.block.MapColor;
+import net.minecraft.block.enums.NoteBlockInstrument;
 import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -11,6 +13,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.text.Text;
 
 import java.util.List;
@@ -32,6 +35,8 @@ public class ModBlocks {
     // workbenches
     public static final Block LIVERY_WORKBENCH = registerBlock("livery_workbench", new LiveryWorkbench(
             AbstractBlock.Settings.create()
+                    .mapColor(MapColor.BRIGHT_RED)
+                    .sounds(BlockSoundGroup.METAL)
                     .strength(4.0f)
                     .requiresTool()
                     .nonOpaque()
@@ -39,6 +44,8 @@ public class ModBlocks {
     ));
     public static final Block PAINT_BUCKET = registerBlock("paint_bucket", new PaintBucket(
             AbstractBlock.Settings.create()
+                    .mapColor(MapColor.GRAY)
+                    .sounds(BlockSoundGroup.METAL)
                     .strength(2.5f)
                     .requiresTool()
                     .nonOpaque()
@@ -48,11 +55,24 @@ public class ModBlocks {
     // trophy
     public static final Block TROPHY = registerBlock("trophy", new Trophy(
             AbstractBlock.Settings.create()
+                    .mapColor(MapColor.GOLD)
+                    .sounds(BlockSoundGroup.METAL)
                     .strength(1.5f)
                     .requiresTool()
                     .nonOpaque()
                     .pistonBehavior(PistonBehavior.BLOCK)
     ));
+
+    // silly fun
+    public static final Block HORN_BLOCK = registerBlock("horn_block", new HornBlock(
+            AbstractBlock.Settings.create()
+                    .mapColor(MapColor.OAK_TAN)
+                    .sounds(BlockSoundGroup.WOOD)
+                    .strength(0.8F)
+                    .burnable()
+    ));
+
+    // racing weekend blocks
 
 
 

@@ -1,5 +1,6 @@
-// 1.21.1	2026-10-21T13:30:45.6387603	BoKarts/Block Loot Tables
+// 1.21.1	2026-10-21T15:29:41.9321768	BoKarts/Block Loot Tables
 64571e34d4ee8ba76101c7b5a4158820e977d6c2 data\bokarts\loot_table\blocks\kart_lift_block.json
 97d9a70d7e0e0fc48ff8b67868195901fbc85ef0 data\bokarts\loot_table\blocks\livery_workbench.json
 d980a04ac3a3161e5f0df66976f438c7ddabc44a data\bokarts\loot_table\blocks\paint_bucket.json
+0e3b00ccf026e599bf6405661a3657bf59f5b8f3 data\bokarts\loot_table\blocks\horn_block.json
 5aa41b84ec07ccf4e470dce854b64425c23dd313 data\bokarts\loot_table\blocks\trophy.json

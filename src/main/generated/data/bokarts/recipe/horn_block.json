@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:note_block"
+    },
+    {
+      "item": "bokarts:steering_wheel"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "bokarts:horn_block"
+  }
+}

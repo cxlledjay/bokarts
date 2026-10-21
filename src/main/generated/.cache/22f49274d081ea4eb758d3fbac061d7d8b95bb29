@@ -1,4 +1,4 @@
-// 1.21.1	2026-10-21T13:30:45.6387603	BoKarts/Recipes
+// 1.21.1	2026-10-21T15:29:41.9321768	BoKarts/Recipes
 0ddb3e00c058923374daa5c31928ecf32f8ab857 data\bokarts\recipe\engine_copper_crafting.json
 411427a1fe5cfb7481aec7efe6560c0f0eb15a56 data\bokarts\recipe\wheels_street.json
 2daab112e6a800b844795402504f3719c3c13920 data\bokarts\recipe\engine_gold.json
@@ -20,6 +20,8 @@ cf297ba68269d04673e1ab1cab48f51152d566e4 data\bokarts\recipe\key_pairing_tool.js
 e19cdfcc3895d9dfbb214b90fffd3ad5411a1f63 data\bokarts\advancement\recipes\transportation\engine_netherite_smithing.json
 f7e827d93f6dd986f26b929a5c04d8a9fbb364ea data\bokarts\advancement\recipes\transportation\spoiler_race.json
 73468a27ca224be57d5ce783539f05c9d6be4396 data\bokarts\recipe\spoiler_race_carbon.json
+5fa066f16be23b9a1ec7c64decb3fe8750e2e596 data\bokarts\advancement\recipes\transportation\horn_block.json
+0098ac29346f828c28f7deeca37b7d2c6a1bfdb1 data\bokarts\recipe\horn_block.json
 d0b283538d01c07cd2837679c7e183ed9029e26d data\bokarts\advancement\recipes\transportation\engine_diamond.json
 c1e124300c5a6b32f56a8aa2b7881df1655b6562 data\bokarts\advancement\recipes\transportation\dye_mix.json
 b1e5c3d935f12924f4623736c4206955e777ca0b data\bokarts\recipe\aero_race_carbon.json

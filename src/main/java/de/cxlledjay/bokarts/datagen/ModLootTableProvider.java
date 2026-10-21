@@ -19,5 +19,6 @@ public class ModLootTableProvider extends FabricBlockLootTableProvider {
         addDrop(ModBlocks.LIVERY_WORKBENCH);
         addDrop(ModBlocks.PAINT_BUCKET);
         addDrop(ModBlocks.TROPHY);
+        addDrop(ModBlocks.HORN_BLOCK);
     }
 }

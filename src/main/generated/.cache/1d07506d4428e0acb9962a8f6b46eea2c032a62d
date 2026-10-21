@@ -1,14 +1,17 @@
-// 1.21.1	2026-10-21T13:30:45.6367648	BoKarts/Model Definitions
+// 1.21.1	2026-10-21T15:29:41.9301833	BoKarts/Model Definitions
 aa6c29bfbae5db95c828d0c8d89316c33ffb3de7 assets\bokarts\blockstates\livery_workbench.json
 751e0dcd1490da8231f53fd734bebae94487c482 assets\bokarts\models\item\engine_copper.json
 a28e608b9402a053c9dde9968dca59418ad95d0e assets\bokarts\models\item\dye_mix.json
 28c584f8499b07df6b20deaa77d2e64aff49d2a0 assets\bokarts\models\item\engine_netherite.json
 f3b4c38cf3b68d672942c24d43a535da5d0b5296 assets\bokarts\models\item\spoiler_race_carbon.json
+28f07512e18d64b8cd2bc218490078fe131dd65c assets\bokarts\models\item\horn_block.json
 e91d428592c0959940ce2236f5239587a8215539 assets\bokarts\models\item\key_pairing_tool.json
 19863560fef135705b7a03a7f7f52dcf0df79018 assets\bokarts\models\item\trophy.json
 5df90c180ffd17b16fe8647c664cb4d65bc9e825 assets\bokarts\models\item\chassis_blueprint.json
+f7dab1ebd2c2bb71791c0b24230d5debfd08a721 assets\bokarts\models\block\horn_block.json
 8d677eab65e78c8b7b02cf18c8f22f92e325e92e assets\bokarts\models\item\spoiler_race.json
 266a6dd402d6934e8cdffcdfa07415ccb5ecf9b3 assets\bokarts\models\item\steering_wheel.json
+e9e465e3e9e8c922620c2244f2aa3ebdb8e08873 assets\bokarts\blockstates\horn_block.json
 c933f04d97d5302bee2909ebd72b8e00b660a16e assets\bokarts\models\item\engine_iron.json
 afec71c794aaf9bfc3e0c18cd67583f7aeb0b840 assets\bokarts\models\item\paint_bucket.json
 d6eedc19f3f301e6468610b2f63a40097ec1f3fd assets\bokarts\models\item\engine_gold.json

@@ -29,5 +29,8 @@ public class ModBlockTagProvider extends FabricTagProvider.BlockTagProvider {
                 .add(ModBlocks.LIVERY_WORKBENCH)
                 .add(ModBlocks.PAINT_BUCKET)
                 .add(ModBlocks.TROPHY);
+
+        getOrCreateTagBuilder(BlockTags.AXE_MINEABLE)
+                .add(ModBlocks.HORN_BLOCK);
     }
 }
