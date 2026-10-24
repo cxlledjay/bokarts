@@ -6,11 +6,15 @@ import de.cxlledjay.bokarts.block.entity.custom.TrackTimerBlockEntity;
 import de.cxlledjay.bokarts.screen.ModScreenHandlers;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.screen.ArrayPropertyDelegate;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,24 +31,56 @@ public class TrackTimerScreenHandler extends ScreenHandler {
     private final PropertyDelegate propertyDelegate;
     private final ScreenHandlerContext context;
     public final TrackTimerBlockEntity blockEntity;
+    private final Inventory blockInventory;
     private final World world;
 
 
 
     // client constructor
     public TrackTimerScreenHandler(int syncId, PlayerInventory playerInventory) {
-        this(syncId, playerInventory, ScreenHandlerContext.EMPTY, new ArrayPropertyDelegate(3), null);
+        this(syncId, playerInventory, ScreenHandlerContext.EMPTY, new ArrayPropertyDelegate(3), null, new SimpleInventory(10));
     }
 
-    public TrackTimerScreenHandler(int syncId, PlayerInventory playerInventory, ScreenHandlerContext context, PropertyDelegate delegate, TrackTimerBlockEntity blockEntity) {
+    public TrackTimerScreenHandler(int syncId, PlayerInventory playerInventory, ScreenHandlerContext context, PropertyDelegate delegate, TrackTimerBlockEntity blockEntity, Inventory blockInventory) {
         super(ModScreenHandlers.TRACK_TIMER_SCREEN_HANDLER, syncId);
 
         this.context = context;
         this.blockEntity = blockEntity;
         this.world = playerInventory.player.getWorld();
+        this.blockInventory = blockInventory;
 
         this.propertyDelegate = delegate;
         this.addProperties(delegate);
+
+        // paper input slot
+        this.addSlot(new Slot(blockInventory, 0, 8, 18) {
+            @Override
+            public boolean canInsert(ItemStack stack) {
+                return stack.isOf(Items.PAPER);
+            }
+        });
+        // output slots
+        for(int i = 0; i < 9; ++i) {
+            this.addSlot(new Slot(blockInventory, 1+ i, 8 + 18 * i, 60) {
+                @Override
+                public boolean canInsert(ItemStack stack) {
+                    return false;
+                }
+            });
+        }
+
+        // player inventory
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 9; j++) {
+                this.addSlot(new Slot(playerInventory, j + i * 9 + 9, 8 + j * 18, 92 + i * 18));
+            }
+        }
+
+        // player hotbar
+        for (int i = 0; i < 9; i++) {
+            this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 150));
+        }
+
     }
 
 

@@ -1,20 +1,18 @@
 package de.cxlledjay.bokarts.block.entity.custom;
 
 import de.cxlledjay.bokarts.BoKarts;
-import de.cxlledjay.bokarts.block.custom.TrackTimer;
 import de.cxlledjay.bokarts.block.entity.ModBlockEntities;
-import de.cxlledjay.bokarts.screen.custom.KartLiftScreenHandler;
 import de.cxlledjay.bokarts.screen.custom.TrackTimerScreenHandler;
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
@@ -28,10 +26,15 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
     public enum TrackTimerMode {
         TIME_ATTACK, GRAND_PRIX
     }
+
     // settings by user
     private TrackTimerMode currentMode;
     private int lapCount;
     private boolean hasStarted;
+
+
+    // inventory tracking
+    public final Inventory inventory;
 
 
 
@@ -41,6 +44,7 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
         this.currentMode = TrackTimerMode.TIME_ATTACK;
         this.lapCount = 1;
         this.hasStarted = false;
+        this.inventory = new SimpleInventory(10);
     }
 
 
@@ -113,7 +117,8 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
                 playerInventory,
                 ScreenHandlerContext.create(this.world, this.pos),
                 this.propertyDelegate,
-                this
+                this,
+                this.inventory
         );
     }
 }
