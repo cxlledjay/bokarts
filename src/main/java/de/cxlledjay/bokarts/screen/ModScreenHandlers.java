@@ -1,10 +1,7 @@
 package de.cxlledjay.bokarts.screen;
 
 import de.cxlledjay.bokarts.BoKarts;
-import de.cxlledjay.bokarts.screen.custom.KartInventoryScreenHandler;
-import de.cxlledjay.bokarts.screen.custom.KartLiftScreenHandler;
-import de.cxlledjay.bokarts.screen.custom.LiveryWorkbenchScreenHandler;
-import de.cxlledjay.bokarts.screen.custom.PaintBucketScreenHandler;
+import de.cxlledjay.bokarts.screen.custom.*;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
@@ -45,6 +42,14 @@ public class ModScreenHandlers {
                     Registries.SCREEN_HANDLER,
                     BoKarts.id("paint_bucket_screen_handler"),
                     new ScreenHandlerType<>(PaintBucketScreenHandler::new, FeatureSet.empty())
+            );
+
+    // track timer
+    public static final ScreenHandlerType<TrackTimerScreenHandler> TRACK_TIMER_SCREEN_HANDLER =
+            Registry.register(
+                    Registries.SCREEN_HANDLER,
+                    BoKarts.id("track_timer_screen_handler"),
+                    new ScreenHandlerType<>(TrackTimerScreenHandler::new, FeatureSet.empty())
             );
 
 
