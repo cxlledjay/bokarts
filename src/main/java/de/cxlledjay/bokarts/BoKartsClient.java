@@ -7,7 +7,7 @@ import de.cxlledjay.bokarts.config.ClientSyncedConfig;
 import de.cxlledjay.bokarts.entity.client.ModEntityLayers;
 import de.cxlledjay.bokarts.event.ModClientEvents;
 import de.cxlledjay.bokarts.hud.ModHuds;
-import de.cxlledjay.bokarts.item.client.KartItemColorProvider;
+import de.cxlledjay.bokarts.item.client.ItemColorProvider;
 import de.cxlledjay.bokarts.keymapping.ModKeyMappings;
 import de.cxlledjay.bokarts.networking.ModPackets;
 import de.cxlledjay.bokarts.screen.client.ModScreens;
@@ -22,8 +22,9 @@ public class BoKartsClient implements ClientModInitializer {
         // Kart Entity rendering
         ModEntityLayers.register();
 
-        // Kart Item rendering
-        KartItemColorProvider.registerKartItemOverlay();
+        // item overlays
+        ItemColorProvider.registerKartItemOverlay();
+        ItemColorProvider.registerTrackReportOverlay();
 
 
         // other client stuff

@@ -28,12 +28,19 @@ public class ModDataComponentTypes {
     public static final ComponentType<Integer> KART_ITEM_BODY_COLOR = register("kart_item_body_color", builder -> builder.codec(Codec.INT));
     public static final ComponentType<Integer> KART_ITEM_WHEEL_COLOR = register("kart_item_wheel_color", builder -> builder.codec(Codec.INT));
     public static final ComponentType<Integer> KART_ITEM_RACE_NUMBER = register("kart_item_race_number", builder -> builder.codec(Codec.INT));
-    // public static final ComponentType<MutableText> KART_ITEM_CUSTOM_NAME =
 
     // key
     public static final ComponentType<Boolean> KART_ITEM_HAS_KEY = register("kart_item_has_key", builder -> builder.codec(Codec.BOOL));
     public static final ComponentType<UUID> KART_KEY_PAIRED_UUID = register("kart_key_paired_uuid", builder -> builder.codec(Uuids.CODEC));
     public static final ComponentType<String> KART_KEY_INFO = register("kart_key_info", builder -> builder.codec(Codec.STRING));
+
+    // track report
+    public static final ComponentType<String> TRACK_REPORT_PLAYER_NAME = register("track_report_player_name", builder -> builder.codec(Codec.STRING));
+    public static final ComponentType<String> TRACK_REPORT_BEST_LAP_TIME = register("track_report_best_track_time", builder -> builder.codec(Codec.STRING));
+    public static final ComponentType<String> TRACK_REPORT_DATE = register("track_report_date", builder -> builder.codec(Codec.STRING));
+    public static final ComponentType<Integer> TRACK_REPORT_PLACEMENT = register("track_report_placement", builder -> builder.codec(Codec.INT));
+    public static final ComponentType<Integer> TRACK_REPORT_TOTAL_LAPS = register("track_report_total_laps", builder -> builder.codec(Codec.INT));
+
 
 
     private static <T>ComponentType<T> register(String name, UnaryOperator<ComponentType.Builder<T>> builderOperator) {

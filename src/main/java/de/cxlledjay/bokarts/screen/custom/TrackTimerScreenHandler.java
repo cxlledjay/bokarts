@@ -169,7 +169,7 @@ public class TrackTimerScreenHandler extends ScreenHandler {
     }
 
     private void printResultOfPlayer(PlayerEntity player) {
-        BoKarts.LOGGER.info("Printing Results for {}", player.getNameForScoreboard());
+        if(this.blockEntity != null) this.blockEntity.printTimeAttackTrackRecord(player);
     }
 
     private void setLaps(int laps) {

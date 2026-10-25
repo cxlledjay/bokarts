@@ -1,10 +1,12 @@
 package de.cxlledjay.bokarts.block.entity.custom;
 
-import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.block.ModBlocks;
 import de.cxlledjay.bokarts.block.custom.TrackTimer;
 import de.cxlledjay.bokarts.block.entity.ModBlockEntities;
+import de.cxlledjay.bokarts.component.ModDataComponentTypes;
 import de.cxlledjay.bokarts.entity.custom.kart.KartEntity;
+import de.cxlledjay.bokarts.item.ModItems;
+import de.cxlledjay.bokarts.item.custom.TrackReport;
 import de.cxlledjay.bokarts.screen.custom.TrackTimerScreenHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -13,8 +15,9 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
-import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
@@ -35,9 +38,11 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHandlerFactory, Inventory {
+public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHandlerFactory, SidedInventory {
 
 
 
@@ -50,6 +55,11 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
     private static final int MAX_LAPS = 1000;
     private static final int BOUNDING_BOX_RADIUS = 8;
     private static final int MAX_TRACK_WIDTH = 32;
+
+    // hopper slot mappings
+    private static final int[] TOP_SLOTS = new int[]{0};
+    private static final int[] BOTTOM_SLOTS = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9};
+    private static final int[] SIDE_SLOTS = new int[]{};
 
 
 
@@ -150,7 +160,9 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
                         // completed the race
                         this.sendGrandPrixPlacementMessages(player.getNameForScoreboard(), kart.getRaceNumber(), this.currentTopPlace, best);
 
-                        // TODO: print track report
+                        // print track report
+                        ItemStack trackReport = createGrandPrixItemStack(kart, player, best, this.currentTopPlace, this.settingLapCount);
+                        if(trackReport != null) this.tryPrintingTrackReport(trackReport);
 
                         // prepare next place
                         this.currentTopPlace++;
@@ -215,12 +227,7 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
     private void sendGrandPrixPlacementMessages(String playerName, int kartNr, int placement, long best) {
         if(this.world == null) return;
         // craft message
-        int playerNameColor = switch(placement) {
-            case 1 -> 0xD4AF37;
-            case 2 -> 0xC0C0C0;
-            case 3 -> 0xCD7F32;
-            default -> 0xFFFFFF;
-        };
+        int playerNameColor = TrackReport.getPlacementColor(placement);
         String deltaLapTimeString = getFormattedLapTime(Math.abs(best));
 
         Text message = getPrefix()
@@ -233,6 +240,83 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
         for(UUID uuid : this.participantInfo.keySet()) {
             PlayerEntity p = this.world.getPlayerByUuid(uuid);
             if(p != null) p.sendMessage(message);
+        }
+    }
+
+
+    private ItemStack createTimeAttackItemStack(PlayerEntity player, long bestLap) {
+        ItemStack res = ItemStack.EMPTY;
+
+        if(this.participantInfo.containsKey(player.getUuid())) {
+            // retrieve all data
+            LocalDate today = LocalDate.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+            String todayAsString = today.format(formatter);
+            String bestLapString = getFormattedLapTime(bestLap);
+
+            // create item
+            res = new ItemStack(ModItems.TRACK_REPORT);
+
+            res.set(ModDataComponentTypes.TRACK_REPORT_PLAYER_NAME, player.getNameForScoreboard());
+            res.set(ModDataComponentTypes.TRACK_REPORT_BEST_LAP_TIME, bestLapString);
+            res.set(ModDataComponentTypes.TRACK_REPORT_DATE, todayAsString);
+        }
+
+        return res;
+    }
+
+
+    private ItemStack createGrandPrixItemStack(KartEntity kart, PlayerEntity player, long bestLap, int placement, int totalLaps) {
+        ItemStack res = ItemStack.EMPTY;
+
+        if(this.participantInfo.containsKey(player.getUuid())) {
+            // retrieve all data
+            LocalDate today = LocalDate.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+            String todayAsString = today.format(formatter);
+            String bestLapString = getFormattedLapTime(bestLap);
+
+            // create item
+            res = new ItemStack(ModItems.TRACK_REPORT);
+
+            res.set(ModDataComponentTypes.KART_ITEM_RACE_NUMBER, kart.getRaceNumber());
+            res.set(ModDataComponentTypes.TRACK_REPORT_PLAYER_NAME, player.getNameForScoreboard());
+            res.set(ModDataComponentTypes.TRACK_REPORT_BEST_LAP_TIME, bestLapString);
+            res.set(ModDataComponentTypes.TRACK_REPORT_DATE, todayAsString);
+            res.set(ModDataComponentTypes.TRACK_REPORT_PLACEMENT, placement);
+            res.set(ModDataComponentTypes.TRACK_REPORT_TOTAL_LAPS, totalLaps);
+        }
+
+        return res;
+    }
+
+
+
+
+    private void tryPrintingTrackReport(ItemStack trackReportItemStack) {
+        ItemStack input = this.inventory.getFirst();
+
+        // has paper?
+        if (input.isOf(Items.PAPER) && input.getCount() > 0) {
+
+            // search valid output slot
+            int targetSlot = -1;
+            for (int i = 1; i < 10; i++) {
+                ItemStack currentSlot = this.inventory.get(i);
+
+                // accept if empty
+                if (currentSlot.isEmpty()) {
+                    targetSlot = i;
+                    break;
+                }
+            }
+
+            // perform transaction
+            if (targetSlot != -1) {
+                input.decrement(1);
+                this.inventory.set(targetSlot, trackReportItemStack);
+                this.markDirty();
+            }
         }
     }
 
@@ -439,7 +523,14 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
         }
     }
 
+    public void printTimeAttackTrackRecord(PlayerEntity player) {
+        if(!this.participantInfo.containsKey(player.getUuid())) return;
 
+        TrackTimerKartStats stats = this.participantInfo.get(player.getUuid());
+
+        ItemStack trackReport = createTimeAttackItemStack(player, stats.best());
+        if(trackReport != null) this.tryPrintingTrackReport(trackReport);
+    }
 
 
 
@@ -579,7 +670,22 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
 
 
 
+    @Override
+    public int[] getAvailableSlots(Direction side) {
+        if (side == Direction.UP) return TOP_SLOTS;
+        if (side == Direction.DOWN) return BOTTOM_SLOTS;
+        return SIDE_SLOTS;
+    }
 
+    @Override
+    public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
+        return dir == Direction.UP && slot == 0 && stack.isOf(Items.PAPER);
+    }
+
+    @Override
+    public boolean canExtract(int slot, ItemStack stack, Direction dir) {
+        return dir == Direction.DOWN && slot > 0;
+    }
 
 
 
