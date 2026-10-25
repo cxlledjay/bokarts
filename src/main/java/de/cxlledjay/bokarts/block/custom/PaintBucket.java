@@ -11,6 +11,7 @@ import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
@@ -81,7 +82,7 @@ public class PaintBucket extends HorizontalFacingBlock {
     protected NamedScreenHandlerFactory createScreenHandlerFactory(BlockState state, World world, BlockPos pos) {
         return new SimpleNamedScreenHandlerFactory(
                 (syncId, playerInventory, player1) ->
-                        new PaintBucketScreenHandler(syncId, playerInventory), Text.translatable("block.bokarts.paint_bucket")
+                        new PaintBucketScreenHandler(syncId, playerInventory, ScreenHandlerContext.create(world, pos)), Text.translatable("block.bokarts.paint_bucket")
         );
     }
 }

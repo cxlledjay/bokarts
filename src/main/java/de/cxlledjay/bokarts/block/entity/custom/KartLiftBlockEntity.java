@@ -31,6 +31,7 @@ import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.ItemScatterer;
@@ -64,12 +65,33 @@ public class KartLiftBlockEntity extends BlockEntity implements ExtendedScreenHa
     private KartEntity storedKart = null;
     private NbtCompound pendingKartNbt = null; //< holds data until the world is ready
 
+    // modify by only one player
+    public PlayerEntity currentUser = null;
+
 
 
     public KartLiftBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.KART_LIFT_BE, pos, state);
     }
 
+
+
+
+    // -------------------- allow only one user --------------------
+
+    public boolean tryOpen(PlayerEntity player) {
+        if (this.currentUser == null || this.currentUser.isRemoved()) {
+            this.currentUser = player;
+            return true;
+        }
+        return this.currentUser == player;
+    }
+
+    public void close(PlayerEntity player) {
+        if (this.currentUser == player) {
+            this.currentUser = null;
+        }
+    }
 
 
     // interface for interaction
@@ -463,7 +485,7 @@ public class KartLiftBlockEntity extends BlockEntity implements ExtendedScreenHa
 
     @Override
     public @Nullable ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-        return new KartLiftScreenHandler(syncId, playerInventory, getInventoryFromKart(), virtualKartInventory, this.pos);
+        return new KartLiftScreenHandler(syncId, playerInventory, getInventoryFromKart(), virtualKartInventory, ScreenHandlerContext.create(this.world, this.pos) , this.pos);
     }
 
     @Override

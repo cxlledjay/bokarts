@@ -290,4 +290,11 @@ public class KartRenderer extends EntityRenderer<KartEntity> {
         matrices.pop();
     }
 
+
+
+    // prevent name rendering
+    @Override
+    protected boolean hasLabel(KartEntity entity) {
+        return false;
+    }
 }

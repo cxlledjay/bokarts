@@ -28,21 +28,23 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
     }
 
     // settings by user
-    private TrackTimerMode currentMode;
-    private int lapCount;
+    private TrackTimerMode settingCurrentMode;
+    private int settingLapCount;
     private boolean hasStarted;
-
 
     // inventory tracking
     public final Inventory inventory;
+
+    // modify by only one player
+    public PlayerEntity currentUser = null;
 
 
 
 
     public TrackTimerBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.TRACK_TIMER_BE, pos, state);
-        this.currentMode = TrackTimerMode.TIME_ATTACK;
-        this.lapCount = 1;
+        this.settingCurrentMode = TrackTimerMode.TIME_ATTACK;
+        this.settingLapCount = 1;
         this.hasStarted = false;
         this.inventory = new SimpleInventory(10);
     }
@@ -51,14 +53,14 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
     // -------------------- interface for screen handler --------------------
 
     public void cycleMode() {
-        if(this.currentMode ==  TrackTimerMode.GRAND_PRIX) this.currentMode = TrackTimerMode.TIME_ATTACK;
-        else this.currentMode = TrackTimerMode.GRAND_PRIX;
+        if(this.settingCurrentMode ==  TrackTimerMode.GRAND_PRIX) this.settingCurrentMode = TrackTimerMode.TIME_ATTACK;
+        else this.settingCurrentMode = TrackTimerMode.GRAND_PRIX;
     }
 
-    public void setLapCount(int lapCount) {
-        if(lapCount > MAX_LAPS) lapCount = MAX_LAPS;
-        else if(lapCount < 1) lapCount = 1;
-        this.lapCount = lapCount;
+    public void setLapCount(int settingLapCount) {
+        if(settingLapCount > MAX_LAPS) settingLapCount = MAX_LAPS;
+        else if(settingLapCount < 1) settingLapCount = 1;
+        this.settingLapCount = settingLapCount;
     }
 
     public void start() {
@@ -80,8 +82,8 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
         @Override
         public int get(int index) {
             return switch (index) {
-                case 0 -> currentMode.ordinal();
-                case 1 -> lapCount;
+                case 0 -> settingCurrentMode.ordinal();
+                case 1 -> settingLapCount;
                 case 2 -> Boolean.compare(hasStarted, true);
                 default -> 0;
             };
@@ -92,10 +94,10 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
             switch (index) {
                 case 0 -> {
                     if (value >= 0 && value < TrackTimerMode.values().length) {
-                        currentMode = TrackTimerMode.values()[value];
+                        settingCurrentMode = TrackTimerMode.values()[value];
                     }
                 }
-                case 1 -> lapCount = value;
+                case 1 -> settingLapCount = value;
             }
         }
 
@@ -120,5 +122,23 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
                 this,
                 this.inventory
         );
+    }
+
+
+
+    // -------------------- allow only one user --------------------
+
+    public boolean tryOpen(PlayerEntity player) {
+        if (this.currentUser == null || this.currentUser.isRemoved()) {
+            this.currentUser = player;
+            return true;
+        }
+        return this.currentUser == player;
+    }
+
+    public void close(PlayerEntity player) {
+        if (this.currentUser == player) {
+            this.currentUser = null;
+        }
     }
 }

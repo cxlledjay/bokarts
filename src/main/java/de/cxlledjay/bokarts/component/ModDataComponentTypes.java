@@ -6,6 +6,7 @@ import de.cxlledjay.bokarts.entity.custom.kart.property.*;
 import net.minecraft.component.ComponentType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.text.MutableText;
 import net.minecraft.util.Uuids;
 
 import java.util.Optional;
@@ -27,6 +28,7 @@ public class ModDataComponentTypes {
     public static final ComponentType<Integer> KART_ITEM_BODY_COLOR = register("kart_item_body_color", builder -> builder.codec(Codec.INT));
     public static final ComponentType<Integer> KART_ITEM_WHEEL_COLOR = register("kart_item_wheel_color", builder -> builder.codec(Codec.INT));
     public static final ComponentType<Integer> KART_ITEM_RACE_NUMBER = register("kart_item_race_number", builder -> builder.codec(Codec.INT));
+    // public static final ComponentType<MutableText> KART_ITEM_CUSTOM_NAME =
 
     // key
     public static final ComponentType<Boolean> KART_ITEM_HAS_KEY = register("kart_item_has_key", builder -> builder.codec(Codec.BOOL));

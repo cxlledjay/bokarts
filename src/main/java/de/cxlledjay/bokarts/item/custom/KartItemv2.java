@@ -5,6 +5,7 @@ import de.cxlledjay.bokarts.config.ClientSyncedConfig;
 import de.cxlledjay.bokarts.entity.custom.kart.KartEntity;
 import de.cxlledjay.bokarts.entity.custom.kart.property.*;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
@@ -268,7 +269,10 @@ public class KartItemv2 extends Item {
 
             // spawn kart
             if (!world.isClient) {
-                kart.setCustomName(null);
+                if (itemStack.contains(DataComponentTypes.CUSTOM_NAME)) {
+                    kart.setCustomName(itemStack.get(DataComponentTypes.CUSTOM_NAME));
+                    kart.setCustomNameVisible(false);
+                }
                 world.spawnEntity(kart);
                 world.emitGameEvent(user, GameEvent.ENTITY_PLACE, hitResult.getPos());
                 itemStack.decrementUnlessCreative(1, user);

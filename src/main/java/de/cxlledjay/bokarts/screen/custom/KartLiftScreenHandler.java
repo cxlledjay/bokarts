@@ -1,5 +1,6 @@
 package de.cxlledjay.bokarts.screen.custom;
 
+import de.cxlledjay.bokarts.block.ModBlocks;
 import de.cxlledjay.bokarts.block.entity.custom.KartLiftBlockEntity;
 import de.cxlledjay.bokarts.item.ModItems;
 import de.cxlledjay.bokarts.item.custom.KartItemv2;
@@ -15,12 +16,16 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class KartLiftScreenHandler extends ScreenHandler {
+
+    // context
+    private final ScreenHandlerContext context;
 
     // tracked inventory
     public static final int LIFT_INVENTORY_SIZE = 12;
@@ -52,15 +57,17 @@ public class KartLiftScreenHandler extends ScreenHandler {
                 playerInventory,
                 new SimpleInventory(LIFT_INVENTORY_SIZE),
                 new SimpleInventory(1),
+                ScreenHandlerContext.EMPTY,
                 pos);
     }
 
 
     // server constructor
-    public KartLiftScreenHandler(int syncId, PlayerInventory playerInventory, Inventory liftInventory, Inventory blockEntityInventory, BlockPos liftBlockEntityBlockPos) {
+    public KartLiftScreenHandler(int syncId, PlayerInventory playerInventory, Inventory liftInventory, Inventory blockEntityInventory, ScreenHandlerContext context, BlockPos liftBlockEntityBlockPos) {
         super(ModScreenHandlers.KART_LIFT_SCREEN_HANDLER, syncId);
 
         // init final fields
+        this.context = context;
         this.liftBlockEntityBlockPos = liftBlockEntityBlockPos;
         this.world = playerInventory.player.getWorld();
         this.liftInventory = liftInventory;
@@ -259,7 +266,7 @@ public class KartLiftScreenHandler extends ScreenHandler {
 
     @Override
     public boolean canUse(PlayerEntity player) {
-        return this.liftInventory.canPlayerUse(player);
+        return canUse(context, player, ModBlocks.KART_LIFT);
     }
 
     @Override
@@ -268,8 +275,8 @@ public class KartLiftScreenHandler extends ScreenHandler {
         // security
         if (player instanceof ServerPlayerEntity) {
 
-        // drop the key pairing slots
-        int[] slotsToDrop = {5, 6, 7};
+            // drop the key pairing slots
+            int[] slotsToDrop = {5, 6, 7};
 
             for (int index : slotsToDrop) {
                 ItemStack stack = this.liftInventory.getStack(index);
@@ -278,6 +285,10 @@ public class KartLiftScreenHandler extends ScreenHandler {
                     player.getInventory().offerOrDrop(stack.copy());
                     this.liftInventory.setStack(index, ItemStack.EMPTY);
                 }
+            }
+
+            if (this.getLiftEntity() != null) {
+                this.getLiftEntity().close(player);
             }
         }
 

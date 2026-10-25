@@ -55,10 +55,12 @@ public class TrackTimer extends BlockWithEntity {
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
 
-        if (!world.isClient) {
+        if (!world.isClient()) {
             BlockEntity be = world.getBlockEntity(pos);
             if (be instanceof TrackTimerBlockEntity trackTimer) {
-                player.openHandledScreen(trackTimer);
+                if (trackTimer.tryOpen(player)) {
+                    player.openHandledScreen(trackTimer);
+                }
             }
         }
 

@@ -342,6 +342,11 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     // ==================== KartEntity <-> KartItem ====================
 
     @Override
+    public boolean isCustomNameVisible() {
+        return false;
+    }
+
+    @Override
     public Item asItem() {
         return ModItems.KART_ITEM;
     }
@@ -376,12 +381,18 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         stack.set(ModDataComponentTypes.KART_ITEM_RACE_NUMBER, this.getRaceNumber());
 
         // set name with livery
-        MutableText name = Text.literal("Kart [").formatted(Formatting.WHITE)
-                .append(KartItemv2.getFormattedLiveryName(this.getBodyType(), this.getBodyColor())
-                .append(Text.literal("]")))
-                .styled(style -> style.withItalic(false));
+        Text kartName = this.getCustomName();
+        if(kartName == null || kartName.equals(Text.translatable("item.bokarts.kart_item"))) {
+             MutableText name = Text.literal("Kart [").formatted(Formatting.WHITE)
+                    .append(KartItemv2.getFormattedLiveryName(this.getBodyType(), this.getBodyColor())
+                            .append(Text.literal("]")))
+                    .styled(style -> style.withItalic(false));
+            stack.set(DataComponentTypes.CUSTOM_NAME, name);
+        } else {
+            stack.set(DataComponentTypes.CUSTOM_NAME, kartName);
+        }
 
-        stack.set(DataComponentTypes.CUSTOM_NAME, name);
+
 
         // save key data
         stack.set(ModDataComponentTypes.KART_ITEM_HAS_KEY, this.isKeyInIgnition());
@@ -787,10 +798,19 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     @Override
     public void openInventory(PlayerEntity player) {
         if(!this.getWorld().isClient) {
+
+            Text kartName = this.getCustomName();
+            if(kartName == null || kartName.equals(Text.translatable("item.bokarts.kart_item"))) {
+                kartName = Text.literal("Kart [").formatted(Formatting.WHITE)
+                        .append(KartItemv2.getFormattedLiveryName(this.getBodyType(), this.getBodyColor())
+                                .append(Text.literal("]")))
+                        .styled(style -> style.withItalic(false));
+            }
+
             player.openHandledScreen(new SimpleNamedScreenHandlerFactory(
                     (syncId, playerInventory, player1) ->
-                            new KartInventoryScreenHandler(syncId, playerInventory), Text.translatable(this.asItem().getTranslationKey())
-            ));
+                            new KartInventoryScreenHandler(syncId, playerInventory), kartName)
+            );
         }
     }
 

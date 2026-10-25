@@ -93,9 +93,10 @@ public abstract class KartLiftBaseClass extends Block {
 
                 // screen can only be opened when active or empty
                 if(lift.liftState == KartLiftBlockEntity.LiftState.ACTIVE || lift.liftState == KartLiftBlockEntity.LiftState.EMPTY) {
-                    player.openHandledScreen(lift);
+                    if (lift.tryOpen(player)) {
+                        player.openHandledScreen(lift);
+                    }
                 }
-
             }
         }
 

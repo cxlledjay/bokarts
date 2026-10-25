@@ -15,6 +15,7 @@ import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -178,6 +179,15 @@ public class TrackTimerScreenHandler extends ScreenHandler {
 
     @Override
     public boolean canUse(PlayerEntity player) {
-        return canUse(this.context, player, ModBlocks.TRACK_TIMER_BLOCK);
+        return canUse(context, player, ModBlocks.TRACK_TIMER_BLOCK);
+    }
+
+    @Override
+    public void onClosed(PlayerEntity player) {
+        super.onClosed(player);
+
+        if (this.blockEntity != null) {
+            this.blockEntity.close(player);
+        }
     }
 }

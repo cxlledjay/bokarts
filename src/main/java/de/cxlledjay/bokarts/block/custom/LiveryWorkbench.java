@@ -82,7 +82,7 @@ public class LiveryWorkbench extends HorizontalFacingBlock {
     protected NamedScreenHandlerFactory createScreenHandlerFactory(BlockState state, World world, BlockPos pos) {
         return new SimpleNamedScreenHandlerFactory(
                 (syncId, playerInventory, player1) ->
-                        new LiveryWorkbenchScreenHandler(syncId, playerInventory), Text.translatable("block.bokarts.livery_workbench")
+                        new LiveryWorkbenchScreenHandler(syncId, playerInventory, ScreenHandlerContext.create(world, pos)), Text.translatable("block.bokarts.livery_workbench")
         );
     }
 }
