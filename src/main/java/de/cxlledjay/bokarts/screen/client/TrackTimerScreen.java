@@ -16,6 +16,8 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
+import java.util.Objects;
+
 @Environment(EnvType.CLIENT)
 public class TrackTimerScreen extends HandledScreen<TrackTimerScreenHandler> {
 
@@ -36,6 +38,10 @@ public class TrackTimerScreen extends HandledScreen<TrackTimerScreenHandler> {
     private ButtonWidget printButton;
     private TextFieldWidget lapsTextInput;
 
+    private boolean updatingFromTick = false;
+    private int lapAmountPrev;
+    private String modeButtonStringPrev;
+
 
 
     public TrackTimerScreen(TrackTimerScreenHandler handler, PlayerInventory inventory, Text title) {
@@ -55,7 +61,7 @@ public class TrackTimerScreen extends HandledScreen<TrackTimerScreenHandler> {
 
         // mode button
         this.modeButton = this.addDrawableChild(new ButtonWidget.Builder(
-                Text.literal(this.handler.getModeString()),
+                Text.literal(""),
                 button -> {
                     int encodedButtonId = TrackTimerScreenHandler.encodeButtonId(TrackTimerScreenHandler.BUTTON_ID_MODE, 0);
                     if(this.handler.onButtonClick(this.client.player, encodedButtonId)) {
@@ -109,10 +115,12 @@ public class TrackTimerScreen extends HandledScreen<TrackTimerScreenHandler> {
                 Text.literal("Lap count")
         );
         this.lapsTextInput.setTooltip(Tooltip.of(Text.literal("Set the lap count")));
-        this.lapsTextInput.setPlaceholder(Text.literal("Lap count"));
         this.lapsTextInput.setMaxLength(3);
+        this.lapsTextInput.setText(String.valueOf(this.handler.getLapAmount()));
         this.lapsTextInput.setDrawsBackground(true);
         this.lapsTextInput.setChangedListener((newString) -> {
+
+            if(updatingFromTick) return;
 
             // parse the string
             try {
@@ -126,6 +134,13 @@ public class TrackTimerScreen extends HandledScreen<TrackTimerScreenHandler> {
             }
         });
         this.addDrawableChild(this.lapsTextInput);
+
+        // set everything invisible for the init
+        this.lapsTextInput.visible = false;
+        this.lapsTextInput.active = false;
+        this.printButton.visible = false;
+        this.printButton.active = false;
+
     }
 
 
@@ -133,8 +148,26 @@ public class TrackTimerScreen extends HandledScreen<TrackTimerScreenHandler> {
     protected void handledScreenTick() {
         super.handledScreenTick();
 
-        if(this.handler.getCurrentMode() == null) return;
-        else if(this.handler.getCurrentMode() == TrackTimerBlockEntity.TrackTimerMode.TIME_ATTACK) {
+        // set values
+        TrackTimerBlockEntity.TrackTimerMode mode = this.handler.getCurrentMode();
+        int lapAmount = this.handler.getLapAmount();
+
+        // safety
+        if(mode == null) return;
+
+        // set texts
+        updatingFromTick = true;
+        if(!Objects.equals(this.handler.getModeString(), modeButtonStringPrev)) {
+            modeButton.setMessage(Text.literal(this.handler.getModeString()));
+            this.modeButtonStringPrev = this.handler.getModeString();
+        }
+        if(lapAmount != lapAmountPrev) {
+            lapsTextInput.setText(String.valueOf(lapAmount));
+            this.lapAmountPrev = lapAmount;
+        }
+
+        // toggle mode stuff
+        if(this.handler.getCurrentMode() == TrackTimerBlockEntity.TrackTimerMode.TIME_ATTACK) {
             this.lapsTextInput.visible = false;
             this.lapsTextInput.active = false;
             this.printButton.visible = true;
@@ -145,7 +178,7 @@ public class TrackTimerScreen extends HandledScreen<TrackTimerScreenHandler> {
             this.printButton.visible = false;
             this.printButton.active = false;
         }
-        modeButton.setMessage(Text.literal(this.handler.getModeString()));
+        updatingFromTick = false;
     }
 
     @Override

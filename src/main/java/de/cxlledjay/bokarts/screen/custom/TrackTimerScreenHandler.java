@@ -15,6 +15,7 @@ import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -102,7 +103,7 @@ public class TrackTimerScreenHandler extends ScreenHandler {
                 this.startTrackTimer(player);
                 break;
             case BUTTON_ID_RESET:
-                this.resetTrackTimer();
+                this.resetTrackTimer(player);
                 break;
             case BUTTON_ID_PRINT_TA:
                 this.printResultOfPlayer(player);
@@ -151,19 +152,28 @@ public class TrackTimerScreenHandler extends ScreenHandler {
     }
 
     private void startTrackTimer(PlayerEntity player) {
-        BoKarts.LOGGER.info("Starting Track Timer");
+        if(this.blockEntity == null) return;
+        if(this.getHasStarted()) {
+            player.sendMessage(Text.literal("Race has already started!"));
+        } else {
+            this.blockEntity.start();
+            player.sendMessage(Text.literal("Starting race..."));
+        }
     }
 
-    private void resetTrackTimer() {
-        BoKarts.LOGGER.info("Resetting Track Timer");
+    private void resetTrackTimer(PlayerEntity player) {
+        if(this.blockEntity != null) {
+            this.blockEntity.stopOrReset();
+            player.sendMessage(Text.literal("Stopping / resetting race..."));
+        }
     }
 
     private void printResultOfPlayer(PlayerEntity player) {
         BoKarts.LOGGER.info("Printing Results for {}", player.getNameForScoreboard());
     }
 
-    private void setLaps(int payload) {
-        BoKarts.LOGGER.info("Setting Laps to {}", payload);
+    private void setLaps(int laps) {
+        if(this.blockEntity != null) this.blockEntity.setLapCount(laps);
     }
 
 

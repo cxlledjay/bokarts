@@ -1,9 +1,13 @@
 package de.cxlledjay.bokarts.block.custom;
 
 import com.mojang.serialization.MapCodec;
+import de.cxlledjay.bokarts.block.entity.ModBlockEntities;
+import de.cxlledjay.bokarts.block.entity.custom.KartLiftBlockEntity;
 import de.cxlledjay.bokarts.block.entity.custom.TrackTimerBlockEntity;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
@@ -65,5 +69,19 @@ public class TrackTimer extends BlockWithEntity {
         }
 
         return ActionResult.SUCCESS;
+    }
+
+
+    // -------------------- block entity --------------------
+
+
+    @Override
+    public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+        if (type == ModBlockEntities.TRACK_TIMER_BE) {
+            return (world1, pos, state1, blockEntity) -> {
+                TrackTimerBlockEntity.tick(world1, pos, state1, (TrackTimerBlockEntity) blockEntity);
+            };
+        }
+        return null;
     }
 }
