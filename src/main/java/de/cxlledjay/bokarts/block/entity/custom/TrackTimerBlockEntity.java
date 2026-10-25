@@ -1,9 +1,15 @@
 package de.cxlledjay.bokarts.block.entity.custom;
 
 import de.cxlledjay.bokarts.BoKarts;
+import de.cxlledjay.bokarts.block.ModBlocks;
+import de.cxlledjay.bokarts.block.custom.KartLiftBaseClass;
+import de.cxlledjay.bokarts.block.custom.TrackTimer;
 import de.cxlledjay.bokarts.block.entity.ModBlockEntities;
+import de.cxlledjay.bokarts.entity.custom.kart.KartEntity;
 import de.cxlledjay.bokarts.screen.custom.TrackTimerScreenHandler;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -22,12 +28,12 @@ import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHandlerFactory, Inventory {
 
@@ -40,7 +46,8 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
 
     // ---------- constants ----------
     private static final int MAX_LAPS = 1000;
-    private static final int BOUNDING_BOX_RADIUS = 6;
+    private static final int BOUNDING_BOX_RADIUS = 8;
+    private static final int MAX_TRACK_WIDTH = 32;
 
 
 
@@ -51,7 +58,9 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
     public PlayerEntity currentUser = null;
 
     // bounding box (used to search each tick for karts inside of it)
-    private Box boundingBox;
+    private Box boundingBox = null;
+    private Direction drivingDirection = Direction.NORTH;
+    private final Map<UUID, Vec3d> previousKartPosition = new HashMap<>();
 
 
 
@@ -65,11 +74,12 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
     private TrackTimerMode settingCurrentMode = TrackTimerMode.TIME_ATTACK;
     private int settingLapCount = 1;
     // where is the reflector => calculate bounding box from it each time it loads.
-    private BlockPos reflectorPos = null;
+    private int trackWidth = 0;
 
     // --- race stats
     // ongoing race?
     private boolean hasStarted = false;
+    private int currentTopPlace = 1;
     Map<UUID, TrackTimerPlayerStats> playerInfo = new HashMap<>();
 
 
@@ -85,6 +95,12 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
 
 
 
+    private void handleLineCrossing(KartEntity kart) {
+        if(kart.getControllingPassenger() == null) return;
+        if(kart.getControllingPassenger() instanceof PlayerEntity player) {
+            player.sendMessage(Text.literal("passed the finish line"));
+        }
+    }
 
 
 
@@ -98,19 +114,87 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
     public static void tick(World world, BlockPos pos, BlockState state, TrackTimerBlockEntity entity) {
 
         // do nothing when race is not yet started
-        if(!entity.hasStarted) return;
+        if(world == null || world.isClient() || !entity.hasStarted || entity.boundingBox == null) return;
 
         // search in the bounding box for karts
+        List<KartEntity> karts = world.getEntitiesByClass(
+                KartEntity.class,
+                entity.boundingBox,
+                kart -> kart.hasControllingPassenger() && kart.getControllingPassenger() instanceof PlayerEntity
+        );
 
+        // found kart(s)
+        Set<UUID> currentlyNearbyUuids = new HashSet<>();
 
+        for (KartEntity kart : karts) {
+            if(kart.getControllingPassenger() == null) continue;
+            if(kart.getControllingPassenger() instanceof PlayerEntity) {
+
+                UUID uuid = kart.getUuid();
+                currentlyNearbyUuids.add(uuid);
+
+                // get positions
+                Vec3d currentPos = kart.getPos();
+                Vec3d previousPos = entity.previousKartPosition.get(uuid);
+
+                // already seen this kart
+                if (previousPos != null) {
+
+                    // check crossing
+                    if (hasCrossedFinishLine(entity, previousPos, currentPos)) {
+
+                        // has completed one lap!
+                        entity.handleLineCrossing(kart);
+                    }
+                }
+
+                // update position
+                entity.previousKartPosition.put(uuid, currentPos);
+            }
+        }
+        // memory cleanup
+        entity.previousKartPosition.keySet().retainAll(currentlyNearbyUuids);
     }
+
+
 
 
     // helpers
     private void calculateBoundingBox() {
+        if(this.trackWidth == 0) return; //< loaded wrong data from nbt
 
+        // calculate driving direction
+        Direction facing = this.getCachedState().get(TrackTimer.FACING);
+        this.drivingDirection = facing.rotateCounterclockwise(Direction.Axis.Y);
+
+        // calculate corner points
+        BlockPos corner1 = this.pos
+                .offset(facing, 1)
+                .offset(this.drivingDirection, BOUNDING_BOX_RADIUS);
+        BlockPos corner2 = this.pos
+                .offset(facing, this.trackWidth)
+                .offset(this.drivingDirection.getOpposite(), BOUNDING_BOX_RADIUS);
+
+        // create union of corner points
+        this.boundingBox = new Box(corner1).union(new Box(corner2));
     }
 
+    private static boolean hasCrossedFinishLine(TrackTimerBlockEntity entity, Vec3d previousPos, Vec3d currentPos) {
+        double timerBlockEntityX = entity.pos.getX() + 0.5;
+        double timerBlockEntityZ = entity.pos.getZ() + 0.5;
+
+        return switch (entity.drivingDirection) {
+            case NORTH -> // Driving North (Z is decreasing)
+                    previousPos.z > timerBlockEntityZ && currentPos.z <= timerBlockEntityZ;
+            case SOUTH -> // Driving South (Z is increasing)
+                    previousPos.z < timerBlockEntityZ && currentPos.z >= timerBlockEntityZ;
+            case WEST ->  // Driving West (X is decreasing)
+                    previousPos.x > timerBlockEntityX && currentPos.x <= timerBlockEntityX;
+            case EAST ->  // Driving East (X is increasing)
+                    previousPos.x < timerBlockEntityX && currentPos.x >= timerBlockEntityX;
+            default -> false;
+        };
+    }
 
 
 
@@ -140,11 +224,38 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
     }
 
     public void start() {
+        // cannot start twice
         if(this.hasStarted) return;
-        // start logic
-        BoKarts.LOGGER.info("Starting Track Timer BlockEntity");
-        this.hasStarted = true;
-        this.markDirty();
+
+        // search for a reflector block
+        if (this.world != null && !this.world.isClient()) {
+
+            BoKarts.LOGGER.info("server code running!");
+
+            // get rotation of this block
+            Direction facing = this.getCachedState().get(TrackTimer.FACING);
+
+            // loop trough blocks in facing direction
+            for(int width = 0; width < MAX_TRACK_WIDTH; width++) {
+                // get block
+                BlockPos inspectedPos = this.pos.offset(facing, width + 1);
+                Block inspectedBlock =  this.world.getBlockState(inspectedPos).getBlock();
+                BoKarts.LOGGER.info("checking width: {}", width);
+
+                // check block
+                if(inspectedBlock.equals(ModBlocks.TRACK_TIMER_REFLECTOR_BLOCK)) {
+                    if(this.world.getBlockState(inspectedPos).get(TrackTimer.FACING) == facing.getOpposite()) {
+                        // correct placement => start
+                            this.trackWidth = width;
+                            calculateBoundingBox();
+                            this.hasStarted = true;
+                            this.markDirty();
+                    }
+                    return;
+                }
+                else if(!inspectedBlock.equals(Blocks.AIR)) return; //< only air is valid
+            }
+        }
     }
 
     public void stopOrReset() {
@@ -175,18 +286,13 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
         }
         nbt.putInt("SettingLapCount", this.settingLapCount);
 
-        // reflector pos
-        if (this.reflectorPos != null) {
-            nbt.putInt("ReflectorX", this.reflectorPos.getX());
-            nbt.putInt("ReflectorY", this.reflectorPos.getY());
-            nbt.putInt("ReflectorZ", this.reflectorPos.getZ());
-            nbt.putBoolean("HasReflector", true);
-        } else {
-            nbt.putBoolean("HasReflector", false);
-        }
+        // track width
+        nbt.putInt("TrackWidth", this.trackWidth);
+        calculateBoundingBox(); //< also recalculate bounding box!
 
         // race stats
         nbt.putBoolean("HasStarted", this.hasStarted);
+        nbt.putInt("CurrentTopPlace", this.currentTopPlace);
 
         NbtList playerListTag = new NbtList();
         for (Map.Entry<UUID, TrackTimerPlayerStats> entry : this.playerInfo.entrySet()) {
@@ -212,19 +318,13 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
         }
         this.settingLapCount = nbt.getInt("SettingLapCount");
 
-        // reflector
-        if (nbt.getBoolean("HasReflector")) {
-            this.reflectorPos = new BlockPos(
-                    nbt.getInt("ReflectorX"),
-                    nbt.getInt("ReflectorY"),
-                    nbt.getInt("ReflectorZ")
-            );
-        } else {
-            this.reflectorPos = null;
-        }
+        // track width
+        this.trackWidth = nbt.getInt("TrackWidth");
 
         // race stats
         this.hasStarted = nbt.getBoolean("HasStarted");
+        this.currentTopPlace = nbt.getInt("CurrentTopPlace");
+        this.trackWidth = nbt.getInt("TrackWidth");
 
         this.playerInfo.clear();
         if (nbt.contains("PlayerInfo", NbtElement.LIST_TYPE)) {

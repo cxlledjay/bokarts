@@ -3,6 +3,6 @@
   "textures": {
     "front": "bokarts:block/track_timer_reflector_front",
     "side": "bokarts:block/track_timer_side",
-    "top": "bokarts:block/track_timer_top"
+    "top": "bokarts:block/track_timer_reflector_top"
   }
 }
