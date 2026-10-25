@@ -2,7 +2,7 @@ package de.cxlledjay.bokarts.block.entity.custom;
 
 import net.minecraft.nbt.NbtCompound;
 
-public record TrackTimerPlayerStats(long timestamp, long best, int laps, boolean finished) {
+public record TrackTimerKartStats(long timestamp, long best, int laps, boolean finished) {
 
     public NbtCompound toNbt() {
         NbtCompound nbt = new NbtCompound();
@@ -13,8 +13,8 @@ public record TrackTimerPlayerStats(long timestamp, long best, int laps, boolean
         return nbt;
     }
 
-    public static TrackTimerPlayerStats fromNbt(NbtCompound nbt) {
-        return new TrackTimerPlayerStats(
+    public static TrackTimerKartStats fromNbt(NbtCompound nbt) {
+        return new TrackTimerKartStats(
                 nbt.getLong("Timestamp"),
                 nbt.getLong("Best"),
                 nbt.getInt("Laps"),
