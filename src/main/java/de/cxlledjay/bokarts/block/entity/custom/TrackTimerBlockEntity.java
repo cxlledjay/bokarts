@@ -493,7 +493,7 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
     public void start(PlayerEntity player) {
         // cannot start twice
         if(this.hasStarted) {
-            Text msg = getPrefix().append(Text.literal(" Timer has already started. Reset it before starting again! ").formatted(Formatting.RED));
+            Text msg = getPrefix().append(Text.literal("Timer has already started. Reset it before starting again! ").formatted(Formatting.RED));
             player.sendMessage(msg);
             return;
         }
@@ -518,21 +518,21 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
                             calculateBoundingBox();
                             this.hasStarted = true;
                             this.markDirty();
-                            Text msg = getPrefix().append(Text.literal(" Timer has started!").formatted(Formatting.GREEN));
+                            Text msg = getPrefix().append(Text.literal("Timer has started!").formatted(Formatting.GREEN));
                             player.sendMessage(msg);
                             return;
                     }
-                    Text msg = getPrefix().append(Text.literal(" Found reflector but it is rotated wrongly!").formatted(Formatting.RED));
+                    Text msg = getPrefix().append(Text.literal("Found reflector but it is rotated wrongly!").formatted(Formatting.RED));
                     player.sendMessage(msg);
                     return;
                 }
                 else if(!inspectedBlock.equals(Blocks.AIR)) {
-                    Text msg = getPrefix().append(Text.literal(" Cannot find reflector. Maybe it is obstructed?").formatted(Formatting.RED));
+                    Text msg = getPrefix().append(Text.literal("Cannot find reflector. Maybe it is obstructed?").formatted(Formatting.RED));
                     player.sendMessage(msg);
                     return; //< only air is valid
                 }
             }
-            Text msg = getPrefix().append(Text.literal(" Cannot find reflector. Maybe it is too far away? (max: " + MAX_TRACK_WIDTH + ")").formatted(Formatting.RED));
+            Text msg = getPrefix().append(Text.literal("Cannot find reflector. Maybe it is too far away? (max: " + MAX_TRACK_WIDTH + ")").formatted(Formatting.RED));
             player.sendMessage(msg);
         }
     }
@@ -554,7 +554,7 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
             this.highestLap = 0;
             this.bestLapTime = 0;
 
-            Text msg = getPrefix().append(Text.literal(" Timer has stopped and reset. Ready to start again!").formatted(Formatting.GREEN));
+            Text msg = getPrefix().append(Text.literal("Timer has stopped and reset. Ready to start again!").formatted(Formatting.GREEN));
             player.sendMessage(msg);
 
             // and save

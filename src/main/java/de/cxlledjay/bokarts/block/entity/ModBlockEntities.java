@@ -4,6 +4,7 @@ import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.block.ModBlocks;
 import de.cxlledjay.bokarts.block.entity.custom.KartLiftBlockEntity;
 import de.cxlledjay.bokarts.block.entity.custom.TrackTimerBlockEntity;
+import de.cxlledjay.bokarts.block.entity.custom.TrophyBlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
@@ -19,6 +20,11 @@ public class ModBlockEntities {
     public static final BlockEntityType<TrackTimerBlockEntity> TRACK_TIMER_BE =
             Registry.register(Registries.BLOCK_ENTITY_TYPE, BoKarts.id("track_timer"),
                     BlockEntityType.Builder.create(TrackTimerBlockEntity::new, ModBlocks.TRACK_TIMER_BLOCK).build());
+
+    // trophy
+    public static final BlockEntityType<TrophyBlockEntity> TROPHY_BE =
+            Registry.register(Registries.BLOCK_ENTITY_TYPE, BoKarts.id("trophy"),
+                    BlockEntityType.Builder.create(TrophyBlockEntity::new, ModBlocks.TROPHY).build());
 
 
 

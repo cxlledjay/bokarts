@@ -2,23 +2,32 @@ package de.cxlledjay.bokarts.block.custom;
 
 import com.mojang.serialization.MapCodec;
 import de.cxlledjay.bokarts.BoKarts;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.HorizontalFacingBlock;
-import net.minecraft.block.ShapeContext;
+import de.cxlledjay.bokarts.block.entity.custom.TrackTimerBlockEntity;
+import de.cxlledjay.bokarts.block.entity.custom.TrophyBlockEntity;
+import de.cxlledjay.bokarts.item.ModItems;
+import net.minecraft.block.*;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.ItemActionResult;
+import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
-public class Trophy extends HorizontalFacingBlock {
+public class Trophy extends BlockWithEntity {
 
     // codec
     public static final MapCodec<Trophy> CODEC = Trophy.createCodec(Trophy::new);
@@ -37,7 +46,7 @@ public class Trophy extends HorizontalFacingBlock {
     }
 
     @Override
-    protected MapCodec<? extends HorizontalFacingBlock> getCodec() {
+    protected MapCodec<Trophy> getCodec() {
         return CODEC;
     }
 
@@ -60,12 +69,65 @@ public class Trophy extends HorizontalFacingBlock {
     }
 
     @Override
-    protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+    protected ItemActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if(world.getBlockEntity(pos) instanceof TrophyBlockEntity blockEntity) {
+            ItemStack slotStack = blockEntity.getStack(0);
 
-        if(!world.isClient()) {
-            BoKarts.LOGGER.info("player clicked the trophy");
+            // insert item
+            if(stack.isOf(ModItems.TRACK_REPORT) && slotStack.isEmpty()) {
+                if(!world.isClient) {
+                    blockEntity.setStack(0, stack.split(1));
+                    blockEntity.markDirty();
+                    world.playSound(null, pos, SoundEvents.ENTITY_ITEM_FRAME_ADD_ITEM, SoundCategory.BLOCKS, 1.0f, 1.0f);
+                    world.updateListeners(pos, state, state, net.minecraft.block.Block.NOTIFY_ALL);
+                }
+                return ItemActionResult.success(world.isClient);
+            }
         }
+        return super.onUseWithItem(stack, state, world, pos, player, hand, hit);
+    }
 
+    @Override
+    protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+        if(world.getBlockEntity(pos) instanceof TrophyBlockEntity blockEntity) {
+            ItemStack slotStack = blockEntity.getStack(0);
+
+            // get item
+            if(player.getMainHandStack().isEmpty() && !slotStack.isEmpty()) {
+                if(!world.isClient) {
+                    player.getInventory().offerOrDrop(slotStack.copy());
+                    blockEntity.setStack(0, ItemStack.EMPTY);
+                    blockEntity.markDirty();
+                    world.playSound(null, pos, SoundEvents.ENTITY_ITEM_FRAME_REMOVE_ITEM, SoundCategory.BLOCKS, 1.0f, 1.0f);
+                    world.updateListeners(pos, state, state, net.minecraft.block.Block.NOTIFY_ALL);
+                }
+                return ActionResult.success(world.isClient);
+            }
+        }
         return super.onUse(state, world, pos, player, hit);
+    }
+
+
+    @Override
+    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+        if(state.getBlock() != newState.getBlock()) {
+            if(world.getBlockEntity(pos) instanceof TrophyBlockEntity blockEntity) {
+                ItemScatterer.spawn(world, pos, blockEntity);
+            }
+            super.onStateReplaced(state, world, pos, newState, moved);
+        }
+    }
+
+
+    // -------------------- block entity --------------------
+
+    @Override
+    public @Nullable BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+        return new TrophyBlockEntity(pos, state);
+    }
+
+    @Override
+    public BlockRenderType getRenderType(BlockState state) {
+        return BlockRenderType.MODEL;
     }
 }
