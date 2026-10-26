@@ -91,12 +91,6 @@ public class KartRenderer extends EntityRenderer<KartEntity> {
             matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(MathHelper.sin(wobbleTime) * wobbleTime * wobbleStrength / 10.0f * kartEntity.getDamageWobbleSide()));
         }
 
-        // bubble wobble rendering
-        float bubbleWobble = kartEntity.interpolateBubbleWobble(tickDelta);
-        if (!MathHelper.approximatelyEquals(bubbleWobble, 0.0f)) {
-            matrixStack.multiply(new Quaternionf().setAngleAxis(kartEntity.interpolateBubbleWobble(tickDelta) * (float) (Math.PI / 180.0), 1.0f, 0.0f, 1.0f));
-        }
-
 
         // -------------------- multipart model rendering --------------------
         // flip from blockbench model

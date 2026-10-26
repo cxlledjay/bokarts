@@ -1,5 +1,6 @@
 package de.cxlledjay.bokarts.entity.custom.kart;
 
+import com.google.common.collect.Lists;
 import de.cxlledjay.bokarts.component.ModDataComponentTypes;
 import de.cxlledjay.bokarts.config.BoKartsConfig;
 import de.cxlledjay.bokarts.config.ClientSyncedConfig;
@@ -15,17 +16,25 @@ import de.cxlledjay.bokarts.util.KartFuelItems;
 import de.cxlledjay.bokarts.util.ModTags;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.*;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.mob.WaterCreatureEntity;
+import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.vehicle.BoatEntity;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.StopSoundS2CPacket;
+import net.minecraft.predicate.entity.EntityPredicates;
+import net.minecraft.registry.tag.EntityTypeTags;
+import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
@@ -33,13 +42,15 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.StringHelper;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
+import net.minecraft.world.BlockLocating;
+import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
+import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.DecimalFormat;
@@ -47,7 +58,562 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class KartEntity extends BoatEntity implements RideableInventory{
+public class KartEntity extends Entity implements RideableInventory{
+
+    // -------------------- vanilla entity stuff --------------------
+    protected static final TrackedData<Integer> DAMAGE_WOBBLE_TICKS = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    protected static final TrackedData<Integer> DAMAGE_WOBBLE_SIDE = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    protected static final TrackedData<Float> DAMAGE_WOBBLE_STRENGTH = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
+
+
+    private float velocityDecay;
+    private float ticksUnderwater;
+    private float yawVelocity;
+    private int lerpTicks;
+    private double x;
+    private double y;
+    private double z;
+    private double boatYaw;
+    private double boatPitch;
+    private boolean pressingLeftBoat;
+    private boolean pressingRightBoat;
+    private boolean pressingForwardBoat;
+    private boolean pressingBackBoat;
+    private double waterLevel;
+    private float nearbySlipperiness;
+    private KartEntity.Location location;
+    private KartEntity.Location lastLocation;
+    private double fallVelocity;
+
+
+    @Override
+    public boolean damage(DamageSource source, float amount) {
+        if (this.getWorld().isClient || this.isRemoved()) {
+            return true;
+        }
+
+        if (this.isInvulnerableTo(source)) {
+            return false;
+        }
+
+        this.setDamageWobbleSide(-this.getDamageWobbleSide());
+        this.setDamageWobbleTicks(10);
+        this.scheduleVelocityUpdate();
+        this.setDamageWobbleStrength(this.getDamageWobbleStrength() + amount * 10.0F);
+        this.emitGameEvent(GameEvent.ENTITY_DAMAGE, source.getAttacker());
+        boolean bl = source.getAttacker() instanceof PlayerEntity && ((PlayerEntity)source.getAttacker()).getAbilities().creativeMode;
+        if ((bl || !(this.getDamageWobbleStrength() > 40.0F)) && !this.shouldAlwaysKill(source)) {
+            if (bl) {
+                this.discard();
+            }
+        } else {
+            this.killAndDropSelf(source);
+        }
+
+        return true;
+    }
+
+    boolean shouldAlwaysKill(DamageSource source) {
+        return false;
+    }
+
+    public void killAndDropItem(Item selfAsItem) {
+        this.kill();
+        if (this.getWorld().getGameRules().getBoolean(GameRules.DO_ENTITY_DROPS)) {
+            ItemStack itemStack = new ItemStack(selfAsItem);
+            itemStack.set(DataComponentTypes.CUSTOM_NAME, this.getCustomName());
+            this.dropStack(itemStack);
+        }
+    }
+
+    protected void killAndDropSelf(DamageSource source) {
+        this.killAndDropItem(this.asItem());
+    }
+
+    @Override
+    protected Entity.MoveEffect getMoveEffect() {
+        return Entity.MoveEffect.EVENTS;
+    }
+
+    @Override
+    public Vec3d positionInPortal(Direction.Axis portalAxis, BlockLocating.Rectangle portalRect) {
+        return LivingEntity.positionInPortal(super.positionInPortal(portalAxis, portalRect));
+    }
+
+    @Override
+    public void pushAwayFrom(Entity entity) {
+        if (entity instanceof KartEntity) {
+            if (entity.getBoundingBox().minY < this.getBoundingBox().maxY) {
+                super.pushAwayFrom(entity);
+            }
+        } else if (entity.getBoundingBox().minY <= this.getBoundingBox().minY) {
+            super.pushAwayFrom(entity);
+        }
+    }
+
+    @Override
+    public void animateDamage(float yaw) {
+        this.setDamageWobbleSide(-this.getDamageWobbleSide());
+        this.setDamageWobbleTicks(10);
+        this.setDamageWobbleStrength(this.getDamageWobbleStrength() * 11.0F);
+    }
+
+    @Override
+    public boolean canHit() {
+        return !this.isRemoved();
+    }
+
+    @Override
+    public void updateTrackedPositionAndAngles(double x, double y, double z, float yaw, float pitch, int interpolationSteps) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.boatYaw = yaw;
+        this.boatPitch = pitch;
+        this.lerpTicks = 10;
+    }
+
+    @Override
+    public double getLerpTargetX() {
+        return this.lerpTicks > 0 ? this.x : this.getX();
+    }
+
+    @Override
+    public double getLerpTargetY() {
+        return this.lerpTicks > 0 ? this.y : this.getY();
+    }
+
+    @Override
+    public double getLerpTargetZ() {
+        return this.lerpTicks > 0 ? this.z : this.getZ();
+    }
+
+    @Override
+    public float getLerpTargetPitch() {
+        return this.lerpTicks > 0 ? (float)this.boatPitch : this.getPitch();
+    }
+
+    @Override
+    public float getLerpTargetYaw() {
+        return this.lerpTicks > 0 ? (float)this.boatYaw : this.getYaw();
+    }
+
+    @Override
+    public Direction getMovementDirection() {
+        return this.getHorizontalFacing().rotateYClockwise();
+    }
+
+    public void superTick() {
+        this.lastLocation = this.location;
+        this.location = this.checkLocation();
+        if (this.location != KartEntity.Location.UNDER_WATER && this.location != KartEntity.Location.UNDER_FLOWING_WATER) {
+            this.ticksUnderwater = 0.0F;
+        } else {
+            this.ticksUnderwater++;
+        }
+
+        if (!this.getWorld().isClient && this.ticksUnderwater >= 60.0F) {
+            this.removeAllPassengers();
+        }
+
+        if (this.getDamageWobbleTicks() > 0) {
+            this.setDamageWobbleTicks(this.getDamageWobbleTicks() - 1);
+        }
+
+        if (this.getDamageWobbleStrength() > 0.0F) {
+            this.setDamageWobbleStrength(this.getDamageWobbleStrength() - 1.0F);
+        }
+
+        super.tick();
+        this.updatePositionAndRotation();
+        if (this.isLogicalSideForUpdatingMovement()) {
+            if (!(this.getFirstPassenger() instanceof PlayerEntity)) {
+                // this.setPaddleMovings(false, false);
+            }
+
+            this.updateVelocity();
+            if (this.getWorld().isClient) {
+                this.updatePaddles();
+                // this.getWorld().sendPacket(new BoatPaddleStateC2SPacket(this.isPaddleMoving(0), this.isPaddleMoving(1)));
+            }
+
+            this.move(MovementType.SELF, this.getVelocity());
+        } else {
+            this.setVelocity(Vec3d.ZERO);
+        }
+
+        // this.handleBubbleColumn();
+
+        this.checkBlockCollision();
+        List<Entity> list = this.getWorld().getOtherEntities(this, this.getBoundingBox().expand(0.2F, -0.01F, 0.2F), EntityPredicates.canBePushedBy(this));
+        if (!list.isEmpty()) {
+            boolean bl = !this.getWorld().isClient && !(this.getControllingPassenger() instanceof PlayerEntity);
+
+            for (Entity entity : list) {
+                if (!entity.hasPassenger(this)) {
+                    if (bl
+                            && this.getPassengerList().size() < this.getMaxPassengers()
+                            && !entity.hasVehicle()
+                            && this.isSmallerThanBoat(entity)
+                            && entity instanceof LivingEntity
+                            && !(entity instanceof WaterCreatureEntity)
+                            && !(entity instanceof PlayerEntity)) {
+                        entity.startRiding(this);
+                    } else {
+                        this.pushAwayFrom(entity);
+                    }
+                }
+            }
+        }
+    }
+
+    private void updatePositionAndRotation() {
+        if (this.isLogicalSideForUpdatingMovement()) {
+            this.lerpTicks = 0;
+            this.updateTrackedPosition(this.getX(), this.getY(), this.getZ());
+        }
+
+        if (this.lerpTicks > 0) {
+            this.lerpPosAndRotation(this.lerpTicks, this.x, this.y, this.z, this.boatYaw, this.boatPitch);
+            this.lerpTicks--;
+        }
+    }
+
+    private KartEntity.Location checkLocation() {
+        KartEntity.Location location = this.getUnderWaterLocation();
+        if (location != null) {
+            this.waterLevel = this.getBoundingBox().maxY;
+            return location;
+        } else if (this.checkBoatInWater()) {
+            return KartEntity.Location.IN_WATER;
+        } else {
+            float f = this.getNearbySlipperiness();
+            if (f > 0.0F) {
+                this.nearbySlipperiness = f;
+                return KartEntity.Location.ON_LAND;
+            } else {
+                return KartEntity.Location.IN_AIR;
+            }
+        }
+    }
+
+    public float getWaterHeightBelow() {
+        Box box = this.getBoundingBox();
+        int i = MathHelper.floor(box.minX);
+        int j = MathHelper.ceil(box.maxX);
+        int k = MathHelper.floor(box.maxY);
+        int l = MathHelper.ceil(box.maxY - this.fallVelocity);
+        int m = MathHelper.floor(box.minZ);
+        int n = MathHelper.ceil(box.maxZ);
+        BlockPos.Mutable mutable = new BlockPos.Mutable();
+
+        label39:
+        for (int o = k; o < l; o++) {
+            float f = 0.0F;
+
+            for (int p = i; p < j; p++) {
+                for (int q = m; q < n; q++) {
+                    mutable.set(p, o, q);
+                    FluidState fluidState = this.getWorld().getFluidState(mutable);
+                    if (fluidState.isIn(FluidTags.WATER)) {
+                        f = Math.max(f, fluidState.getHeight(this.getWorld(), mutable));
+                    }
+
+                    if (f >= 1.0F) {
+                        continue label39;
+                    }
+                }
+            }
+
+            if (f < 1.0F) {
+                return mutable.getY() + f;
+            }
+        }
+
+        return l + 1;
+    }
+
+    private boolean checkBoatInWater() {
+        Box box = this.getBoundingBox();
+        int i = MathHelper.floor(box.minX);
+        int j = MathHelper.ceil(box.maxX);
+        int k = MathHelper.floor(box.minY);
+        int l = MathHelper.ceil(box.minY + 0.001);
+        int m = MathHelper.floor(box.minZ);
+        int n = MathHelper.ceil(box.maxZ);
+        boolean bl = false;
+        this.waterLevel = -Double.MAX_VALUE;
+        BlockPos.Mutable mutable = new BlockPos.Mutable();
+
+        for (int o = i; o < j; o++) {
+            for (int p = k; p < l; p++) {
+                for (int q = m; q < n; q++) {
+                    mutable.set(o, p, q);
+                    FluidState fluidState = this.getWorld().getFluidState(mutable);
+                    if (fluidState.isIn(FluidTags.WATER)) {
+                        float f = p + fluidState.getHeight(this.getWorld(), mutable);
+                        this.waterLevel = Math.max(f, this.waterLevel);
+                        bl |= box.minY < f;
+                    }
+                }
+            }
+        }
+
+        return bl;
+    }
+    @Nullable
+    private KartEntity.Location getUnderWaterLocation() {
+        Box box = this.getBoundingBox();
+        double d = box.maxY + 0.001;
+        int i = MathHelper.floor(box.minX);
+        int j = MathHelper.ceil(box.maxX);
+        int k = MathHelper.floor(box.maxY);
+        int l = MathHelper.ceil(d);
+        int m = MathHelper.floor(box.minZ);
+        int n = MathHelper.ceil(box.maxZ);
+        boolean bl = false;
+        BlockPos.Mutable mutable = new BlockPos.Mutable();
+
+        for (int o = i; o < j; o++) {
+            for (int p = k; p < l; p++) {
+                for (int q = m; q < n; q++) {
+                    mutable.set(o, p, q);
+                    FluidState fluidState = this.getWorld().getFluidState(mutable);
+                    if (fluidState.isIn(FluidTags.WATER) && d < mutable.getY() + fluidState.getHeight(this.getWorld(), mutable)) {
+                        if (!fluidState.isStill()) {
+                            return KartEntity.Location.UNDER_FLOWING_WATER;
+                        }
+
+                        bl = true;
+                    }
+                }
+            }
+        }
+
+        return bl ? KartEntity.Location.UNDER_WATER : null;
+    }
+
+    @Override
+    protected double getGravity() {
+        return 0.04;
+    }
+
+    private void updateVelocity() {
+        double d = -this.getFinalGravity();
+        double e = 0.0;
+        this.velocityDecay = 0.05F;
+        if (this.lastLocation == KartEntity.Location.IN_AIR && this.location != KartEntity.Location.IN_AIR && this.location != KartEntity.Location.ON_LAND) {
+            this.waterLevel = this.getBodyY(1.0);
+            double f = this.getWaterHeightBelow() - this.getHeight() + 0.101;
+            if (this.getWorld().isSpaceEmpty(this, this.getBoundingBox().offset(0.0, f - this.getY(), 0.0))) {
+                this.setPosition(this.getX(), f, this.getZ());
+                this.setVelocity(this.getVelocity().multiply(1.0, 0.0, 1.0));
+                this.fallVelocity = 0.0;
+            }
+
+            this.location = KartEntity.Location.IN_WATER;
+        } else {
+            if (this.location == KartEntity.Location.IN_WATER) {
+                e = (this.waterLevel - this.getY()) / this.getHeight();
+                this.velocityDecay = 0.9F;
+            } else if (this.location == KartEntity.Location.UNDER_FLOWING_WATER) {
+                d = -7.0E-4;
+                this.velocityDecay = 0.9F;
+            } else if (this.location == KartEntity.Location.UNDER_WATER) {
+                e = 0.01F;
+                this.velocityDecay = 0.45F;
+            } else if (this.location == KartEntity.Location.IN_AIR) {
+                this.velocityDecay = 0.9F;
+            } else if (this.location == KartEntity.Location.ON_LAND) {
+                this.velocityDecay = this.nearbySlipperiness;
+                if (this.getControllingPassenger() instanceof PlayerEntity) {
+                    this.nearbySlipperiness /= 2.0F;
+                }
+            }
+
+            Vec3d vec3d = this.getVelocity();
+            this.setVelocity(vec3d.x * this.velocityDecay, vec3d.y + d, vec3d.z * this.velocityDecay);
+            this.yawVelocity = this.yawVelocity * this.velocityDecay;
+            if (e > 0.0) {
+                Vec3d vec3d2 = this.getVelocity();
+                this.setVelocity(vec3d2.x, (vec3d2.y + e * (this.getGravity() / 0.65)) * 0.75, vec3d2.z);
+            }
+        }
+    }
+
+    private void updatePaddles() {
+        if (this.hasPassengers()) {
+            float f = 0.0F;
+            if (this.pressingLeftBoat) {
+                this.yawVelocity--;
+            }
+
+            if (this.pressingRightBoat) {
+                this.yawVelocity++;
+            }
+
+            if (this.pressingRightBoat != this.pressingLeftBoat && !this.pressingForwardBoat && !this.pressingBackBoat) {
+                f += 0.005F;
+            }
+
+            this.setYaw(this.getYaw() + this.yawVelocity);
+            if (this.pressingForwardBoat) {
+                f += 0.04F;
+            }
+
+            if (this.pressingBackBoat) {
+                f -= 0.005F;
+            }
+
+            this.setVelocity(
+                    this.getVelocity().add(MathHelper.sin(-this.getYaw() * (float) (Math.PI / 180.0)) * f, 0.0, MathHelper.cos(this.getYaw() * (float) (Math.PI / 180.0)) * f)
+            );
+            // this.setPaddleMovings(this.pressingRightBoat && !this.pressingLeftBoat || this.pressingForwardBoat, this.pressingLeftBoat && !this.pressingRightBoat || this.pressingForwardBoat);
+        }
+    }
+
+    public boolean isSmallerThanBoat(Entity entity) {
+        return entity.getWidth() < this.getWidth();
+    }
+
+    @Override
+    public Vec3d updatePassengerForDismount(LivingEntity passenger) {
+        Vec3d vec3d = getPassengerDismountOffset(this.getWidth() * MathHelper.SQUARE_ROOT_OF_TWO, passenger.getWidth(), passenger.getYaw());
+        double d = this.getX() + vec3d.x;
+        double e = this.getZ() + vec3d.z;
+        BlockPos blockPos = BlockPos.ofFloored(d, this.getBoundingBox().maxY, e);
+        BlockPos blockPos2 = blockPos.down();
+        if (!this.getWorld().isWater(blockPos2)) {
+            List<Vec3d> list = Lists.newArrayList();
+            double f = this.getWorld().getDismountHeight(blockPos);
+            if (Dismounting.canDismountInBlock(f)) {
+                list.add(new Vec3d(d, blockPos.getY() + f, e));
+            }
+
+            double g = this.getWorld().getDismountHeight(blockPos2);
+            if (Dismounting.canDismountInBlock(g)) {
+                list.add(new Vec3d(d, blockPos2.getY() + g, e));
+            }
+
+            for (EntityPose entityPose : passenger.getPoses()) {
+                for (Vec3d vec3d2 : list) {
+                    if (Dismounting.canPlaceEntityAt(this.getWorld(), vec3d2, passenger, entityPose)) {
+                        passenger.setPose(entityPose);
+                        return vec3d2;
+                    }
+                }
+            }
+        }
+
+        return super.updatePassengerForDismount(passenger);
+    }
+
+    protected void clampPassengerYaw(Entity passenger) {
+        passenger.setBodyYaw(this.getYaw());
+        float f = MathHelper.wrapDegrees(passenger.getYaw() - this.getYaw());
+        float g = MathHelper.clamp(f, -105.0F, 105.0F);
+        passenger.prevYaw += g - f;
+        passenger.setYaw(passenger.getYaw() + g - f);
+        passenger.setHeadYaw(passenger.getYaw());
+    }
+
+    @Override
+    public void onPassengerLookAround(Entity passenger) {
+        this.clampPassengerYaw(passenger);
+    }
+
+    @Override
+    public ActionResult interact(PlayerEntity player, Hand hand) {
+        ActionResult actionResult = super.interact(player, hand);
+        if (actionResult != ActionResult.PASS) {
+            return actionResult;
+        }
+
+        if (player.shouldCancelInteraction()) {
+            return ActionResult.PASS;
+        }
+
+        if (this.ticksUnderwater < 60.0F) {
+            if (!this.getWorld().isClient) {
+                return player.startRiding(this) ? ActionResult.CONSUME : ActionResult.PASS;
+            } else {
+                return ActionResult.SUCCESS;
+            }
+        } else {
+            return ActionResult.PASS;
+        }
+    }
+
+    protected void superFall(double heightDifference, boolean onGround, BlockState state, BlockPos landedPosition) {
+        this.fallVelocity = this.getVelocity().y;
+        if (!this.hasVehicle()) {
+            if (onGround) {
+                if (this.fallDistance > 3.0F) {
+                    if (this.location != KartEntity.Location.ON_LAND) {
+                        this.onLanding();
+                        return;
+                    }
+
+                    this.handleFallDamage(this.fallDistance, 1.0F, this.getDamageSources().fall());
+                    if (!this.getWorld().isClient && !this.isRemoved()) {
+                        this.kill();
+                        if (this.getWorld().getGameRules().getBoolean(GameRules.DO_ENTITY_DROPS)) {
+                            for (int i = 0; i < 3; i++) {
+                                // this.dropItem(this.getVariant().getBaseBlock());
+                                this.killAndDropItem(this.asItem());
+                            }
+
+                            for (int i = 0; i < 2; i++) {
+                                this.dropItem(Items.STICK);
+                            }
+                        }
+                    }
+                }
+
+                this.onLanding();
+            } else if (!this.getWorld().getFluidState(this.getBlockPos().down()).isIn(FluidTags.WATER) && heightDifference < 0.0) {
+                this.fallDistance -= (float)heightDifference;
+            }
+        }
+    }
+
+    @Override
+    protected boolean canAddPassenger(Entity passenger) {
+        return this.getPassengerList().size() < this.getMaxPassengers() && !this.isSubmergedIn(FluidTags.WATER) && passenger instanceof PlayerEntity;
+    }
+
+    @Nullable
+    @Override
+    public LivingEntity getControllingPassenger() {
+        return this.getFirstPassenger() instanceof LivingEntity livingEntity ? livingEntity : super.getControllingPassenger();
+    }
+
+    public void superSetInputs(boolean pressingLeftBoat, boolean pressingRightBoat, boolean pressingForwardBoat, boolean pressingBackBoat) {
+        this.pressingLeftBoat = pressingLeftBoat;
+        this.pressingRightBoat = pressingRightBoat;
+        this.pressingForwardBoat = pressingForwardBoat;
+        this.pressingBackBoat = pressingBackBoat;
+    }
+
+    @Override
+    protected Text getDefaultName() {
+        return Text.translatable(this.asItem().getTranslationKey());
+    }
+
+    @Override
+    public boolean isSubmergedInWater() {
+        return this.location == KartEntity.Location.UNDER_WATER || this.location == KartEntity.Location.UNDER_FLOWING_WATER;
+    }
+
+    public enum Location {
+        IN_WATER,
+        UNDER_WATER,
+        UNDER_FLOWING_WATER,
+        ON_LAND,
+        IN_AIR;
+    }
+
+
 
     // -------------------- constants --------------------
     private static final float STEERING_SPEED = 20.0f;
@@ -126,7 +692,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
     // ==================== the kart ====================
 
-    public KartEntity(EntityType<? extends BoatEntity> entityType, World world) {
+    public KartEntity(EntityType<?> entityType, World world) {
         super(entityType, world);
     }
 
@@ -142,49 +708,37 @@ public class KartEntity extends BoatEntity implements RideableInventory{
     // ==================== fixing BoatEntity behaviour ====================
 
     // fix driver position and number
+
     @Override
     protected void updatePassengerPosition(Entity passenger, Entity.PositionUpdater positionUpdater) {
-        if (this.hasPassenger(passenger)) {
-            // 1. Define your local offset: X (left/right), Y (height), Z (forward/backward)
-            // Adjust these values to align exactly with your seat
-            Vec3d localOffset = new Vec3d(0.0, -0.42, -0.3);
-
-            // 2. Convert the kart's yaw to radians and rotate the offset
-            // Minecraft yaw is inverted, so we use negative yaw
-            float yaw = this.getYaw();
-            Vec3d rotatedOffset = localOffset.rotateY(-yaw * ((float)Math.PI / 180F));
-
-            // 3. Apply the rotated offset to the kart's true world position
-            positionUpdater.accept(
-                    passenger,
-                    this.getX() + rotatedOffset.x,
-                    this.getY() + localOffset.y,
-                    this.getZ() + rotatedOffset.z
-            );
-
-            // 1. Calculate how much the kart rotated since the last tick
-            float deltaYaw = this.getYaw() - this.prevYaw;
-
-            // 2. Add that rotation to the passenger's current camera angles
-            passenger.setYaw(passenger.getYaw() + deltaYaw);
-            passenger.setHeadYaw(passenger.getHeadYaw() + deltaYaw);
-
-            // 3. Keep the torso facing strictly forward
-            passenger.setBodyYaw(this.getYaw());
-        } else {
-            super.updatePassengerPosition(passenger, positionUpdater);
+        super.updatePassengerPosition(passenger, positionUpdater);
+        if (passenger instanceof PlayerEntity) {
+            passenger.setYaw(passenger.getYaw() + this.yawVelocity);
+            passenger.setHeadYaw(passenger.getHeadYaw() + this.yawVelocity);
+            this.clampPassengerYaw(passenger);
         }
     }
 
-    @Override
     protected int getMaxPassengers() {
         return 1;
+    }
+
+    @Override
+    protected Vec3d getPassengerAttachmentPos(Entity passenger, EntityDimensions dimensions, float scaleFactor) {
+        return new Vec3d(0.0, dimensions.height() / 3.0F - 0.05f, -0.4f).rotateY(-this.getYaw() * (float) (Math.PI / 180.0));
+    }
+
+    @Override
+    protected void addPassenger(Entity passenger) {
+        super.addPassenger(passenger);
+        passenger.setYaw(this.getYaw());
+        passenger.setHeadYaw(this.getYaw());
+        passenger.setBodyYaw(this.getYaw());
     }
 
 
     // ==================== kart driving behaviour ====================
 
-    @Override
     public float getNearbySlipperiness() {
 
         // get block below kart
@@ -334,7 +888,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         this.fallDistance = 0.0F;
 
         // Continue with standard entity falling (won't break because distance is 0)
-        super.fall(heightDifference, onGround, state, pos);
+        this.superFall(heightDifference, onGround, state, pos);
     }
 
 
@@ -346,8 +900,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         return false;
     }
 
-    @Override
-    public Item asItem() {
+    protected Item asItem() {
         return ModItems.KART_ITEM;
     }
 
@@ -429,7 +982,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
     // ==================== input handling ====================
 
-    @Override
+    //@Override
     public void setInputs(boolean left, boolean right, boolean forward, boolean back) {
 
         // manipulate reverse physics
@@ -437,7 +990,7 @@ public class KartEntity extends BoatEntity implements RideableInventory{
         boolean manipulatedRight = back ? left : right;
 
         // handle inputs in BoatEntity
-        super.setInputs(manipulatedLeft, manipulatedRight, forward, back);
+        this.superSetInputs(manipulatedLeft, manipulatedRight, forward, back);
 
         if (this.getWorld().isClient()) {
 
@@ -490,11 +1043,20 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
         // no drive ?
         if (this.canNotDrive()) {
-            super.setInputs(false, false, false, false);
+            this.superSetInputs(false, false, false, false);
+        } else {
+            if (this.getControllingPassenger() instanceof PlayerEntity player) {
+                boolean forward = player.forwardSpeed > 0.0F;
+                boolean backward = player.forwardSpeed < 0.0F;
+                boolean left = player.sidewaysSpeed > 0.0F;
+                boolean right = player.sidewaysSpeed < 0.0F;
+
+                this.setInputs(left, right, forward, backward);
+            }
         }
 
         // tick the boat parent
-        super.tick();
+        this.superTick();
 
 
         // ---------------- position tracking (client + server) ----------------
@@ -732,13 +1294,6 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
     // ==================== sounds ====================
 
-    @Override
-    @Nullable
-    protected SoundEvent getPaddleSoundEvent() {
-        return null;
-    }
-
-
     public float getSoundScaling() {
         return soundScaling;
     }
@@ -906,7 +1461,10 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
     @Override
     protected void initDataTracker(DataTracker.Builder builder) {
-        super.initDataTracker(builder);
+        // vanilla stuff
+        builder.add(DAMAGE_WOBBLE_TICKS, 0);
+        builder.add(DAMAGE_WOBBLE_SIDE, 1);
+        builder.add(DAMAGE_WOBBLE_STRENGTH, 0.0F);
 
         // fuel and distance
         builder.add(FUEL, 0.0f);
@@ -934,8 +1492,6 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
     @Override
     protected void writeCustomDataToNbt(NbtCompound nbt) {
-        super.writeCustomDataToNbt(nbt);
-
         nbt.putFloat("Fuel", this.getFuelSynced());
         nbt.putFloat("Odo", this.getOdometerSynced());
 
@@ -962,8 +1518,6 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
     @Override
     protected void readCustomDataFromNbt(NbtCompound nbt) {
-        super.readCustomDataFromNbt(nbt);
-
         // convert old paints
         if (nbt.contains("PaintColor")) {
 
@@ -1061,6 +1615,28 @@ public class KartEntity extends BoatEntity implements RideableInventory{
 
 
     // ==================== getter and setter related to data tracking ====================
+
+    // vanilla
+    public void setDamageWobbleTicks(int damageWobbleTicks) {
+        this.dataTracker.set(DAMAGE_WOBBLE_TICKS, damageWobbleTicks);
+    }
+    public void setDamageWobbleSide(int damageWobbleSide) {
+        this.dataTracker.set(DAMAGE_WOBBLE_SIDE, damageWobbleSide);
+    }
+    public void setDamageWobbleStrength(float damageWobbleStrength) {
+        this.dataTracker.set(DAMAGE_WOBBLE_STRENGTH, damageWobbleStrength);
+    }
+    public float getDamageWobbleStrength() {
+        return this.dataTracker.get(DAMAGE_WOBBLE_STRENGTH);
+    }
+    public int getDamageWobbleTicks() {
+        return this.dataTracker.get(DAMAGE_WOBBLE_TICKS);
+    }
+    public int getDamageWobbleSide() {
+        return this.dataTracker.get(DAMAGE_WOBBLE_SIDE);
+    }
+
+    // horn
     public HornType getHornType() {
         return this.dataTracker.get(HORN_TYPE);
     }
