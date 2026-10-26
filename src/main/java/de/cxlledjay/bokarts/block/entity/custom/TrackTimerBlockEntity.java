@@ -107,8 +107,6 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
 
     // -------------------- racing business logic --------------------
 
-
-
     private void handleLineCrossing(KartEntity kart, long timestamp) {
         if(kart.getControllingPassenger() == null) return;
         if(kart.getControllingPassenger() instanceof PlayerEntity player) {
@@ -193,12 +191,6 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
                     }
                 }
             }
-
-
-
-
-
-
 
             // update entry
             TrackTimerKartStats updatedStats = new TrackTimerKartStats(timestamp, best, laps, finished);
@@ -294,7 +286,6 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
         return res;
     }
 
-
     private ItemStack createGrandPrixItemStack(KartEntity kart, PlayerEntity player, long bestLap, int placement, int totalLaps) {
         ItemStack res = ItemStack.EMPTY;
 
@@ -318,9 +309,6 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
 
         return res;
     }
-
-
-
 
     private void tryPrintingTrackReport(ItemStack trackReportItemStack) {
         ItemStack input = this.inventory.getFirst();
@@ -502,9 +490,13 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
         this.markDirty();
     }
 
-    public void start() {
+    public void start(PlayerEntity player) {
         // cannot start twice
-        if(this.hasStarted) return;
+        if(this.hasStarted) {
+            Text msg = getPrefix().append(Text.literal(" Timer has already started. Reset it before starting again! ").formatted(Formatting.RED));
+            player.sendMessage(msg);
+            return;
+        }
 
         // search for a reflector block
         if (this.world != null && !this.world.isClient()) {
@@ -526,15 +518,26 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
                             calculateBoundingBox();
                             this.hasStarted = true;
                             this.markDirty();
+                            Text msg = getPrefix().append(Text.literal(" Timer has started!").formatted(Formatting.GREEN));
+                            player.sendMessage(msg);
+                            return;
                     }
+                    Text msg = getPrefix().append(Text.literal(" Found reflector but it is rotated wrongly!").formatted(Formatting.RED));
+                    player.sendMessage(msg);
                     return;
                 }
-                else if(!inspectedBlock.equals(Blocks.AIR)) return; //< only air is valid
+                else if(!inspectedBlock.equals(Blocks.AIR)) {
+                    Text msg = getPrefix().append(Text.literal(" Cannot find reflector. Maybe it is obstructed?").formatted(Formatting.RED));
+                    player.sendMessage(msg);
+                    return; //< only air is valid
+                }
             }
+            Text msg = getPrefix().append(Text.literal(" Cannot find reflector. Maybe it is too far away? (max: " + MAX_TRACK_WIDTH + ")").formatted(Formatting.RED));
+            player.sendMessage(msg);
         }
     }
 
-    public void stopOrReset() {
+    public void stopOrReset(PlayerEntity player) {
         // reset everything server sided
         if (this.world != null && !this.world.isClient()) {
 
@@ -550,6 +553,9 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
             this.firstPlaceUuid = null;
             this.highestLap = 0;
             this.bestLapTime = 0;
+
+            Text msg = getPrefix().append(Text.literal(" Timer has stopped and reset. Ready to start again!").formatted(Formatting.GREEN));
+            player.sendMessage(msg);
 
             // and save
             this.markDirty();
@@ -739,7 +745,6 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
             return switch (index) {
                 case 0 -> settingCurrentMode.ordinal();
                 case 1 -> settingLapCount;
-                case 2 -> Boolean.compare(hasStarted, true);
                 default -> 0;
             };
         }
@@ -758,7 +763,7 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
 
         @Override
         public int size() {
-            return 3; //< 3 variables tracked
+            return 2; //< 2 variables tracked
         }
     };
 

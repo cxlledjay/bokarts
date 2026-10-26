@@ -40,7 +40,7 @@ public class TrackTimerScreenHandler extends ScreenHandler {
 
     // client constructor
     public TrackTimerScreenHandler(int syncId, PlayerInventory playerInventory) {
-        this(syncId, playerInventory, ScreenHandlerContext.EMPTY, new ArrayPropertyDelegate(3), null, new SimpleInventory(10));
+        this(syncId, playerInventory, ScreenHandlerContext.EMPTY, new ArrayPropertyDelegate(2), null, new SimpleInventory(10));
     }
 
     public TrackTimerScreenHandler(int syncId, PlayerInventory playerInventory, ScreenHandlerContext context, PropertyDelegate delegate, TrackTimerBlockEntity blockEntity, Inventory blockInventory) {
@@ -131,10 +131,6 @@ public class TrackTimerScreenHandler extends ScreenHandler {
         return this.propertyDelegate.get(1);
     }
 
-    private boolean getHasStarted() {
-        return this.propertyDelegate.get(2) == 0;
-    }
-
     public String getModeString() {
         if(this.getCurrentMode() == TrackTimerBlockEntity.TrackTimerMode.TIME_ATTACK) return "Mode: Time Attack";
         else if(this.getCurrentMode() == TrackTimerBlockEntity.TrackTimerMode.GRAND_PRIX) return "Mode: Grand Prix";
@@ -145,7 +141,6 @@ public class TrackTimerScreenHandler extends ScreenHandler {
     // -------------------- interface for block entity --------------------
 
     private void cycleMode() {
-        BoKarts.LOGGER.info("cycling mode from: {}", this.getModeString());
         if(this.blockEntity != null) {
             this.blockEntity.cycleMode();
         }
@@ -153,18 +148,12 @@ public class TrackTimerScreenHandler extends ScreenHandler {
 
     private void startTrackTimer(PlayerEntity player) {
         if(this.blockEntity == null) return;
-        if(this.getHasStarted()) {
-            player.sendMessage(Text.literal("Race has already started!"));
-        } else {
-            this.blockEntity.start();
-            player.sendMessage(Text.literal("Starting race..."));
-        }
+        this.blockEntity.start(player);
     }
 
     private void resetTrackTimer(PlayerEntity player) {
         if(this.blockEntity != null) {
-            this.blockEntity.stopOrReset();
-            player.sendMessage(Text.literal("Stopping / resetting race..."));
+            this.blockEntity.stopOrReset(player);
         }
     }
 
