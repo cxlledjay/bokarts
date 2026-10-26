@@ -172,8 +172,26 @@ public class TrackTimerScreenHandler extends ScreenHandler {
     // -------------------- vanilla logic --------------------
 
     @Override
-    public ItemStack quickMove(PlayerEntity player, int slot) {
-        return ItemStack.EMPTY;
+    public ItemStack quickMove(PlayerEntity player, int invSlot) {
+        ItemStack newStack = ItemStack.EMPTY;
+        Slot slot = this.slots.get(invSlot);
+        if (slot.hasStack()) {
+            ItemStack originalStack = slot.getStack();
+            newStack = originalStack.copy();
+            if (invSlot < this.blockInventory.size()) {
+                if (!this.insertItem(originalStack, this.blockInventory.size(), this.slots.size(), false)) {
+                    return ItemStack.EMPTY;
+                }
+            } else if (!this.insertItem(originalStack, 0, this.blockInventory.size(), false)) {
+                return ItemStack.EMPTY;
+            }
+            if (originalStack.isEmpty()) {
+                slot.setStack(ItemStack.EMPTY);
+            } else {
+                slot.markDirty();
+            }
+        }
+        return newStack;
     }
 
     @Override

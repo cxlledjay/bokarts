@@ -566,6 +566,7 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
         if(!this.participantInfo.containsKey(player.getUuid())) return;
 
         TrackTimerKartStats stats = this.participantInfo.get(player.getUuid());
+        if(stats.best() <= 0) return;
 
         ItemStack trackReport = createTimeAttackItemStack(player, stats.best());
         if(trackReport != null) this.tryPrintingTrackReport(trackReport);
