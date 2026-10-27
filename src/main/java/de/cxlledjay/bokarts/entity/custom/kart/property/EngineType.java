@@ -17,7 +17,7 @@ public enum EngineType implements StringIdentifiable {
     ENGINE_IRON(2, "engine_iron", "Iron"),
     ENGINE_GOLD(3, "engine_gold", "Gold"),
     ENGINE_DIAMOND(4, "engine_diamond", "Diamond"),
-    ENGINE_NETHERITE(5, "engine_netherite", "Netherite"),;
+    ENGINE_NETHERITE(5, "engine_netherite", "Netherite");
 
     // id to value function
     private static final IntFunction<EngineType> INDEX_TO_VALUE = ValueLists.createIdToValueFunction(

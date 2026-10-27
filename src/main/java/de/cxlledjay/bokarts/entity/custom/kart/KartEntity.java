@@ -927,30 +927,7 @@ public class KartEntity extends Entity implements RideableInventory{
     @Override
     public void tick() {
 
-        // -------------------- handle inputs --------------------
-        if (this.getControllingPassenger() instanceof PlayerEntity player) {
-            boolean forward = player.forwardSpeed > 0.0F;
-            boolean backward = player.forwardSpeed < 0.0F;
-            boolean left = player.sidewaysSpeed > 0.0F;
-            boolean right = player.sidewaysSpeed < 0.0F;
-
-            this.setInputs(left, right, forward, backward);
-        }
-
-        // calculate steering angle here to allow steering without fuel / key
-        calculateSteeringAngle();
-
-        // no fuel / key => no driving
-        if (this.canNotDrive()) {
-            this.pressingLeft = false;
-            this.pressingRight = false;
-            this.pressingForward = false;
-            this.pressingBack = false;
-            this.pressingSlow = false;
-        }
-
-
-        // -------------------- water physics --------------------
+        // underwater check
         this.lastLocation = this.location;
         this.location = this.checkLocation();
 
@@ -960,28 +937,8 @@ public class KartEntity extends Entity implements RideableInventory{
             this.ticksUnderwater++;
         }
 
-        // spend too long in water => kaboom
-        if (!this.getWorld().isClient && this.ticksUnderwater >= ClientSyncedConfig.getMaxTicksInWater()) {
 
-            // eject passengers
-            this.removeAllPassengers();
-
-            // spawn explosion
-            this.getWorld().createExplosion(
-                    this,     // The entity causing the explosion
-                    this.getX(),    // X coordinate
-                    this.getY(),    // Y coordinate
-                    this.getZ(),    // Z coordinate
-                    1.5f,           // Power (TNT is 4.0f, Creeper is 3.0f)
-                    World.ExplosionSourceType.NONE // NONE = damages players/entities, but DOES NOT break blocks!
-            );
-
-            // kill kart and drop it
-            this.killAndDropItem(this.asItem());
-
-            // despawn it
-            this.discard();
-        }
+        // -------------------- vanilla stuff --------------------
 
         // damage wobble
         if (this.getDamageWobbleTicks() > 0) {
@@ -990,15 +947,25 @@ public class KartEntity extends Entity implements RideableInventory{
         if (this.getDamageWobbleStrength() > 0.0F) {
             this.setDamageWobbleStrength(this.getDamageWobbleStrength() - 1.0F);
         }
-
-        // base entity tick() call
         super.tick();
-
-        // -------------------- movement physics --------------------
         this.updatePositionAndRotation();
+
+
+        // ==================== movement physics ====================
         if (this.isLogicalSideForUpdatingMovement()) {
+
+            // set inputs
+            if (this.getControllingPassenger() instanceof PlayerEntity player) {
+                boolean forward = player.forwardSpeed > 0.0F;
+                boolean backward = player.forwardSpeed < 0.0F;
+                boolean left = player.sidewaysSpeed > 0.0F;
+                boolean right = player.sidewaysSpeed < 0.0F;
+
+                this.setInputs(left, right, forward, backward);
+            }
+
             this.updateVelocity();
-            if (this.getWorld().isClient) {
+            if (this.getWorld().isClient && !this.canNotDrive()) {
                 this.updatePaddles();
             }
             this.move(MovementType.SELF, this.getVelocity());
@@ -1006,21 +973,20 @@ public class KartEntity extends Entity implements RideableInventory{
             this.setVelocity(Vec3d.ZERO);
         }
 
-        // calculate movement for this tick
+        // ==================== post movement calculations ====================
         Vec3d movementThisTick = new Vec3d(
                 this.getX() - this.lastTickX,
                 this.getY() - this.lastTickY,
                 this.getZ() - this.lastTickZ);
         this.distanceThisTick = movementThisTick.length();
 
-
-        // -------------------- engine revving --------------------
-        calculateEngineRevs();
-
         // -------------------- collision check --------------------
         this.checkBlockCollision();
         this.handleKartCollisions(movementThisTick.normalize(), this.distanceThisTick);
 
+        // -------------------- server synced animations --------------------
+        calculateSteeringAngle();
+        calculateEngineRevs();
 
         // -------------------- kart stats --------------------
         // init
@@ -1034,8 +1000,31 @@ public class KartEntity extends Entity implements RideableInventory{
         }
         this.currentOdometer += (float) this.distanceThisTick;
 
-        //-------------------- server sided updates --------------------
+        //==================== server sided updates ====================
         if (!this.getWorld().isClient()) {
+
+            // spend too long in water => kaboom
+            if (this.ticksUnderwater >= ClientSyncedConfig.getMaxTicksInWater()) {
+
+                // eject passengers
+                this.removeAllPassengers();
+
+                // spawn explosion
+                this.getWorld().createExplosion(
+                        this,     // The entity causing the explosion
+                        this.getX(),    // X coordinate
+                        this.getY(),    // Y coordinate
+                        this.getZ(),    // Z coordinate
+                        1.5f,           // Power (TNT is 4.0f, Creeper is 3.0f)
+                        World.ExplosionSourceType.NONE // NONE = damages players/entities, but DOES NOT break blocks!
+                );
+
+                // kill kart and drop it
+                this.killAndDropItem(this.asItem());
+
+                // despawn it
+                this.discard();
+            }
 
             // sync client data with exact data from server, executed every second
             if(this.age % 20 == 0) {
@@ -1054,7 +1043,7 @@ public class KartEntity extends Entity implements RideableInventory{
             this.tickKeyFob();
         }
 
-        //-------------------- client sided animations --------------------
+        //==================== client sided animations ====================
         else {
 
             // animations when kart is able to drive
