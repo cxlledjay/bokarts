@@ -131,11 +131,12 @@ public class KartEntity extends Entity implements RideableInventory{
     private double lastTickX;
     private double lastTickY;
     private double lastTickZ;
-    public double acceleration;
-    public double vMax;
-    public double drag;
-    public double dragPenalty;
-    public float fuelConsumptionBase;
+    public float acceleration = 0.04f;
+    public float vMax = 2.0f;
+    public float wheelFriction = 0.02f;
+    public float frictionPenalty = 0.08f;
+    public float handBrakeProgress = 0.0f;
+    public float fuelConsumptionBase = 0.07125f;
     public float stepHeight = 0.75f;
 
     // sound tracking
@@ -782,34 +783,6 @@ public class KartEntity extends Entity implements RideableInventory{
         return this.stepHeight;
     }
 
-    public float getNearbySlipperiness() {
-
-        // get block below kart
-        BlockState groundBlock = this.getWorld().getBlockState(this.getSteppingPos());
-
-        // calculated ice boat slipperiness
-        float slipperiness = 0.6f; //< default: no passenger
-
-        // check if a player is controlling it
-        if(hasControllingPassenger() && getControllingPassenger() instanceof PlayerEntity) {
-            if(pressingSlow) {
-                // player wants to go slow (maneuvering)
-                slipperiness = 0.75f;
-            } else {
-                // normal driving => check block
-                if(isDrivableBlock(groundBlock)) {
-                    // on a road
-                    slipperiness = 0.98f;
-                } else {
-                    // off-road
-                    slipperiness = 0.9f;
-                }
-            }
-        }
-
-        return slipperiness;
-    }
-
     private boolean isDrivableBlock(BlockState blockState) {
         return blockState.isIn(ModTags.Blocks.DRIVABLE_BLOCKS);
     }
@@ -822,13 +795,7 @@ public class KartEntity extends Entity implements RideableInventory{
         } else if (this.checkBoatInWater()) {
             return KartEntity.Location.IN_WATER;
         } else {
-            float f = this.getNearbySlipperiness();
-            if (f > 0.0F) {
-                this.nearbySlipperiness = f;
-                return KartEntity.Location.ON_LAND;
-            } else {
-                return KartEntity.Location.IN_AIR;
-            }
+            return KartEntity.Location.ON_LAND;
         }
     }
 
@@ -907,12 +874,105 @@ public class KartEntity extends Entity implements RideableInventory{
     }
 
 
+
+
+    private void updateMovement() {
+        double gravity = -this.getFinalGravity();
+        float appliedFriction = 0.3f; //< default
+
+        if(this.isOnGround()) {
+            // when somebody is driving on ground, apply normal friction
+            BlockState groundBlock = this.getWorld().getBlockState(this.getSteppingPos());
+            if(getControllingPassenger() instanceof PlayerEntity) {
+                appliedFriction = (isDrivableBlock(groundBlock)) ? (this.wheelFriction) : (this.wheelFriction + this.frictionPenalty);
+            }
+        } else if(this.isTouchingWater()) {
+            // in water => higher friction + gravity
+            gravity = -7.0E-4;
+            appliedFriction = Math.min(0.8f, this.wheelFriction + this.frictionPenalty * 2);
+        } else {
+            // in air => a bit more friction
+            appliedFriction = this.wheelFriction * 1.25f;
+        }
+
+
+        // apply handbrake
+        appliedFriction += this.handBrakeProgress * (1.0f - appliedFriction);
+
+
+
+        float decay = Math.max(0.0f, 1.0f - appliedFriction);
+
+        Vec3d vec3d = this.getVelocity();
+        this.setVelocity(vec3d.x * decay, vec3d.y + gravity, vec3d.z * decay);
+        this.yawVelocity = this.yawVelocity * decay;
+
+    }
+
+    private void updateAcceleration() {
+        if (this.hasPassengers()) {
+
+            if(!this.isDrivable()) return; // no update when undrivable
+
+            // result
+            float appliedAcceleration = 0.0f;
+
+            // current speed
+            Vec3d currentVel = this.getVelocity();
+            float v = (float) Math.sqrt(currentVel.x * currentVel.x + currentVel.z * currentVel.z);
+
+            // physics
+            float maintenanceForce = this.vMax * this.wheelFriction;
+            float effectiveVMax = this.vMax * (1.0f - this.wheelFriction);
+            float ratio = Math.min((v/effectiveVMax), 1.0f);
+            float a = this.acceleration - (this.acceleration - maintenanceForce) * ratio;
+
+            // get input types
+            if (this.pressingLeft) {
+                this.yawVelocity--;
+            }
+
+            if (this.pressingRight) {
+                this.yawVelocity++;
+            }
+
+            if (this.pressingRight != this.pressingLeft && !this.pressingForward && !this.pressingBack) {
+                appliedAcceleration += a / 8.0f;
+            }
+
+            this.setYaw(this.getYaw() + this.yawVelocity);
+            if (this.pressingForward) {
+                appliedAcceleration += a;
+            }
+
+            if (this.pressingBack) {
+                appliedAcceleration -= a / 4.0f;
+            }
+
+            this.setVelocity(
+                    this.getVelocity().add(
+                            MathHelper.sin(-this.getYaw() * (float) (Math.PI / 180.0)) * appliedAcceleration,
+                            0.0,
+                            MathHelper.cos(this.getYaw() * (float) (Math.PI / 180.0)) * appliedAcceleration
+            ));
+        }
+    }
+
+
     // call when kart is created / loaded / updated
     public void recalculateKartPhysics() {
-        BoKarts.LOGGER.info("recalculating kart physics, engine: {}", this.getEngineType().getDisplayName());
-        BoKarts.LOGGER.info("recalculating kart physics, wheels: {}", this.getWheelType().getDisplayName());
+        // get tuning parts
+        EngineType engine = this.getEngineType();
+        WheelType wheel = this.getWheelType();
+        SpoilerType spoiler = this.getSpoilerType();
+        AeroType aero = this.getAeroType();
 
-        this.stepHeight = this.getWheelType().getStepHeight();
+        // calculate physics
+        this.acceleration = engine.getAcceleration() * (1 + wheel.getAccelerationMultiplier() + spoiler.getAccelerationMultiplier());
+        this.vMax = engine.getVMax() * (1 + aero.getVMaxMultiplier() + spoiler.getVMaxMultiplier());
+        this.wheelFriction = wheel.getWheelFriction();
+        this.frictionPenalty = wheel.getFrictionPenalty();
+        this.stepHeight = wheel.getStepHeight();
     }
 
 
@@ -964,9 +1024,9 @@ public class KartEntity extends Entity implements RideableInventory{
                 this.setInputs(left, right, forward, backward);
             }
 
-            this.updateVelocity();
+            this.updateMovement();
             if (this.getWorld().isClient && !this.canNotDrive()) {
-                this.updatePaddles();
+                this.updateAcceleration();
             }
             this.move(MovementType.SELF, this.getVelocity());
         } else {
@@ -985,8 +1045,9 @@ public class KartEntity extends Entity implements RideableInventory{
         this.handleKartCollisions(movementThisTick.normalize(), this.distanceThisTick);
 
         // -------------------- server synced animations --------------------
-        calculateSteeringAngle();
-        calculateEngineRevs();
+        this.calculateSteeringAngle();
+        this.calculateEngineRevs();
+        this.calculateHandBrake();
 
         // -------------------- kart stats --------------------
         // init
@@ -1173,6 +1234,15 @@ public class KartEntity extends Entity implements RideableInventory{
         }
         return currentRevs;
     }
+
+    private void calculateHandBrake() {
+        if(!pressingSlow) this.handBrakeProgress = 0.0f; //< instantly snap back to normal when released
+        else {
+            float dynamicBrake = 0.02f + (this.handBrakeProgress * 0.125f);
+            this.handBrakeProgress = Math.min(this.handBrakeProgress + dynamicBrake, 1.0f);
+        }
+    }
+
 
     private void tickKeyFob() {
         // only do something when active

@@ -13,9 +13,9 @@ import net.minecraft.util.function.ValueLists;
 import org.jetbrains.annotations.Nullable;
 
 public enum AeroType implements StringIdentifiable {
-    NONE(0, "none", "None"),
-    RACE(1, "race", "Race (Normal)"),
-    RACE_CARBON(2, "race_carbon", "Race (Carbon)");
+    NONE(0, "none", "None", 0.0f),
+    RACE(1, "race", "Race (Normal)", 0.075f),
+    RACE_CARBON(2, "race_carbon", "Race (Carbon)", 0.1f);
 
     // id to value function
     private static final IntFunction<AeroType> INDEX_TO_VALUE = ValueLists.createIdToValueFunction(
@@ -32,13 +32,15 @@ public enum AeroType implements StringIdentifiable {
     private final int id;
     private final String name;
     private final String display_name;
+    private final float vMaxMultiplier;
     @Nullable
     private final Identifier texture;
 
-    AeroType(final int id, final String name, final String display_name) {
+    AeroType(final int id, final String name, final String display_name, float vMaxMultiplier) {
         this.id = id;
         this.name = name;
         this.display_name = display_name;
+        this.vMaxMultiplier = vMaxMultiplier;
 
         // dynamically creating a texture/model path using the enum's name
         this.texture = (name.equals("none")) ? null : BoKarts.id("textures/entity/kartv2/aero/" + name + ".png");
@@ -57,6 +59,11 @@ public enum AeroType implements StringIdentifiable {
 
     public static AeroType fromId(int id) {
         return INDEX_TO_VALUE.apply(id);
+    }
+
+    // --- physics ---
+    public float getVMaxMultiplier() {
+        return this.vMaxMultiplier;
     }
 
     // --- textures ---

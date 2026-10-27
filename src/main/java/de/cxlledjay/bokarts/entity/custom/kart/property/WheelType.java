@@ -12,15 +12,15 @@ import net.minecraft.util.function.ValueLists;
 import java.util.function.IntFunction;
 
 public enum WheelType implements StringIdentifiable {
-    NONE(0,"none", "None") {
+    NONE(0,"none", "None", 1.0f, 0.0f, 0.0f) {
         @Override
         public float getStepHeight() {
             return 0.0f;
         }
     },
-    STREET(1,"street", "Street"),
-    DRIFT(2,"drift", "Drift"),
-    OFFROAD(3,"offroad", "Offroad") {
+    STREET(1,"street", "Street", 0.04f, 0.08f, 0.2f),
+    DRIFT(2,"drift", "Drift", 0.02f, 0.08f, 0.0f),
+    OFFROAD(3,"offroad", "Offroad", 0.06f, 0.0f, -0.5f) {
         @Override
         public float getStepHeight() {
             return 1.05f;
@@ -45,13 +45,19 @@ public enum WheelType implements StringIdentifiable {
     private final int id;
     private final String name;
     private final String display_name;
+    private final float wheelFriction;
+    private final float frictionPenalty;
+    private final float accelerationMultiplier;
     private final Identifier texture;
     private final Identifier overlay;
 
-    WheelType(final int id, final String name, final String display_name) {
+    WheelType(final int id, final String name, final String display_name, float wheelFriction, float frictionPenalty, float accelerationMultiplier) {
         this.id = id;
         this.name = name;
         this.display_name = display_name;
+        this.wheelFriction = wheelFriction;
+        this.frictionPenalty = frictionPenalty;
+        this.accelerationMultiplier = accelerationMultiplier;
 
         // create paths for textures
         this.texture = BoKarts.id("textures/entity/kartv2/wheels/" + name + ".png");
@@ -84,7 +90,17 @@ public enum WheelType implements StringIdentifiable {
         return 0.75F;
     }
 
+    public float getWheelFriction() {
+        return wheelFriction;
+    }
 
+    public float getFrictionPenalty() {
+        return this.frictionPenalty;
+    }
+
+    public float getAccelerationMultiplier() {
+        return this.accelerationMultiplier;
+    }
 
     // --- textures ---
     public Identifier getBaseTexture() {
