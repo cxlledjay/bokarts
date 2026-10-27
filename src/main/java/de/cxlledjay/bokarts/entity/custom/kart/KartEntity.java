@@ -70,9 +70,6 @@ public class KartEntity extends Entity implements RideableInventory{
     private double x;
     private double y;
     private double z;
-    private double lastTickX;
-    private double lastTickY;
-    private double lastTickZ;
     private double boatYaw;
     private double boatPitch;
     private double waterLevel;
@@ -129,6 +126,17 @@ public class KartEntity extends Entity implements RideableInventory{
     // input tracking
     public boolean  pressingLeft, pressingRight, pressingForward, pressingBack, pressingSlow;
     private boolean lastSentLeft, lastSentRight, lastSentForward, lastSentBack, lastSentSlow;
+
+    // custom physics
+    private double lastTickX;
+    private double lastTickY;
+    private double lastTickZ;
+    public double acceleration;
+    public double vMax;
+    public double drag;
+    public double dragPenalty;
+    public float fuelConsumptionBase;
+    public float stepHeight = 0.75f;
 
     // sound tracking
     private boolean engineSoundStarted = false;
@@ -771,7 +779,7 @@ public class KartEntity extends Entity implements RideableInventory{
 
     @Override
     public float getStepHeight() {
-        return this.getWheelType().getStepHeight();
+        return this.stepHeight;
     }
 
     public float getNearbySlipperiness() {
@@ -902,6 +910,9 @@ public class KartEntity extends Entity implements RideableInventory{
     // call when kart is created / loaded / updated
     public void recalculateKartPhysics() {
         BoKarts.LOGGER.info("recalculating kart physics, engine: {}", this.getEngineType().getDisplayName());
+        BoKarts.LOGGER.info("recalculating kart physics, wheels: {}", this.getWheelType().getDisplayName());
+
+        this.stepHeight = this.getWheelType().getStepHeight();
     }
 
 
@@ -1529,12 +1540,16 @@ public class KartEntity extends Entity implements RideableInventory{
         super.onTrackedDataSet(data);
 
         // sync client tracked values with server values
-        if (this.getWorld().isClient()) {
-            if (FUEL.equals(data)) {
+        if(this.getWorld().isClient()) {
+            if(FUEL.equals(data)) {
                 this.currentFuel = this.getFuelSynced();
             }
-            if (ODO.equals(data)) {
+            if(ODO.equals(data)) {
                 this.currentOdometer = this.getOdometerSynced();
+            }
+
+            if(ENGINE_TYPE.equals(data) || WHEEL_TYPE.equals(data) || SPOILER_TYPE.equals(data) || AERO_TYPE.equals(data)) {
+                this.recalculateKartPhysics();
             }
         }
     }
