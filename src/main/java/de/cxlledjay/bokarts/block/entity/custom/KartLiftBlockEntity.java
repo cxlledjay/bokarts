@@ -206,7 +206,9 @@ public class KartLiftBlockEntity extends BlockEntity implements ExtendedScreenHa
                 kartEntity.refreshPositionAndAngles(spawnX, spawnY, spawnZ, yaw, 0.0F);
                 kartEntity.setBodyYaw(yaw);
                 kartEntity.setHeadYaw(yaw);
-                // spawn it
+                // recalculate its physics
+                kartEntity.recalculateKartPhysics();
+                // and spawn it
                 this.world.spawnEntity(kartEntity);
             } else {
                 // invalid kart (not drivable) => spawn item
@@ -223,7 +225,7 @@ public class KartLiftBlockEntity extends BlockEntity implements ExtendedScreenHa
     public KartEntity getKartEntity() {
         // create new kart from nbt
         if (this.storedKart == null && this.pendingKartNbt != null && this.world != null) {
-            this.storedKart = new KartEntity(ModEntities.KART_ENTITY_TYPE, this.world);
+            this.storedKart = new KartEntity(this.world, this.getPos().getX(), this.getPos().getY(), this.getPos().getZ());
             this.storedKart.readNbt(this.pendingKartNbt);
 
             this.pendingKartNbt = null; // prevent duping
@@ -521,7 +523,7 @@ public class KartLiftBlockEntity extends BlockEntity implements ExtendedScreenHa
             } else if(stack.getItem() instanceof KartItemv2 || stack.getItem() == ModItems.CHASSIS_BLUEPRINT) {
                 // player inserted item => parse to entity
                 if (world != null) {
-                    storedKart = new KartEntity(ModEntities.KART_ENTITY_TYPE, world);
+                    storedKart = new KartEntity(world, getPos().getX(), getPos().getY(), getPos().getZ());
                     pendingKartNbt = null;
 
                     // apply item data to entity

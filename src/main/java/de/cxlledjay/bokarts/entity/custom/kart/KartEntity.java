@@ -1,6 +1,7 @@
 package de.cxlledjay.bokarts.entity.custom.kart;
 
 import com.google.common.collect.Lists;
+import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.component.ModDataComponentTypes;
 import de.cxlledjay.bokarts.config.BoKartsConfig;
 import de.cxlledjay.bokarts.config.ClientSyncedConfig;
@@ -16,6 +17,7 @@ import de.cxlledjay.bokarts.util.KartFuelItems;
 import de.cxlledjay.bokarts.util.ModTags;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.*;
 import net.minecraft.entity.damage.DamageSource;
@@ -68,6 +70,9 @@ public class KartEntity extends Entity implements RideableInventory{
     private double x;
     private double y;
     private double z;
+    private double lastTickX;
+    private double lastTickY;
+    private double lastTickZ;
     private double boatYaw;
     private double boatPitch;
     private double waterLevel;
@@ -125,9 +130,6 @@ public class KartEntity extends Entity implements RideableInventory{
     public boolean  pressingLeft, pressingRight, pressingForward, pressingBack, pressingSlow;
     private boolean lastSentLeft, lastSentRight, lastSentForward, lastSentBack, lastSentSlow;
 
-    // physics tracking
-    private int ticksInWater = 0;
-
     // sound tracking
     private boolean engineSoundStarted = false;
     private float soundScaling = 0.0f;
@@ -136,12 +138,6 @@ public class KartEntity extends Entity implements RideableInventory{
     // range tracking
     public float currentFuel = -1;
     public float currentOdometer = -1;
-
-    // position tracking
-    private boolean hasTrackedPosition = false;
-    private double lastTickX;
-    private double lastTickY;
-    private double lastTickZ;
 
     // animation tracking
     public float frontAxleRotation = 0.0f;
@@ -169,9 +165,9 @@ public class KartEntity extends Entity implements RideableInventory{
     public KartEntity(World world, double x, double y, double z) {
         this(ModEntities.KART_ENTITY_TYPE, world);
         this.setPosition(x, y, z);
-        this.prevX = x;
-        this.prevY = y;
-        this.prevZ = z;
+        this.lastTickX = x;
+        this.lastTickY = y;
+        this.lastTickZ = z;
     }
 
 
@@ -470,10 +466,6 @@ public class KartEntity extends Entity implements RideableInventory{
         return this.getFirstPassenger() instanceof LivingEntity livingEntity ? livingEntity : super.getControllingPassenger();
     }
 
-    public boolean isSmallerThanBoat(Entity entity) {
-        return entity.getWidth() < this.getWidth();
-    }
-
     @Override
     public Vec3d updatePassengerForDismount(LivingEntity passenger) {
         Vec3d vec3d = getPassengerDismountOffset(this.getWidth() * MathHelper.SQUARE_ROOT_OF_TWO, passenger.getWidth(), passenger.getYaw());
@@ -542,27 +534,28 @@ public class KartEntity extends Entity implements RideableInventory{
     }
 
     @Override
-    public boolean isCollidable() {
-        return false;
-    }
-
-    @Override
     public boolean collidesWith(Entity other) {
         return false;
     }
 
     private void handleKartCollisions(Vec3d velocityDirection, double distanceThisTick) {
 
-        // handle collisions only from a certain speed upwards
-        if(distanceThisTick > 0.1) {
+        // get nearby entities
+        List<Entity> possibleHitEntities = this.getWorld().getOtherEntities(
+                this,
+                this.getBoundingBox().expand(0.2F, -0.01F, 0.2F),
+                entity -> !this.hasPassenger(entity) && entity instanceof LivingEntity && !entity.isSpectator());
 
-            List<Entity> possibleHitEntities = this.getWorld().getOtherEntities(
-                    this,
-                    this.getBoundingBox().expand(0.25),
-                    entity -> !this.hasPassenger(entity) && entity instanceof LivingEntity && !entity.isSpectator());
+        // optimize
+        if(possibleHitEntities.isEmpty()) return;
 
-            for(Entity entity : possibleHitEntities) {
+        // iterate trough them
+        for(Entity entity : possibleHitEntities) {
 
+            // hit while driving
+            if(!this.getWorld().isClient() && distanceThisTick > 0.1) {
+
+                // yeet only living entities
                 if(entity instanceof LivingEntity livingEntity) {
 
                     // no knockback if entity is riding something
@@ -592,10 +585,11 @@ public class KartEntity extends Entity implements RideableInventory{
                     );
                 }
             }
-
+            // hit while standing still => push away
+            else if (EntityPredicates.canBePushedBy(this).test(entity) && !entity.hasPassenger(this)) {
+                this.pushAwayFrom(entity);
+            }
         }
-
-
     }
 
 
@@ -604,88 +598,15 @@ public class KartEntity extends Entity implements RideableInventory{
     // ==================== edge cases in movement ====================
 
     @Override
-    public void move(MovementType movementType, Vec3d movement) {
-
-        super.move(movementType, movement);
-
-        // physics logic on server!
-        if(!this.getWorld().isClient()) {
-
-            if(this.isTouchingWater() || this.isSubmergedInWater()) {
-                // touching water!
-                if(++this.ticksInWater >= ClientSyncedConfig.getMaxTicksInWater()) {
-                    // spend too long in water => kaboom
-
-                    // spawn explosion
-                    this.getWorld().createExplosion(
-                            this,     // The entity causing the explosion
-                            this.getX(),    // X coordinate
-                            this.getY(),    // Y coordinate
-                            this.getZ(),    // Z coordinate
-                            1.5f,           // Power (TNT is 4.0f, Creeper is 3.0f)
-                            World.ExplosionSourceType.NONE // NONE = damages players/entities, but DOES NOT break blocks!
-                    );
-
-                    // eject passengers
-                    if (this.hasPassengers()) {
-                        this.removeAllPassengers();
-                    }
-
-                    // kill kart and drop it
-                    this.killAndDropItem(this.asItem());
-
-                    // despawn it
-                    this.discard();
-                }
-            } else {
-                // not touching water (anymore!)
-                this.ticksInWater = 0;
-            }
-        }
-    }
-
-
-
-    protected void superFall(double heightDifference, boolean onGround, BlockState state, BlockPos landedPosition) {
+    protected void fall(double heightDifference, boolean onGround, BlockState state, BlockPos landedPosition) {
         this.fallVelocity = this.getVelocity().y;
         if (!this.hasVehicle()) {
             if (onGround) {
-                if (this.fallDistance > 3.0F) {
-                    if (this.location != KartEntity.Location.ON_LAND) {
-                        this.onLanding();
-                        return;
-                    }
-
-                    this.handleFallDamage(this.fallDistance, 1.0F, this.getDamageSources().fall());
-                    if (!this.getWorld().isClient && !this.isRemoved()) {
-                        this.kill();
-                        if (this.getWorld().getGameRules().getBoolean(GameRules.DO_ENTITY_DROPS)) {
-                            for (int i = 0; i < 3; i++) {
-                                // this.dropItem(this.getVariant().getBaseBlock());
-                                this.killAndDropItem(this.asItem());
-                            }
-
-                            for (int i = 0; i < 2; i++) {
-                                this.dropItem(Items.STICK);
-                            }
-                        }
-                    }
-                }
-
                 this.onLanding();
             } else if (!this.getWorld().getFluidState(this.getBlockPos().down()).isIn(FluidTags.WATER) && heightDifference < 0.0) {
                 this.fallDistance -= (float)heightDifference;
             }
         }
-    }
-
-    @Override
-    public void fall(double heightDifference, boolean onGround, BlockState state, BlockPos pos) {
-        // Reset the fall distance to 0 every tick it falls
-        this.fallDistance = 0.0F;
-
-        // Continue with standard entity falling (won't break because distance is 0)
-        this.superFall(heightDifference, onGround, state, pos);
     }
 
 
@@ -807,7 +728,7 @@ public class KartEntity extends Entity implements RideableInventory{
 
             // steal space key
             Entity driver = this.getControllingPassenger();
-            if (driver instanceof net.minecraft.client.network.ClientPlayerEntity clientPlayer) {
+            if (driver instanceof ClientPlayerEntity clientPlayer) {
                 this.pressingSlow = clientPlayer.input.jumping;
             }
 
@@ -978,6 +899,12 @@ public class KartEntity extends Entity implements RideableInventory{
     }
 
 
+    // call when kart is created / loaded / updated
+    public void recalculateKartPhysics() {
+        BoKarts.LOGGER.info("recalculating kart physics, engine: {}", this.getEngineType().getDisplayName());
+    }
+
+
 
 
 
@@ -986,76 +913,10 @@ public class KartEntity extends Entity implements RideableInventory{
     // ==================== main function tick() ====================
 
 
-    public void superTick() {
-        this.lastLocation = this.location;
-        this.location = this.checkLocation();
-        if (this.location != KartEntity.Location.UNDER_WATER && this.location != KartEntity.Location.UNDER_FLOWING_WATER) {
-            this.ticksUnderwater = 0.0F;
-        } else {
-            this.ticksUnderwater++;
-        }
-
-        if (!this.getWorld().isClient && this.ticksUnderwater >= 60.0F) {
-            this.removeAllPassengers();
-        }
-
-        if (this.getDamageWobbleTicks() > 0) {
-            this.setDamageWobbleTicks(this.getDamageWobbleTicks() - 1);
-        }
-
-        if (this.getDamageWobbleStrength() > 0.0F) {
-            this.setDamageWobbleStrength(this.getDamageWobbleStrength() - 1.0F);
-        }
-
-        super.tick();
-        this.updatePositionAndRotation();
-        if (this.isLogicalSideForUpdatingMovement()) {
-            if (!(this.getFirstPassenger() instanceof PlayerEntity)) {
-                // this.setPaddleMovings(false, false);
-            }
-
-            this.updateVelocity();
-            if (this.getWorld().isClient) {
-                this.updatePaddles();
-                // this.getWorld().sendPacket(new BoatPaddleStateC2SPacket(this.isPaddleMoving(0), this.isPaddleMoving(1)));
-            }
-
-            this.move(MovementType.SELF, this.getVelocity());
-        } else {
-            this.setVelocity(Vec3d.ZERO);
-        }
-
-        // this.handleBubbleColumn();
-
-        this.checkBlockCollision();
-        List<Entity> list = this.getWorld().getOtherEntities(this, this.getBoundingBox().expand(0.2F, -0.01F, 0.2F), EntityPredicates.canBePushedBy(this));
-        if (!list.isEmpty()) {
-            boolean bl = !this.getWorld().isClient && !(this.getControllingPassenger() instanceof PlayerEntity);
-
-            for (Entity entity : list) {
-                if (!entity.hasPassenger(this)) {
-                    if (bl
-                            && this.getPassengerList().size() < this.getMaxPassengers()
-                            && !entity.hasVehicle()
-                            && this.isSmallerThanBoat(entity)
-                            && entity instanceof LivingEntity
-                            && !(entity instanceof WaterCreatureEntity)
-                            && !(entity instanceof PlayerEntity)) {
-                        entity.startRiding(this);
-                    } else {
-                        this.pushAwayFrom(entity);
-                    }
-                }
-            }
-        }
-    }
-
-
     @Override
     public void tick() {
 
         // -------------------- handle inputs --------------------
-
         if (this.getControllingPassenger() instanceof PlayerEntity player) {
             boolean forward = player.forwardSpeed > 0.0F;
             boolean backward = player.forwardSpeed < 0.0F;
@@ -1078,21 +939,60 @@ public class KartEntity extends Entity implements RideableInventory{
         }
 
 
+        // -------------------- water physics --------------------
+        this.lastLocation = this.location;
+        this.location = this.checkLocation();
 
-        // -------------------- handle physics --------------------
+        if (this.location != Location.UNDER_WATER && this.location != Location.UNDER_FLOWING_WATER && this.location != Location.IN_WATER) {
+            this.ticksUnderwater = 0.0F;
+        } else {
+            this.ticksUnderwater++;
+        }
 
+        // spend too long in water => kaboom
+        if (!this.getWorld().isClient && this.ticksUnderwater >= ClientSyncedConfig.getMaxTicksInWater()) {
 
-        // tick the boat parent
-        this.superTick();
+            // eject passengers
+            this.removeAllPassengers();
 
+            // spawn explosion
+            this.getWorld().createExplosion(
+                    this,     // The entity causing the explosion
+                    this.getX(),    // X coordinate
+                    this.getY(),    // Y coordinate
+                    this.getZ(),    // Z coordinate
+                    1.5f,           // Power (TNT is 4.0f, Creeper is 3.0f)
+                    World.ExplosionSourceType.NONE // NONE = damages players/entities, but DOES NOT break blocks!
+            );
 
-        // ---------------- position tracking (client + server) ----------------
+            // kill kart and drop it
+            this.killAndDropItem(this.asItem());
 
-        if (!this.hasTrackedPosition) {
-            this.lastTickX = this.getX();
-            this.lastTickY = this.getY();
-            this.lastTickZ = this.getZ();
-            this.hasTrackedPosition = true;
+            // despawn it
+            this.discard();
+        }
+
+        // damage wobble
+        if (this.getDamageWobbleTicks() > 0) {
+            this.setDamageWobbleTicks(this.getDamageWobbleTicks() - 1);
+        }
+        if (this.getDamageWobbleStrength() > 0.0F) {
+            this.setDamageWobbleStrength(this.getDamageWobbleStrength() - 1.0F);
+        }
+
+        // base entity tick() call
+        super.tick();
+
+        // -------------------- movement physics --------------------
+        this.updatePositionAndRotation();
+        if (this.isLogicalSideForUpdatingMovement()) {
+            this.updateVelocity();
+            if (this.getWorld().isClient) {
+                this.updatePaddles();
+            }
+            this.move(MovementType.SELF, this.getVelocity());
+        } else {
+            this.setVelocity(Vec3d.ZERO);
         }
 
         // calculate movement for this tick
@@ -1102,63 +1002,53 @@ public class KartEntity extends Entity implements RideableInventory{
                 this.getZ() - this.lastTickZ);
         this.distanceThisTick = movementThisTick.length();
 
-        // update position tracking
-        this.lastTickX = this.getX();
-        this.lastTickY = this.getY();
-        this.lastTickZ = this.getZ();
 
-        // fuel + odo tracking code
+        // -------------------- engine revving --------------------
+        calculateEngineRevs();
+
+        // -------------------- collision check --------------------
+        this.checkBlockCollision();
+        this.handleKartCollisions(movementThisTick.normalize(), this.distanceThisTick);
+
+
+        // -------------------- kart stats --------------------
+        // init
         if (this.currentFuel == -1) this.currentFuel = this.getFuelSynced();
         if (this.currentOdometer == -1) this.currentOdometer = this.getOdometerSynced();
 
+        // fuel consumption
         if(this.pressingForward || this.pressingBack) {
             // we are accelerating: consume fuel!
             this.currentFuel = Math.max(0, this.currentFuel - 0.7625f); // prevent going under 0
         }
         this.currentOdometer += (float) this.distanceThisTick;
-        calculateEngineRevs();
 
-
-
-
-
-
-
-        // ==================== [SERVER SIDED CODE] ====================
+        //-------------------- server sided updates --------------------
         if (!this.getWorld().isClient()) {
 
-            // ---------------- collisions ----------------
-            this.handleKartCollisions(movementThisTick.normalize(), this.distanceThisTick);
-
-
-            // ---------------- fuel and odo sync ----------------
-
-            // sync client data with exact data from server, executed every 10 ticks
-            if(this.age % 10 == 0) {
+            // sync client data with exact data from server, executed every second
+            if(this.age % 20 == 0) {
                 this.setFuelSynced(this.currentFuel);
                 this.setOdometerSynced(this.currentOdometer);
             }
 
-            // ---------------- calculate values for animation ----------------
+            // update animations of other karts, 4x per second
+            if(this.age % 5 == 0) {
+                this.setEngineRevs(this.engineRevs);
+                this.setSteeringAngle(this.steeringAngle);
+            }
 
-            // update client
-            this.setEngineRevs(this.engineRevs);
-            this.setSteeringAngle(this.steeringAngle);
-
-
-
-            // ---------------- horn stuff ----------------
-
+            // horn
             if(this.currentHornTicks > 0) this.currentHornTicks--;
             this.tickKeyFob();
         }
 
-        // ==================== [CLIENT SIDED CODE] ====================
+        //-------------------- client sided animations --------------------
         else {
 
-
-            // no driving animation if cant drive
+            // animations when kart is able to drive
             if(!this.canNotDrive()) {
+
                 // kart speed calculation
                 double yawRad = Math.toRadians(this.getYaw());
                 double forwardX = -Math.sin(yawRad);
@@ -1169,12 +1059,9 @@ public class KartEntity extends Entity implements RideableInventory{
                 float frontAxleRotationThisTick = (float) (forwardSpeed * 5.34);
                 float backAxleRotationThisTick = frontAxleRotationThisTick + this.getEngineRevs() / 33;
 
-
-
                 // ---------------- wheel spin front ----------------
                 this.frontAxleRotationPrev = this.frontAxleRotation;
                 this.frontAxleRotation = this.frontAxleRotation + frontAxleRotationThisTick;
-
 
                 // ---------------- wheel spin back ----------------
                 this.rearAxleRotationPrev = this.rearAxleRotation;
@@ -1186,11 +1073,7 @@ public class KartEntity extends Entity implements RideableInventory{
                     this.rearAxleRotation = this.rearAxleRotation + backAxleRotationThisTick;
                 }
 
-
-
                 // ---------------- sounds ----------------
-
-                //this.setSoundScaling(((float) forwardSpeed * 5) + (Math.abs(this.getEngineRevs()) / 5));
                 this.setSoundScaling(Math.abs(this.getEngineRevs()));
 
                 if (this.getWorld().isClient) {
@@ -1201,18 +1084,22 @@ public class KartEntity extends Entity implements RideableInventory{
                         this.engineSoundStarted = false;
                     }
                 }
+
+            // no driving
             } else {
-                // wheels not moving
                 frontAxleRotation = 0.0f;
                 frontAxleRotationPrev = 0.0f;
                 rearAxleRotation = 0.0f;
                 rearAxleRotationPrev = 0.0f;
-
-                // reset engine sound
                 this.engineSoundStarted = false;
             }
 
         }
+
+        // update position tracking
+        this.lastTickX = this.getX();
+        this.lastTickY = this.getY();
+        this.lastTickZ = this.getZ();
     }
 
 
@@ -1627,6 +1514,14 @@ public class KartEntity extends Entity implements RideableInventory{
         if (keyUuid != null) {
             this.setKeyUuid(keyUuid);
         }
+
+        // update position to prevent loading with undefined lastTickX/Y/Z
+        this.lastTickX = this.getX();
+        this.lastTickY = this.getY();
+        this.lastTickZ = this.getZ();
+
+        // update physics
+        this.recalculateKartPhysics();
     }
 
     @Override
