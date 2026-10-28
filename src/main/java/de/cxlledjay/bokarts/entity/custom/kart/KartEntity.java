@@ -63,7 +63,6 @@ public class KartEntity extends Entity implements RideableInventory{
     protected static final TrackedData<Integer> DAMAGE_WOBBLE_TICKS = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.INTEGER);
     protected static final TrackedData<Integer> DAMAGE_WOBBLE_SIDE = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.INTEGER);
     protected static final TrackedData<Float> DAMAGE_WOBBLE_STRENGTH = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
-    private float velocityDecay;
     private float ticksUnderwater;
     private float yawVelocity;
     private int lerpTicks;
@@ -73,10 +72,7 @@ public class KartEntity extends Entity implements RideableInventory{
     private double boatYaw;
     private double boatPitch;
     private double waterLevel;
-    private float nearbySlipperiness;
     private KartEntity.Location location;
-    private KartEntity.Location lastLocation;
-    private double fallVelocity;
     public enum Location {
         IN_WATER,
         UNDER_WATER,
@@ -103,8 +99,7 @@ public class KartEntity extends Entity implements RideableInventory{
     private static final TrackedData<Float> ODO = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
 
     // animation
-    private static final TrackedData<Float> ENGINE_REVS = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
-    private static final TrackedData<Float> STEERING_ANGLE = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
+    private static final TrackedData<Byte> PLAYER_INPUT = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.BYTE);
 
     // modification
     private static final TrackedData<WheelType> WHEEL_TYPE = DataTracker.registerData(KartEntity.class, ModTrackedDataHandlers.WHEEL_TYPE_TRACKED_DATA_HANDLER);
@@ -126,11 +121,17 @@ public class KartEntity extends Entity implements RideableInventory{
     // input tracking
     public boolean  pressingLeft, pressingRight, pressingForward, pressingBack, pressingSlow;
     private boolean lastSentLeft, lastSentRight, lastSentForward, lastSentBack, lastSentSlow;
+    private static final byte FLAG_FORWARD  = 1;
+    private static final byte FLAG_BACKWARD = 1 << 1;
+    private static final byte FLAG_LEFT     = 1 << 2;
+    private static final byte FLAG_RIGHT    = 1 << 3;
+    private static final byte FLAG_SLOW     = 1 << 4;
 
     // custom physics
     private double lastTickX;
     private double lastTickY;
     private double lastTickZ;
+    private boolean hasTrackedPos = false;
     public float acceleration = 0.04f;
     public float vMax = 2.0f;
     public float wheelFriction = 0.02f;
@@ -306,42 +307,6 @@ public class KartEntity extends Entity implements RideableInventory{
 
 
     // ==================== water stuff from boat code ==================== TODO: check it is needed...
-
-    public float getWaterHeightBelow() {
-        Box box = this.getBoundingBox();
-        int i = MathHelper.floor(box.minX);
-        int j = MathHelper.ceil(box.maxX);
-        int k = MathHelper.floor(box.maxY);
-        int l = MathHelper.ceil(box.maxY - this.fallVelocity);
-        int m = MathHelper.floor(box.minZ);
-        int n = MathHelper.ceil(box.maxZ);
-        BlockPos.Mutable mutable = new BlockPos.Mutable();
-
-        label39:
-        for (int o = k; o < l; o++) {
-            float f = 0.0F;
-
-            for (int p = i; p < j; p++) {
-                for (int q = m; q < n; q++) {
-                    mutable.set(p, o, q);
-                    FluidState fluidState = this.getWorld().getFluidState(mutable);
-                    if (fluidState.isIn(FluidTags.WATER)) {
-                        f = Math.max(f, fluidState.getHeight(this.getWorld(), mutable));
-                    }
-
-                    if (f >= 1.0F) {
-                        continue label39;
-                    }
-                }
-            }
-
-            if (f < 1.0F) {
-                return mutable.getY() + f;
-            }
-        }
-
-        return l + 1;
-    }
 
     private boolean checkBoatInWater() {
         Box box = this.getBoundingBox();
@@ -608,7 +573,6 @@ public class KartEntity extends Entity implements RideableInventory{
 
     @Override
     protected void fall(double heightDifference, boolean onGround, BlockState state, BlockPos landedPosition) {
-        this.fallVelocity = this.getVelocity().y;
         if (!this.hasVehicle()) {
             if (onGround) {
                 this.onLanding();
@@ -768,6 +732,17 @@ public class KartEntity extends Entity implements RideableInventory{
         this.pressingForward = pressingForward;
         this.pressingBack = pressingBack;
         this.pressingSlow = pressingSlow;
+
+        if (!this.getWorld().isClient()) {
+            byte input = 0;
+            if (pressingForward) input |= FLAG_FORWARD;
+            if (pressingBack) input |= FLAG_BACKWARD;
+            if (pressingLeft) input |= FLAG_LEFT;
+            if (pressingRight) input |= FLAG_RIGHT;
+            if (pressingSlow) input |= FLAG_SLOW;
+
+            this.setPlayerInput(input);
+        }
     }
 
 
@@ -796,80 +771,6 @@ public class KartEntity extends Entity implements RideableInventory{
             return KartEntity.Location.IN_WATER;
         } else {
             return KartEntity.Location.ON_LAND;
-        }
-    }
-
-    private void updateVelocity() {
-        double d = -this.getFinalGravity();
-        double e = 0.0;
-        this.velocityDecay = 0.05F;
-        if (this.lastLocation == KartEntity.Location.IN_AIR && this.location != KartEntity.Location.IN_AIR && this.location != KartEntity.Location.ON_LAND) {
-            this.waterLevel = this.getBodyY(1.0);
-            double f = this.getWaterHeightBelow() - this.getHeight() + 0.101;
-            if (this.getWorld().isSpaceEmpty(this, this.getBoundingBox().offset(0.0, f - this.getY(), 0.0))) {
-                this.setPosition(this.getX(), f, this.getZ());
-                this.setVelocity(this.getVelocity().multiply(1.0, 0.0, 1.0));
-                this.fallVelocity = 0.0;
-            }
-
-            this.location = KartEntity.Location.IN_WATER;
-        } else {
-            if (this.location == KartEntity.Location.IN_WATER) {
-                e = (this.waterLevel - this.getY()) / this.getHeight();
-                this.velocityDecay = 0.9F;
-            } else if (this.location == KartEntity.Location.UNDER_FLOWING_WATER) {
-                d = -7.0E-4;
-                this.velocityDecay = 0.9F;
-            } else if (this.location == KartEntity.Location.UNDER_WATER) {
-                e = 0.01F;
-                this.velocityDecay = 0.45F;
-            } else if (this.location == KartEntity.Location.IN_AIR) {
-                this.velocityDecay = 0.9F;
-            } else if (this.location == KartEntity.Location.ON_LAND) {
-                this.velocityDecay = this.nearbySlipperiness;
-                if (this.getControllingPassenger() instanceof PlayerEntity) {
-                    this.nearbySlipperiness /= 2.0F;
-                }
-            }
-
-            Vec3d vec3d = this.getVelocity();
-            this.setVelocity(vec3d.x * this.velocityDecay, vec3d.y + d, vec3d.z * this.velocityDecay);
-            this.yawVelocity = this.yawVelocity * this.velocityDecay;
-            if (e > 0.0) {
-                Vec3d vec3d2 = this.getVelocity();
-                this.setVelocity(vec3d2.x, (vec3d2.y + e * (this.getGravity() / 0.65)) * 0.75, vec3d2.z);
-            }
-        }
-    }
-
-    private void updatePaddles() {
-        if (this.hasPassengers()) {
-            float f = 0.0F;
-            if (this.pressingLeft) {
-                this.yawVelocity--;
-            }
-
-            if (this.pressingRight) {
-                this.yawVelocity++;
-            }
-
-            if (this.pressingRight != this.pressingLeft && !this.pressingForward && !this.pressingBack) {
-                f += 0.005F;
-            }
-
-            this.setYaw(this.getYaw() + this.yawVelocity);
-            if (this.pressingForward) {
-                f += 0.04F;
-            }
-
-            if (this.pressingBack) {
-                f -= 0.005F;
-            }
-
-            this.setVelocity(
-                    this.getVelocity().add(MathHelper.sin(-this.getYaw() * (float) (Math.PI / 180.0)) * f, 0.0, MathHelper.cos(this.getYaw() * (float) (Math.PI / 180.0)) * f)
-            );
-            // this.setPaddleMovings(this.pressingRight && !this.pressingLeft || this.pressingForward, this.pressingLeft && !this.pressingRight || this.pressingForward);
         }
     }
 
@@ -990,7 +891,6 @@ public class KartEntity extends Entity implements RideableInventory{
     public void tick() {
 
         // underwater check
-        this.lastLocation = this.location;
         this.location = this.checkLocation();
 
         if (this.location != Location.UNDER_WATER && this.location != Location.UNDER_FLOWING_WATER && this.location != Location.IN_WATER) {
@@ -1033,9 +933,26 @@ public class KartEntity extends Entity implements RideableInventory{
             this.move(MovementType.SELF, this.getVelocity());
         } else {
             this.setVelocity(Vec3d.ZERO);
+
+            // track input from all other clients spectating the kart
+            if (this.getWorld().isClient()) {
+                byte flags = this.getPlayerInput();
+                this.pressingForward = (flags & FLAG_FORWARD) != 0;
+                this.pressingBack    = (flags & FLAG_BACKWARD) != 0;
+                this.pressingLeft    = (flags & FLAG_LEFT) != 0;
+                this.pressingRight   = (flags & FLAG_RIGHT) != 0;
+                this.pressingSlow    = (flags & FLAG_SLOW) != 0;
+            }
         }
 
         // ==================== post movement calculations ====================
+        if(!hasTrackedPos) {
+            this.lastTickX = this.getX();
+            this.lastTickY = this.getY();
+            this.lastTickZ = this.getZ();
+            this.hasTrackedPos = true;
+        }
+
         Vec3d movementThisTick = new Vec3d(
                 this.getX() - this.lastTickX,
                 this.getY() - this.lastTickY,
@@ -1047,6 +964,8 @@ public class KartEntity extends Entity implements RideableInventory{
         this.handleKartCollisions(movementThisTick.normalize(), this.distanceThisTick);
 
         // -------------------- server synced animations --------------------
+        this.steeringAnglePrev = this.steeringAngle;
+        this.engineRevsPrev = this.engineRevs;
         this.calculateSteeringAngle();
         this.calculateEngineRevs();
         this.calculateHandBrake();
@@ -1097,12 +1016,6 @@ public class KartEntity extends Entity implements RideableInventory{
                 this.setOdometerSynced(this.currentOdometer);
             }
 
-            // update animations of other karts, 4x per second
-            if(this.age % 5 == 0) {
-                this.setEngineRevs(this.engineRevs);
-                this.setSteeringAngle(this.steeringAngle);
-            }
-
             // horn
             if(this.currentHornTicks > 0) this.currentHornTicks--;
             this.tickKeyFob();
@@ -1122,7 +1035,7 @@ public class KartEntity extends Entity implements RideableInventory{
 
                 // resulting rotation
                 float frontAxleRotationThisTick = (float) (forwardSpeed * 5.34);
-                float backAxleRotationThisTick = frontAxleRotationThisTick + this.getEngineRevs() / 33;
+                float backAxleRotationThisTick = frontAxleRotationThisTick + this.engineRevs / 33;
 
                 // ---------------- wheel spin front ----------------
                 this.frontAxleRotationPrev = this.frontAxleRotation;
@@ -1139,7 +1052,7 @@ public class KartEntity extends Entity implements RideableInventory{
                 }
 
                 // ---------------- sounds ----------------
-                this.setSoundScaling(Math.abs(this.getEngineRevs()));
+                this.setSoundScaling(Math.abs(this.engineRevs));
 
                 if (this.getWorld().isClient) {
                     if (this.hasPassengers() && !this.engineSoundStarted) {
@@ -1180,7 +1093,6 @@ public class KartEntity extends Entity implements RideableInventory{
     }
 
     private void calculateSteeringAngle() {
-        this.steeringAnglePrev = this.steeringAngle;
 
         if (!(pressingLeft && pressingRight)) {
             if (pressingLeft) {
@@ -1215,7 +1127,6 @@ public class KartEntity extends Entity implements RideableInventory{
     }
 
     private void calculateEngineRevs() {
-        this.engineRevsPrev = this.engineRevs;
 
         if(pressingForward) {
             float dMax = 1.0f - (this.engineRevs / ENGINE_REVS_MAX);
@@ -1464,8 +1375,7 @@ public class KartEntity extends Entity implements RideableInventory{
         builder.add(ODO, 0.0f);
 
         // animations
-        builder.add(ENGINE_REVS, 0.0f);
-        builder.add(STEERING_ANGLE, STEERING_CENTER);
+        builder.add(PLAYER_INPUT, (byte) 0);
 
         // v2 model
         builder.add(HORN_TYPE, HornType.HORN1);
@@ -1487,9 +1397,6 @@ public class KartEntity extends Entity implements RideableInventory{
     protected void writeCustomDataToNbt(NbtCompound nbt) {
         nbt.putFloat("Fuel", this.getFuelSynced());
         nbt.putFloat("Odo", this.getOdometerSynced());
-
-        nbt.putFloat("EngineRevs", this.getEngineRevs());
-        nbt.putFloat("SteeringAngle", this.getSteeringAngle());
 
         // v2 model
         nbt.putInt("HornType", this.getHornType().getId());
@@ -1560,9 +1467,6 @@ public class KartEntity extends Entity implements RideableInventory{
 
         if (nbt.contains("Fuel")) this.setFuelSynced(nbt.getFloat("Fuel"));
         if (nbt.contains("Odo")) this.setOdometerSynced(nbt.getFloat("Odo"));
-
-        if (nbt.contains("EngineRevs")) this.setEngineRevs(nbt.getFloat("EngineRevs"));
-        if (nbt.contains("SteeringAngle")) this.setSteeringAngle(nbt.getFloat("SteeringAngle"));
 
         if (nbt.contains("HornType")) this.setHornType(HornType.fromId(nbt.getInt("HornType")));
         else if (nbt.contains("HornSound")) this.setHornType(HornType.HORN1); //< update from old horn system
@@ -1670,17 +1574,11 @@ public class KartEntity extends Entity implements RideableInventory{
     }
 
     // animations
-    public Float getEngineRevs() {
-        return this.dataTracker.get(ENGINE_REVS);
+    public byte getPlayerInput() {
+        return this.dataTracker.get(PLAYER_INPUT);
     }
-    private void setEngineRevs(Float acceleration) {
-        this.dataTracker.set(ENGINE_REVS, acceleration);
-    }
-    public Float getSteeringAngle() {
-        return this.dataTracker.get(STEERING_ANGLE);
-    }
-    private void setSteeringAngle(Float speed) {
-        this.dataTracker.set(STEERING_ANGLE, speed);
+    private void setPlayerInput(byte input) {
+        this.dataTracker.set(PLAYER_INPUT, input);
     }
 
     // kartv2 modifications
