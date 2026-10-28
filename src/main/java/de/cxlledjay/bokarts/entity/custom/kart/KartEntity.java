@@ -25,6 +25,7 @@ import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.WaterCreatureEntity;
+import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.item.Item;
@@ -33,6 +34,7 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.StopSoundS2CPacket;
 import net.minecraft.predicate.entity.EntityPredicates;
+import net.minecraft.registry.tag.EntityTypeTags;
 import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -405,20 +407,43 @@ public class KartEntity extends Entity implements RideableInventory{
     @Override
     protected void updatePassengerPosition(Entity passenger, Entity.PositionUpdater positionUpdater) {
         super.updatePassengerPosition(passenger, positionUpdater);
-        if (passenger instanceof PlayerEntity) {
+        if (passenger.equals(this.getControllingPassenger())) {
             passenger.setYaw(passenger.getYaw() + this.yawVelocity);
             passenger.setHeadYaw(passenger.getHeadYaw() + this.yawVelocity);
             this.clampPassengerYaw(passenger);
+        } else {
+            passenger.setYaw(passenger.getYaw() + this.yawVelocity);
+            passenger.setHeadYaw(passenger.getHeadYaw() + this.yawVelocity);
         }
     }
 
     protected int getMaxPassengers() {
-        return 1;
+        return (this.getSpoilerType() == SpoilerType.RACE_PLUS || this.getSpoilerType() == SpoilerType.RACE_PLUS_CARBON) ? 3 : 1;
     }
 
     @Override
     protected Vec3d getPassengerAttachmentPos(Entity passenger, EntityDimensions dimensions, float scaleFactor) {
-        return new Vec3d(0.0, dimensions.height() / 3.0F - 0.05f, -0.4f).rotateY(-this.getYaw() * (float) (Math.PI / 180.0));
+
+        float x = 0.0f;
+        float y = 0.05f;
+        float z = -0.4f;
+
+        if (this.getPassengerList().size() > 1) {
+            int i = this.getPassengerList().indexOf(passenger);
+
+            if(i == 1) {
+                x = -0.75f;
+                y = -0.6225f;
+                z = -1.4f;
+            }
+            else if(i == 2) {
+                x = 0.75f;
+                y = -0.6225f;
+                z = -1.4f;
+            }
+        }
+
+        return new Vec3d(x, dimensions.height() / 3.0F - y, z).rotateY(-this.getYaw() * (float) (Math.PI / 180.0));
     }
 
     @Override
