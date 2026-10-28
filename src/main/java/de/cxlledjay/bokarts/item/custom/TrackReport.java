@@ -49,6 +49,11 @@ public class TrackReport extends Item {
             tooltip.add(Text.literal(s).formatted(Formatting.GRAY));
         }
 
+        if(stack.contains(ModDataComponentTypes.TRACK_REPORT_DURATION)) {
+            String s = "Duration: " + stack.get(ModDataComponentTypes.TRACK_REPORT_DURATION);
+            tooltip.add(Text.literal(s).formatted(Formatting.GRAY));
+        }
+
         if(stack.contains(ModDataComponentTypes.TRACK_REPORT_PLACEMENT)) {
             int placement = stack.getOrDefault(ModDataComponentTypes.TRACK_REPORT_PLACEMENT, -1);
             String s = "Placement: #" + placement;

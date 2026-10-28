@@ -95,6 +95,7 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
     UUID firstPlaceUuid = null;
     int highestLap = 0;
     long bestLapTime = 0;
+    long raceStart = 0;
 
 
 
@@ -121,6 +122,9 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
                 // init stat tracking data
                 TrackTimerKartStats newStats = new TrackTimerKartStats(timestamp, 0, 0, false);
                 this.participantInfo.put(playerUuid, newStats);
+
+                // duration tracking
+                if(this.raceStart == 0) this.raceStart = timestamp;
 
                 // send message to player
                 Text msg = null;
@@ -164,8 +168,6 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
             boolean newBestGlobal = deltaToBestLap < 0;
             if(newBestGlobal || this.bestLapTime == 0) this.bestLapTime = lapTime;
 
-
-
             // lap finished logic
             if(this.settingCurrentMode == TrackTimerMode.TIME_ATTACK) {
                 this.sendTimeAttackMessage(player, laps, lapTime, deltaTime, newPB);
@@ -178,11 +180,13 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
                     this.sendGrandPrixLapMessages(player.getNameForScoreboard(), kart.getRaceNumber(), laps, lapTime, deltaToFirst, flags);
 
                     if(laps >= this.settingLapCount) {
+                        long duration = timestamp - this.raceStart;
+
                         // completed the race
                         this.sendGrandPrixPlacementMessages(player.getNameForScoreboard(), kart.getRaceNumber(), this.currentTopPlace, best);
 
                         // print track report
-                        ItemStack trackReport = createGrandPrixItemStack(kart, player, best, this.currentTopPlace, this.settingLapCount);
+                        ItemStack trackReport = createGrandPrixItemStack(kart, player, best, this.currentTopPlace, this.settingLapCount, duration);
                         if(trackReport != null) this.tryPrintingTrackReport(trackReport);
 
                         // prepare next place
@@ -224,7 +228,7 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
 
         Formatting lapTimeFormat = switch(best) {
             case 1 -> Formatting.LIGHT_PURPLE;
-            case 2 -> Formatting.YELLOW;
+            case 2 -> Formatting.GREEN;
             default -> Formatting.WHITE;
         };
 
@@ -265,7 +269,7 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
     }
 
 
-    private ItemStack createTimeAttackItemStack(PlayerEntity player, long bestLap) {
+    private ItemStack createTimeAttackItemStack(PlayerEntity player, long bestLap, long duration) {
         ItemStack res = ItemStack.EMPTY;
 
         if(this.participantInfo.containsKey(player.getUuid())) {
@@ -274,6 +278,7 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
             String todayAsString = today.format(formatter);
             String bestLapString = getFormattedLapTime(bestLap);
+            String durationString = getFormattedLapTime(duration);
 
             // create item
             res = new ItemStack(ModItems.TRACK_REPORT);
@@ -281,12 +286,13 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
             res.set(ModDataComponentTypes.TRACK_REPORT_PLAYER_NAME, player.getNameForScoreboard());
             res.set(ModDataComponentTypes.TRACK_REPORT_BEST_LAP_TIME, bestLapString);
             res.set(ModDataComponentTypes.TRACK_REPORT_DATE, todayAsString);
+            res.set(ModDataComponentTypes.TRACK_REPORT_DURATION, durationString);
         }
 
         return res;
     }
 
-    private ItemStack createGrandPrixItemStack(KartEntity kart, PlayerEntity player, long bestLap, int placement, int totalLaps) {
+    private ItemStack createGrandPrixItemStack(KartEntity kart, PlayerEntity player, long bestLap, int placement, int totalLaps, long duration) {
         ItemStack res = ItemStack.EMPTY;
 
         if(this.participantInfo.containsKey(player.getUuid())) {
@@ -295,6 +301,7 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
             String todayAsString = today.format(formatter);
             String bestLapString = getFormattedLapTime(bestLap);
+            String durationString = getFormattedLapTime(duration);
 
             // create item
             res = new ItemStack(ModItems.TRACK_REPORT);
@@ -303,6 +310,7 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
             res.set(ModDataComponentTypes.TRACK_REPORT_PLAYER_NAME, player.getNameForScoreboard());
             res.set(ModDataComponentTypes.TRACK_REPORT_BEST_LAP_TIME, bestLapString);
             res.set(ModDataComponentTypes.TRACK_REPORT_DATE, todayAsString);
+            res.set(ModDataComponentTypes.TRACK_REPORT_DURATION, durationString);
             res.set(ModDataComponentTypes.TRACK_REPORT_PLACEMENT, placement);
             res.set(ModDataComponentTypes.TRACK_REPORT_TOTAL_LAPS, totalLaps);
         }
@@ -553,6 +561,7 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
             this.firstPlaceUuid = null;
             this.highestLap = 0;
             this.bestLapTime = 0;
+            this.raceStart = 0;
 
             Text msg = getPrefix().append(Text.literal("Timer has stopped and reset. Ready to start again!").formatted(Formatting.GREEN));
             player.sendMessage(msg);
@@ -568,7 +577,9 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
         TrackTimerKartStats stats = this.participantInfo.get(player.getUuid());
         if(stats.best() <= 0) return;
 
-        ItemStack trackReport = createTimeAttackItemStack(player, stats.best());
+        long duration = stats.timestamp() - this.raceStart;
+
+        ItemStack trackReport = createTimeAttackItemStack(player, stats.best(), duration);
         if(trackReport != null) this.tryPrintingTrackReport(trackReport);
     }
 
@@ -600,6 +611,7 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
         if(this.firstPlaceUuid != null) nbt.putUuid("FirstPlaceUuid", this.firstPlaceUuid);
         nbt.putInt("HighestLap", this.highestLap);
         nbt.putLong("BestLapTime", this.bestLapTime);
+        nbt.putLong("RaceStart", this.raceStart);
 
         NbtList playerListTag = new NbtList();
         for (Map.Entry<UUID, TrackTimerKartStats> entry : this.participantInfo.entrySet()) {
@@ -635,6 +647,7 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
         if(nbt.contains("FirstPlaceUuid")) this.firstPlaceUuid = nbt.getUuid("FirstPlaceUuid");
         this.highestLap = nbt.getInt("HighestLap");
         this.bestLapTime = nbt.getLong("BestLapTime");
+        this.raceStart = nbt.getLong("RaceStart");
 
         this.participantInfo.clear();
         if (nbt.contains("PlayerInfo", NbtElement.LIST_TYPE)) {

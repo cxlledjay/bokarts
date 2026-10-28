@@ -38,6 +38,7 @@ public class ModDataComponentTypes {
     public static final ComponentType<String> TRACK_REPORT_PLAYER_NAME = register("track_report_player_name", builder -> builder.codec(Codec.STRING));
     public static final ComponentType<String> TRACK_REPORT_BEST_LAP_TIME = register("track_report_best_track_time", builder -> builder.codec(Codec.STRING));
     public static final ComponentType<String> TRACK_REPORT_DATE = register("track_report_date", builder -> builder.codec(Codec.STRING));
+    public static final ComponentType<String> TRACK_REPORT_DURATION = register("track_report_duration", builder -> builder.codec(Codec.STRING));
     public static final ComponentType<Integer> TRACK_REPORT_PLACEMENT = register("track_report_placement", builder -> builder.codec(Codec.INT));
     public static final ComponentType<Integer> TRACK_REPORT_TOTAL_LAPS = register("track_report_total_laps", builder -> builder.codec(Codec.INT));
 
