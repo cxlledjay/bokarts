@@ -136,7 +136,7 @@ public class KartEntity extends Entity implements RideableInventory{
     public float wheelFriction = 0.02f;
     public float frictionPenalty = 0.08f;
     public float handBrakeProgress = 0.0f;
-    public float fuelConsumptionBase = 0.07125f;
+    public float fuelConsumptionBase = 0.5f;
     public float stepHeight = 0.75f;
 
     // sound tracking
@@ -968,12 +968,13 @@ public class KartEntity extends Entity implements RideableInventory{
         AeroType aero = this.getAeroType();
 
         // calculate physics
-        this.acceleration       = engine.getbaseA() * ( 1 + aero.getMultiA() + spoiler.getMultiA() + wheel.getMultiA() );
-        this.vMax               = engine.getbaseV() * ( 1 + aero.getMultiV() + spoiler.getMultiV() + wheel.getMultiV() );
-        this.wheelFriction      = wheel.getBaseF()  * ( 1 + aero.getMultiF() + spoiler.getMultiF() );
+        this.acceleration           = engine.getbaseA() * ( 1 + aero.getMultiA() + spoiler.getMultiA() + wheel.getMultiA() );
+        this.vMax                   = engine.getbaseV() * ( 1 + aero.getMultiV() + spoiler.getMultiV() + wheel.getMultiV() );
+        this.wheelFriction          = wheel.getBaseF()  * ( 1 + aero.getMultiF() + spoiler.getMultiF() );
 
-        this.frictionPenalty    = wheel.getPenalityF();
-        this.stepHeight         = wheel.getStepHeight();
+        this.frictionPenalty        = wheel.getPenalityF();
+        this.stepHeight             = wheel.getStepHeight();
+        this.fuelConsumptionBase    = 0.5f * engine.getFuelMulti();
     }
 
 
@@ -1058,7 +1059,9 @@ public class KartEntity extends Entity implements RideableInventory{
         // fuel consumption
         if(this.pressingForward || this.pressingBack) {
             // we are accelerating: consume fuel!
-            this.currentFuel = Math.max(0, this.currentFuel - 0.7625f); // prevent going under 0
+            float revFactor = 0.5f + (Math.abs(this.engineRevs) / ENGINE_REVS_MAX);
+            float fuelDrain = this.fuelConsumptionBase * revFactor;
+            this.currentFuel = Math.max(0, this.currentFuel - fuelDrain); // prevent going under 0
         }
         this.currentOdometer += (float) this.distanceThisTick;
 
