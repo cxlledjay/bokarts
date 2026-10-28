@@ -5,6 +5,7 @@ import de.cxlledjay.bokarts.entity.client.kartv2.ChassisModel;
 import de.cxlledjay.bokarts.entity.client.kartv2.EngineModel;
 import de.cxlledjay.bokarts.entity.client.kartv2.aero.AeroRaceModel;
 import de.cxlledjay.bokarts.entity.client.kartv2.spoiler.SpoilerRaceModel;
+import de.cxlledjay.bokarts.entity.client.kartv2.spoiler.SpoilerRaceProMaxModel;
 import de.cxlledjay.bokarts.entity.client.kartv2.spoiler.SpoilerStreetModel;
 import de.cxlledjay.bokarts.entity.client.kartv2.wheels.WheelsModelBase;
 import de.cxlledjay.bokarts.entity.client.kartv2.wheels.WheelsModelNormal;
@@ -52,8 +53,13 @@ public class KartRenderer extends EntityRenderer<KartEntity> {
 
         // wheels
         this.modelWheels.put(WheelType.STREET, new WheelsModelNormal<>(ctx.getPart(WheelsModelNormal.ENTITY_MODEL_LAYER)));
+        this.modelWheels.put(WheelType.SEMI_SLICK, new WheelsModelNormal<>(ctx.getPart(WheelsModelNormal.ENTITY_MODEL_LAYER)));
+        this.modelWheels.put(WheelType.SOFT, new WheelsModelNormal<>(ctx.getPart(WheelsModelNormal.ENTITY_MODEL_LAYER)));
+        this.modelWheels.put(WheelType.HARD, new WheelsModelNormal<>(ctx.getPart(WheelsModelNormal.ENTITY_MODEL_LAYER)));
         this.modelWheels.put(WheelType.DRIFT, new WheelsModelNormal<>(ctx.getPart(WheelsModelNormal.ENTITY_MODEL_LAYER)));
+        this.modelWheels.put(WheelType.DRIFT_PLUS, new WheelsModelNormal<>(ctx.getPart(WheelsModelNormal.ENTITY_MODEL_LAYER)));
         this.modelWheels.put(WheelType.OFFROAD, new WheelsModelOffroad<>(ctx.getPart(WheelsModelOffroad.ENTITY_MODEL_LAYER)));
+        this.modelWheels.put(WheelType.SPIKES, new WheelsModelOffroad<>(ctx.getPart(WheelsModelOffroad.ENTITY_MODEL_LAYER)));
 
         // engine
         this.modelEngine = new EngineModel<>(ctx.getPart(EngineModel.ENTITY_MODEL_LAYER));
@@ -63,6 +69,8 @@ public class KartRenderer extends EntityRenderer<KartEntity> {
         this.modelSpoiler.put(SpoilerType.STREET_CARBON, new SpoilerStreetModel<>(ctx.getPart(SpoilerStreetModel.ENTITY_MODEL_LAYER)));
         this.modelSpoiler.put(SpoilerType.RACE, new SpoilerRaceModel<>(ctx.getPart(SpoilerRaceModel.ENTITY_MODEL_LAYER)));
         this.modelSpoiler.put(SpoilerType.RACE_CARBON, new SpoilerRaceModel<>(ctx.getPart(SpoilerRaceModel.ENTITY_MODEL_LAYER)));
+        this.modelSpoiler.put(SpoilerType.RACE_PLUS, new SpoilerRaceProMaxModel<>(ctx.getPart(SpoilerRaceProMaxModel.ENTITY_MODEL_LAYER)));
+        this.modelSpoiler.put(SpoilerType.RACE_PLUS_CARBON, new SpoilerRaceProMaxModel<>(ctx.getPart(SpoilerRaceProMaxModel.ENTITY_MODEL_LAYER)));
 
         // aero
         this.modelAero.put(AeroType.RACE, new AeroRaceModel<>(ctx.getPart(AeroRaceModel.ENTITY_MODEL_LAYER)));

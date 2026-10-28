@@ -24,8 +24,13 @@ public class ModItems {
     public static final Item CHASSIS_BLUEPRINT = registerItem("chassis_blueprint", new Item(new Item.Settings()));
     // wheels
     public static final Item WHEELS_STREET = registerItem("wheels_street", new WheelsItem(new Item.Settings()));
+    public static final Item WHEELS_SEMI_SLICK = registerItem("wheels_semi_slick", new WheelsItem(new Item.Settings()));
+    public static final Item WHEELS_SOFT = registerItem("wheels_soft", new WheelsItem(new Item.Settings()));
+    public static final Item WHEELS_HARD = registerItem("wheels_hard", new WheelsItem(new Item.Settings()));
     public static final Item WHEELS_DRIFT = registerItem("wheels_drift", new WheelsItem(new Item.Settings()));
+    public static final Item WHEELS_DRIFT_PLUS = registerItem("wheels_drift_plus", new WheelsItem(new Item.Settings()));
     public static final Item WHEELS_OFFROAD = registerItem("wheels_offroad", new WheelsItem(new Item.Settings()));
+    public static final Item WHEELS_SPIKES = registerItem("wheels_spikes", new WheelsItem(new Item.Settings()));
     // engines
     public static final Item ENGINE_COPPER = registerItem("engine_copper", new EngineItem(new Item.Settings()));
     public static final Item ENGINE_IRON = registerItem("engine_iron", new EngineItem(new Item.Settings()));
@@ -37,6 +42,8 @@ public class ModItems {
     public static final Item SPOILER_STREET_CARBON = registerItem("spoiler_street_carbon", new SpoilerItem(new Item.Settings()));
     public static final Item SPOILER_RACE = registerItem("spoiler_race", new SpoilerItem(new Item.Settings()));
     public static final Item SPOILER_RACE_CARBON = registerItem("spoiler_race_carbon", new SpoilerItem(new Item.Settings()));
+    public static final Item SPOILER_RACE_PRO_MAX = registerItem("spoiler_race_pro_max", new SpoilerItem(new Item.Settings()));
+    public static final Item SPOILER_RACE_PRO_MAX_CARBON = registerItem("spoiler_race_pro_max_carbon", new SpoilerItem(new Item.Settings()));
     // aero kits
     public static final Item AERO_RACE = registerItem("aero_race", new AeroItem(new Item.Settings()));
     public static final Item AERO_RACE_CARBON = registerItem("aero_race_carbon", new AeroItem(new Item.Settings()));

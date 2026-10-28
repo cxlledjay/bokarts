@@ -12,12 +12,12 @@ import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.function.ValueLists;
 
 public enum EngineType implements StringIdentifiable {
-    ENGINE_NONE(0, "engine_none", "None", 0.0f, 0.0f),
-    ENGINE_COPPER(1, "engine_copper", "Copper", 0.03f, 1.5f),
-    ENGINE_IRON(2, "engine_iron", "Iron", 0.035f, 1.75f),
-    ENGINE_GOLD(3, "engine_gold", "Gold", 0.04f, 2.0f),
-    ENGINE_DIAMOND(4, "engine_diamond", "Diamond", 0.055f, 2.15f),
-    ENGINE_NETHERITE(5, "engine_netherite", "Netherite", 0.07f, 2.3f);
+    ENGINE_NONE         (0,  "engine_none",         "None",         0.0f,   0.0f),
+    ENGINE_COPPER       (1,  "engine_copper",       "Copper",       0.03f,  1.3f),
+    ENGINE_IRON         (2,  "engine_iron",         "Iron",         0.035f, 1.7f),
+    ENGINE_GOLD         (3,  "engine_gold",         "Gold",         0.04f,  2.0f),
+    ENGINE_DIAMOND      (4,  "engine_diamond",      "Diamond",      0.05f,  2.2f),
+    ENGINE_NETHERITE    (5,  "engine_netherite",    "Netherite",    0.06f,  2.3473f);
 
     // id to value function
     private static final IntFunction<EngineType> INDEX_TO_VALUE = ValueLists.createIdToValueFunction(
@@ -34,16 +34,16 @@ public enum EngineType implements StringIdentifiable {
     private final int id;
     private final String name;
     private final String display_name;
-    private final float acceleration;
-    private final float vMax;
+    private final float baseA;
+    private final float baseV;
     private final Identifier texture;
 
-    EngineType(final int id, final String name, final String display_name, float acceleration, float vMax) {
+    EngineType(final int id, final String name, final String display_name, float baseA, float baseV) {
         this.id = id;
         this.name = name;
         this.display_name = display_name;
-        this.acceleration = acceleration;
-        this.vMax = vMax;
+        this.baseA = baseA;
+        this.baseV = baseV;
 
         // dynamically creating a texture/model path using the enum's name
         this.texture = BoKarts.id("textures/entity/kartv2/engine/" + name + ".png");
@@ -51,37 +51,22 @@ public enum EngineType implements StringIdentifiable {
 
     // --- interface ---
     @Override
-    public String asString() {
-        return this.name;
-    }
+    public String asString() { return this.name; }
 
     // --- id <-> enum ---
-    public int getId() {
-        return this.id;
-    }
+    public int getId() { return this.id; }
 
-    public static EngineType fromId(int id) {
-        return INDEX_TO_VALUE.apply(id);
-    }
+    public static EngineType fromId(int id) { return INDEX_TO_VALUE.apply(id); }
 
     // --- physics ---
-    public float getAcceleration() {
-        return this.acceleration;
-    }
-
-    public float getVMax() {
-        return this.vMax;
-    }
+    public float getbaseA() { return baseA; }
+    public float getbaseV() { return baseV; }
 
 
     // --- textures ---
-    public Identifier getTexture() {
-        return this.texture;
-    }
+    public Identifier getTexture() { return this.texture; }
 
     // --- items ---
-    public String getDisplayName() {
-        return this.display_name;
-    }
+    public String getDisplayName() { return this.display_name; }
 
 }

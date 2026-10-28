@@ -43,8 +43,13 @@ public class ModItemGroups {
                         entries.add(new ItemStack(ModItems.DYE_MIX));
                         // wheels
                         entries.add(new ItemStack(ModItems.WHEELS_STREET));
+                        entries.add(new ItemStack(ModItems.WHEELS_SEMI_SLICK));
+                        entries.add(new ItemStack(ModItems.WHEELS_SOFT));
+                        entries.add(new ItemStack(ModItems.WHEELS_HARD));
                         entries.add(new ItemStack(ModItems.WHEELS_DRIFT));
+                        entries.add(new ItemStack(ModItems.WHEELS_DRIFT_PLUS));
                         entries.add(new ItemStack(ModItems.WHEELS_OFFROAD));
+                        entries.add(new ItemStack(ModItems.WHEELS_SPIKES));
                         // engines
                         entries.add(new ItemStack(ModItems.ENGINE_COPPER));
                         entries.add(new ItemStack(ModItems.ENGINE_IRON));
@@ -56,6 +61,8 @@ public class ModItemGroups {
                         entries.add(new ItemStack(ModItems.SPOILER_STREET_CARBON));
                         entries.add(new ItemStack(ModItems.SPOILER_RACE));
                         entries.add(new ItemStack(ModItems.SPOILER_RACE_CARBON));
+                        entries.add(new ItemStack(ModItems.SPOILER_RACE_PRO_MAX));
+                        entries.add(new ItemStack(ModItems.SPOILER_RACE_PRO_MAX_CARBON));
                         // aero
                         entries.add(new ItemStack(ModItems.AERO_RACE));
                         entries.add(new ItemStack(ModItems.AERO_RACE_CARBON));

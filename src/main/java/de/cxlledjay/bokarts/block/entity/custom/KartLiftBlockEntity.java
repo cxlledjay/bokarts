@@ -244,8 +244,13 @@ public class KartLiftBlockEntity extends BlockEntity implements ExtendedScreenHa
         WheelType wheelType = WheelType.NONE;
         if(item instanceof WheelsItem) {
             if(item == ModItems.WHEELS_STREET) wheelType = WheelType.STREET;
+            if(item == ModItems.WHEELS_SEMI_SLICK) wheelType = WheelType.SEMI_SLICK;
+            if(item == ModItems.WHEELS_SOFT) wheelType = WheelType.SOFT;
+            if(item == ModItems.WHEELS_HARD) wheelType = WheelType.HARD;
             else if(item == ModItems.WHEELS_DRIFT) wheelType = WheelType.DRIFT;
+            else if(item == ModItems.WHEELS_DRIFT_PLUS) wheelType = WheelType.DRIFT_PLUS;
             else if(item == ModItems.WHEELS_OFFROAD) wheelType = WheelType.OFFROAD;
+            else if(item == ModItems.WHEELS_SPIKES) wheelType = WheelType.SPIKES;
         }
         storedKart.setWheelType(wheelType);
     }
@@ -275,6 +280,8 @@ public class KartLiftBlockEntity extends BlockEntity implements ExtendedScreenHa
             else if(item == ModItems.SPOILER_STREET_CARBON) spoilerType = SpoilerType.STREET_CARBON;
             else if(item == ModItems.SPOILER_RACE) spoilerType = SpoilerType.RACE;
             else if(item == ModItems.SPOILER_RACE_CARBON) spoilerType = SpoilerType.RACE_CARBON;
+            else if(item == ModItems.SPOILER_RACE_PRO_MAX) spoilerType = SpoilerType.RACE_PLUS;
+            else if(item == ModItems.SPOILER_RACE_PRO_MAX_CARBON) spoilerType = SpoilerType.RACE_PLUS_CARBON;
         }
         storedKart.setSpoilerType(spoilerType);
     }
@@ -332,8 +339,13 @@ public class KartLiftBlockEntity extends BlockEntity implements ExtendedScreenHa
         // wheels
         ItemStack wheelItem = switch(this.getKartEntity().getWheelType()) {
             case STREET -> new ItemStack(ModItems.WHEELS_STREET);
+            case SEMI_SLICK -> new ItemStack(ModItems.WHEELS_SEMI_SLICK);
+            case SOFT -> new ItemStack(ModItems.WHEELS_SOFT);
+            case HARD -> new ItemStack(ModItems.WHEELS_HARD);
             case DRIFT -> new ItemStack(ModItems.WHEELS_DRIFT);
+            case DRIFT_PLUS -> new ItemStack(ModItems.WHEELS_DRIFT_PLUS);
             case OFFROAD -> new ItemStack(ModItems.WHEELS_OFFROAD);
+            case SPIKES -> new ItemStack(ModItems.WHEELS_SPIKES);
             default -> ItemStack.EMPTY;
         };
         // engines
@@ -351,6 +363,8 @@ public class KartLiftBlockEntity extends BlockEntity implements ExtendedScreenHa
             case STREET_CARBON ->  new ItemStack(ModItems.SPOILER_STREET_CARBON);
             case RACE  -> new ItemStack(ModItems.SPOILER_RACE);
             case RACE_CARBON -> new ItemStack(ModItems.SPOILER_RACE_CARBON);
+            case RACE_PLUS -> new ItemStack(ModItems.SPOILER_RACE_PRO_MAX);
+            case RACE_PLUS_CARBON -> new ItemStack(ModItems.SPOILER_RACE_PRO_MAX_CARBON);
             default -> ItemStack.EMPTY;
         };
         // aero

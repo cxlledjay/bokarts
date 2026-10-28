@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "I": {
+      "item": "minecraft:iron_block"
+    },
+    "M": {
+      "item": "minecraft:honey_block"
+    },
+    "W": {
+      "item": "minecraft:black_wool"
+    }
+  },
+  "pattern": [
+    "MWM",
+    "WIW",
+    "MWM"
+  ],
+  "result": {
+    "count": 1,
+    "id": "bokarts:wheels_soft"
+  }
+}

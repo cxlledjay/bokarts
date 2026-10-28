@@ -6,8 +6,13 @@
   "item.bokarts.seat" : "Kart Seat",
 
   "item.bokarts.wheels_street" : "Kart Wheels (Street)",
+  "item.bokarts.wheels_semi_slick" : "Kart Wheels (Semi Slicks)",
+  "item.bokarts.wheels_soft" : "Kart Wheels (Slicks Soft)",
+  "item.bokarts.wheels_hard" : "Kart Wheels (Slicks Hard)",
   "item.bokarts.wheels_drift" : "Kart Wheels (Drift)",
+  "item.bokarts.wheels_drift_plus" : "Kart Wheels (Drift Plus)",
   "item.bokarts.wheels_offroad" : "Kart Wheels (Offroad)",
+  "item.bokarts.wheels_spikes" : "Kart Wheels (Spikes)",
 
   "item.bokarts.engine_copper": "Kart Engine (Copper)",
   "item.bokarts.engine_iron": "Kart Engine (Iron)",
@@ -19,6 +24,8 @@
   "item.bokarts.spoiler_street_carbon": "Kart Spoiler (Street Carbon)",
   "item.bokarts.spoiler_race": "Kart Spoiler (Race)",
   "item.bokarts.spoiler_race_carbon": "Kart Spoiler (Race Carbon)",
+  "item.bokarts.spoiler_race_plus": "Kart Spoiler (Race Pro Max)",
+  "item.bokarts.spoiler_race_plus_carbon": "Kart Spoiler (Race Pro Max Carbon)",
 
   "item.bokarts.aero_race": "Kart Aero Kit (Race)",
   "item.bokarts.aero_race_carbon": "Kart Aero Kit (Race Carbon)",

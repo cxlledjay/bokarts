@@ -1,0 +1,54 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_black_wool": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:black_wool"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_iron_block": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:iron_block"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_logs": {
+      "conditions": {
+        "items": [
+          {
+            "items": "#minecraft:logs"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "bokarts:wheels_drift_plus"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_black_wool",
+      "has_iron_block",
+      "has_logs"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "bokarts:wheels_drift_plus"
+    ]
+  }
+}

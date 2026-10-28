@@ -12,19 +12,27 @@ import net.minecraft.util.function.ValueLists;
 import java.util.function.IntFunction;
 
 public enum WheelType implements StringIdentifiable {
-    NONE(0,"none", "None", 1.0f, 0.0f, 0.0f) {
+    NONE        (0, "none",         "None",             1.0f,   0.0f,   0.0f,       0.0f) {
         @Override
-        public float getStepHeight() {
-            return 0.0f;
-        }
+        public float getStepHeight() { return 0.0f; }
     },
-    STREET(1,"street", "Street", 0.04f, 0.08f, 0.2f),
-    DRIFT(2,"drift", "Drift", 0.02f, 0.08f, 0.0f),
-    OFFROAD(3,"offroad", "Offroad", 0.06f, 0.0f, -0.5f) {
+    STREET      (1, "street",       "Street",           0.04f,  0.08f,  0.045f,     0.03f),
+    SEMI_SLICK  (2, "semi_slick",   "Semi Slicks",      0.045f, 0.09f,  0.0675f,    0.045f),
+    SOFT        (3, "soft",         "Slicks (Soft)",    0.06f,  0.1f,   0.09f,      0.03f),
+    HARD        (4, "hard",         "Slicks (Hard)",    0.03f,  0.1f,   0.045f,     0.06f),
+    DRIFT       (5, "drift",        "Drift",            0.02f,  0.08f,  0.0f,       0.0f),
+    DRIFT_PLUS  (6, "drift_plus",   "Drift Plus",       0.015f, 0.08f,  -0.16f,     0.055f),
+    OFFROAD     (7, "offroad",      "Offroad",          0.048f, 0.0f,   -0.1f,      -0.40825f) {
         @Override
-        public float getStepHeight() {
-            return 1.05f;
-        }
+        public float getStepHeight() { return 1.05f; }
+        @Override
+        public Identifier getOverlayTexture() { return BoKarts.id("textures/entity/kartv2/wheels/overlay_offroad.png"); }
+    },
+    SPIKES      (8, "spikes",       "Spikes",           0.055f, 0.0f,   0.05f,      -0.35f) {
+        @Override
+        public float getStepHeight() { return 1.05f; }
+        @Override
+        public Identifier getOverlayTexture() { return BoKarts.id("textures/entity/kartv2/wheels/overlay_offroad.png"); }
     };
 
 
@@ -45,74 +53,47 @@ public enum WheelType implements StringIdentifiable {
     private final int id;
     private final String name;
     private final String display_name;
-    private final float wheelFriction;
-    private final float frictionPenalty;
-    private final float accelerationMultiplier;
+    private final float baseF;
+    private final float penalityF;
+    private final float multiA;
+    private final float multiV;
     private final Identifier texture;
-    private final Identifier overlay;
 
-    WheelType(final int id, final String name, final String display_name, float wheelFriction, float frictionPenalty, float accelerationMultiplier) {
+    WheelType(final int id, final String name, final String display_name, float baseF, float penalityF, float multiA, float multiV) {
         this.id = id;
         this.name = name;
         this.display_name = display_name;
-        this.wheelFriction = wheelFriction;
-        this.frictionPenalty = frictionPenalty;
-        this.accelerationMultiplier = accelerationMultiplier;
+        this.baseF = baseF;
+        this.penalityF = penalityF;
+        this.multiA = multiA;
+        this.multiV = multiV;
 
         // create paths for textures
         this.texture = BoKarts.id("textures/entity/kartv2/wheels/" + name + ".png");
-        this.overlay = BoKarts.id("textures/entity/kartv2/wheels/" + name + "_overlay.png");
     }
 
 
 
     // --- interface ---
     @Override
-    public String asString() {
-        return this.name;
-    }
-
-
+    public String asString() { return this.name; }
 
     // --- id <-> enum ---
-    public int getId() {
-        return this.id;
-    }
-
-    public static WheelType fromId(int id) {
-        return INDEX_TO_VALUE.apply(id);
-    }
-
+    public int getId() { return this.id; }
+    public static WheelType fromId(int id) { return INDEX_TO_VALUE.apply(id); }
 
 
     // --- physics ---
-    public float getStepHeight() {
-        return 0.75F;
-    }
-
-    public float getWheelFriction() {
-        return wheelFriction;
-    }
-
-    public float getFrictionPenalty() {
-        return this.frictionPenalty;
-    }
-
-    public float getAccelerationMultiplier() {
-        return this.accelerationMultiplier;
-    }
+    public float getStepHeight() { return 0.75F; }
+    public float getBaseF() { return baseF; }
+    public float getPenalityF() { return penalityF; }
+    public float getMultiA() { return multiA; }
+    public float getMultiV() { return multiV; }
 
     // --- textures ---
-    public Identifier getBaseTexture() {
-        return this.texture;
-    }
-
-    public Identifier getOverlayTexture() {
-        return this.overlay;
-    }
+    public Identifier getBaseTexture() { return this.texture; }
+    public Identifier getOverlayTexture() { return BoKarts.id("textures/entity/kartv2/wheels/overlay_normal.png"); }
 
     // --- items ---
-    public String getDisplayName() {
-        return this.display_name;
-    }
+    public String getDisplayName() { return this.display_name; }
 }

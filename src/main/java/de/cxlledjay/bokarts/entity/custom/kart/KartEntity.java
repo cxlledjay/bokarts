@@ -968,11 +968,12 @@ public class KartEntity extends Entity implements RideableInventory{
         AeroType aero = this.getAeroType();
 
         // calculate physics
-        this.acceleration = engine.getAcceleration() * (1 + wheel.getAccelerationMultiplier() + spoiler.getAccelerationMultiplier());
-        this.vMax = engine.getVMax() * (1 + aero.getVMaxMultiplier() + spoiler.getVMaxMultiplier());
-        this.wheelFriction = wheel.getWheelFriction();
-        this.frictionPenalty = wheel.getFrictionPenalty();
-        this.stepHeight = wheel.getStepHeight();
+        this.acceleration       = engine.getbaseA() * ( 1 + aero.getMultiA() + spoiler.getMultiA() + wheel.getMultiA() );
+        this.vMax               = engine.getbaseV() * ( 1 + aero.getMultiV() + spoiler.getMultiV() + wheel.getMultiV() );
+        this.wheelFriction      = wheel.getBaseF()  * ( 1 + aero.getMultiF() + spoiler.getMultiF() );
+
+        this.frictionPenalty    = wheel.getPenalityF();
+        this.stepHeight         = wheel.getStepHeight();
     }
 
 
@@ -1545,7 +1546,7 @@ public class KartEntity extends Entity implements RideableInventory{
             };
 
             WheelType wheelType = WheelType.DRIFT;
-            EngineType engineType = EngineType.ENGINE_COPPER;
+            EngineType engineType = EngineType.ENGINE_GOLD;
 
             this.setBodyType(bodyType);
             this.setBodyColor(bodyColor);
