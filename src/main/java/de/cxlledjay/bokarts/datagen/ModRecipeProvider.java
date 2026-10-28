@@ -3,7 +3,6 @@ package de.cxlledjay.bokarts.datagen;
 import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.block.ModBlocks;
 import de.cxlledjay.bokarts.item.ModItems;
-import de.cxlledjay.bokarts.util.ModTags;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.minecraft.data.server.recipe.RecipeExporter;
@@ -15,7 +14,6 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.ItemTags;
-import net.minecraft.registry.tag.TagKey;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -421,7 +419,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .offerTo(exporter);
 
         // trophy
-        ShapedRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, ModBlocks.TROPHY)
+        ShapedRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, ModBlocks.TROPHY_GOLD)
                 .pattern("IBI")
                 .pattern(" I ")
                 .pattern("GGG")
@@ -430,6 +428,28 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .input('G', Items.GRAY_CONCRETE)
                 .criterion(hasItem(Items.GOLD_BLOCK), conditionsFromItem(Items.GOLD_BLOCK))
                 .criterion(hasItem(Items.GOLD_INGOT), conditionsFromItem(Items.GOLD_INGOT))
+                .criterion(hasItem(Items.GRAY_CONCRETE), conditionsFromItem(Items.GRAY_CONCRETE))
+                .offerTo(exporter);
+        ShapedRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, ModBlocks.TROPHY_SILVER)
+                .pattern("IBI")
+                .pattern(" I ")
+                .pattern("GGG")
+                .input('B', Items.IRON_BLOCK)
+                .input('I', Items.IRON_INGOT)
+                .input('G', Items.GRAY_CONCRETE)
+                .criterion(hasItem(Items.IRON_BLOCK), conditionsFromItem(Items.IRON_BLOCK))
+                .criterion(hasItem(Items.IRON_INGOT), conditionsFromItem(Items.IRON_INGOT))
+                .criterion(hasItem(Items.GRAY_CONCRETE), conditionsFromItem(Items.GRAY_CONCRETE))
+                .offerTo(exporter);
+        ShapedRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, ModBlocks.TROPHY_BRONZE)
+                .pattern("IBI")
+                .pattern(" I ")
+                .pattern("GGG")
+                .input('B', Items.COPPER_BLOCK)
+                .input('I', Items.COPPER_INGOT)
+                .input('G', Items.GRAY_CONCRETE)
+                .criterion(hasItem(Items.COPPER_BLOCK), conditionsFromItem(Items.COPPER_BLOCK))
+                .criterion(hasItem(Items.COPPER_INGOT), conditionsFromItem(Items.COPPER_INGOT))
                 .criterion(hasItem(Items.GRAY_CONCRETE), conditionsFromItem(Items.GRAY_CONCRETE))
                 .offerTo(exporter);
 

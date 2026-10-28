@@ -5,7 +5,6 @@ import de.cxlledjay.bokarts.block.custom.*;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.MapColor;
-import net.minecraft.block.enums.NoteBlockInstrument;
 import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -53,14 +52,14 @@ public class ModBlocks {
     ));
 
     // trophy
-    public static final Block TROPHY = registerBlock("trophy", new Trophy(
-            AbstractBlock.Settings.create()
-                    .mapColor(MapColor.GOLD)
-                    .sounds(BlockSoundGroup.METAL)
-                    .strength(1.5f)
-                    .requiresTool()
-                    .nonOpaque()
-                    .pistonBehavior(PistonBehavior.BLOCK)
+    public static final Block TROPHY_GOLD = registerBlock("trophy_gold", new TrophyGold(
+            TrophyBase.getDefaultSettings()
+    ));
+    public static final Block TROPHY_SILVER = registerBlock("trophy_silver", new TrophySilver(
+            TrophyBase.getDefaultSettings()
+    ));
+    public static final Block TROPHY_BRONZE = registerBlock("trophy_bronze", new TrophyBronze(
+            TrophyBase.getDefaultSettings()
     ));
 
     // silly fun

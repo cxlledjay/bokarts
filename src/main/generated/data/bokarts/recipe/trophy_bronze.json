@@ -3,13 +3,13 @@
   "category": "misc",
   "key": {
     "B": {
-      "item": "minecraft:gold_block"
+      "item": "minecraft:copper_block"
     },
     "G": {
       "item": "minecraft:gray_concrete"
     },
     "I": {
-      "item": "minecraft:gold_ingot"
+      "item": "minecraft:copper_ingot"
     }
   },
   "pattern": [
@@ -19,6 +19,6 @@
   ],
   "result": {
     "count": 1,
-    "id": "bokarts:trophy"
+    "id": "bokarts:trophy_bronze"
   }
 }

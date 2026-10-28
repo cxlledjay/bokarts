@@ -1,6 +1,6 @@
 package de.cxlledjay.bokarts.block.entity.client;
 
-import de.cxlledjay.bokarts.block.custom.Trophy;
+import de.cxlledjay.bokarts.block.custom.TrophyBase;
 import de.cxlledjay.bokarts.block.entity.custom.TrophyBlockEntity;
 import de.cxlledjay.bokarts.component.ModDataComponentTypes;
 import de.cxlledjay.bokarts.item.custom.TrackReport;
@@ -37,7 +37,7 @@ public class TrophyBlockEntityRenderer implements BlockEntityRenderer<TrophyBloc
         Text placementText = Text.literal("#" + placement);
 
         // rendering
-        Direction direction = entity.getCachedState().get(Trophy.FACING);
+        Direction direction = entity.getCachedState().get(TrophyBase.FACING);
         matrices.push();
 
         double xOffset = 0.5 + (direction.getOffsetX() * 0.251);

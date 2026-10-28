@@ -18,7 +18,9 @@ public class ModModelProvider extends FabricModelProvider {
     public void generateBlockStateModels(BlockStateModelGenerator blockStateModelGenerator) {
         blockStateModelGenerator.registerNorthDefaultHorizontalRotation(ModBlocks.LIVERY_WORKBENCH);
         blockStateModelGenerator.registerNorthDefaultHorizontalRotation(ModBlocks.PAINT_BUCKET);
-        blockStateModelGenerator.registerNorthDefaultHorizontalRotation(ModBlocks.TROPHY);
+        blockStateModelGenerator.registerNorthDefaultHorizontalRotation(ModBlocks.TROPHY_GOLD);
+        blockStateModelGenerator.registerNorthDefaultHorizontalRotation(ModBlocks.TROPHY_SILVER);
+        blockStateModelGenerator.registerNorthDefaultHorizontalRotation(ModBlocks.TROPHY_BRONZE);
         blockStateModelGenerator.registerSimpleCubeAll(ModBlocks.HORN_BLOCK);
     }
 

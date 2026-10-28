@@ -24,7 +24,7 @@ public class ModBlockEntities {
     // trophy
     public static final BlockEntityType<TrophyBlockEntity> TROPHY_BE =
             Registry.register(Registries.BLOCK_ENTITY_TYPE, BoKarts.id("trophy"),
-                    BlockEntityType.Builder.create(TrophyBlockEntity::new, ModBlocks.TROPHY).build());
+                    BlockEntityType.Builder.create(TrophyBlockEntity::new, ModBlocks.TROPHY_GOLD, ModBlocks.TROPHY_SILVER, ModBlocks.TROPHY_BRONZE).build());
 
 
 

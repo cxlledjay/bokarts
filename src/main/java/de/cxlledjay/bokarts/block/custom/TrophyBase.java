@@ -1,16 +1,16 @@
 package de.cxlledjay.bokarts.block.custom;
 
 import com.mojang.serialization.MapCodec;
-import de.cxlledjay.bokarts.BoKarts;
-import de.cxlledjay.bokarts.block.entity.custom.TrackTimerBlockEntity;
 import de.cxlledjay.bokarts.block.entity.custom.TrophyBlockEntity;
+import de.cxlledjay.bokarts.component.ModDataComponentTypes;
 import de.cxlledjay.bokarts.item.ModItems;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.StateManager;
@@ -27,10 +27,7 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public class Trophy extends BlockWithEntity {
-
-    // codec
-    public static final MapCodec<Trophy> CODEC = Trophy.createCodec(Trophy::new);
+public abstract class TrophyBase extends BlockWithEntity {
 
     // facing
     public static final DirectionProperty FACING = HorizontalFacingBlock.FACING;
@@ -40,15 +37,23 @@ public class Trophy extends BlockWithEntity {
     protected static final VoxelShape SHAPE_EAST_WEST = Block.createCuboidShape(2, 0, 2, 14, 19, 14);
 
 
-    public Trophy(Settings settings) {
+    public TrophyBase(Settings settings) {
         super(settings);
         this.setDefaultState(this.stateManager.getDefaultState().with(FACING, Direction.NORTH));
     }
 
-    @Override
-    protected MapCodec<Trophy> getCodec() {
-        return CODEC;
+    public static AbstractBlock.Settings getDefaultSettings() {
+        return AbstractBlock.Settings.create()
+                .mapColor(MapColor.GOLD)
+                .sounds(BlockSoundGroup.METAL)
+                .strength(1.5f)
+                .requiresTool()
+                .nonOpaque()
+                .pistonBehavior(PistonBehavior.BLOCK);
     }
+
+    abstract boolean isValidPlacement(int placement);
+
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
@@ -73,8 +78,10 @@ public class Trophy extends BlockWithEntity {
         if(world.getBlockEntity(pos) instanceof TrophyBlockEntity blockEntity) {
             ItemStack slotStack = blockEntity.getStack(0);
 
+            int placement = stack.getOrDefault(ModDataComponentTypes.TRACK_REPORT_PLACEMENT, 0);
+
             // insert item
-            if(stack.isOf(ModItems.TRACK_REPORT) && slotStack.isEmpty()) {
+            if(stack.isOf(ModItems.TRACK_REPORT) && slotStack.isEmpty() && isValidPlacement(placement)) {
                 if(!world.isClient) {
                     blockEntity.setStack(0, stack.split(1));
                     blockEntity.markDirty();

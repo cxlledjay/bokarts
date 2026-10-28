@@ -31,7 +31,9 @@ public class ModItemGroups {
                         entries.add(new ItemStack(ModBlocks.KART_LIFT));
                         entries.add(new ItemStack(ModBlocks.LIVERY_WORKBENCH));
                         entries.add(new ItemStack(ModBlocks.PAINT_BUCKET));
-                        entries.add(new ItemStack(ModBlocks.TROPHY));
+                        entries.add(new ItemStack(ModBlocks.TROPHY_GOLD));
+                        entries.add(new ItemStack(ModBlocks.TROPHY_SILVER));
+                        entries.add(new ItemStack(ModBlocks.TROPHY_BRONZE));
 
                         // items
 
