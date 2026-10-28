@@ -342,7 +342,7 @@ public class KartLiftScreen extends HandledScreen<KartLiftScreenHandler> {
             String stepHeight =         "Step Height: " + String.format("%.2f", kart.stepHeight) + " blocks";
 
 
-            context.drawText(this.textRenderer, header,             this.x + 254, this.y + 30,      0xFFFFFF, false);
+            context.drawText(this.textRenderer, header,             this.x + 244, this.y + 30,      0xFFFFFF, false);
 
             context.drawText(this.textRenderer, acceleration,       this.x + 254, this.y + 48,      0x00FFFF, false);
             context.drawText(this.textRenderer, vMax,               this.x + 254, this.y + 60,      0x00FFFF, false);

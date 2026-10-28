@@ -1,6 +1,10 @@
 package de.cxlledjay.bokarts.item;
 
 import de.cxlledjay.bokarts.BoKarts;
+import de.cxlledjay.bokarts.entity.custom.kart.property.AeroType;
+import de.cxlledjay.bokarts.entity.custom.kart.property.EngineType;
+import de.cxlledjay.bokarts.entity.custom.kart.property.SpoilerType;
+import de.cxlledjay.bokarts.entity.custom.kart.property.WheelType;
 import de.cxlledjay.bokarts.item.custom.*;
 import de.cxlledjay.bokarts.item.custom.modification.AeroItem;
 import de.cxlledjay.bokarts.item.custom.modification.EngineItem;
@@ -23,30 +27,30 @@ public class ModItems {
     public static final Item SEAT = registerItem("seat", new Item(new Item.Settings()));
     public static final Item CHASSIS_BLUEPRINT = registerItem("chassis_blueprint", new Item(new Item.Settings()));
     // wheels
-    public static final Item WHEELS_STREET = registerItem("wheels_street", new WheelsItem(new Item.Settings()));
-    public static final Item WHEELS_SEMI_SLICK = registerItem("wheels_semi_slick", new WheelsItem(new Item.Settings()));
-    public static final Item WHEELS_SOFT = registerItem("wheels_soft", new WheelsItem(new Item.Settings()));
-    public static final Item WHEELS_HARD = registerItem("wheels_hard", new WheelsItem(new Item.Settings()));
-    public static final Item WHEELS_DRIFT = registerItem("wheels_drift", new WheelsItem(new Item.Settings()));
-    public static final Item WHEELS_DRIFT_PLUS = registerItem("wheels_drift_plus", new WheelsItem(new Item.Settings()));
-    public static final Item WHEELS_OFFROAD = registerItem("wheels_offroad", new WheelsItem(new Item.Settings()));
-    public static final Item WHEELS_SPIKES = registerItem("wheels_spikes", new WheelsItem(new Item.Settings()));
+    public static final Item WHEELS_STREET = registerItem("wheels_street", new WheelsItem(WheelType.STREET, new Item.Settings()));
+    public static final Item WHEELS_SEMI_SLICK = registerItem("wheels_semi_slick", new WheelsItem(WheelType.SEMI_SLICK, new Item.Settings()));
+    public static final Item WHEELS_SOFT = registerItem("wheels_soft", new WheelsItem(WheelType.SOFT, new Item.Settings()));
+    public static final Item WHEELS_HARD = registerItem("wheels_hard", new WheelsItem(WheelType.HARD, new Item.Settings()));
+    public static final Item WHEELS_DRIFT = registerItem("wheels_drift", new WheelsItem(WheelType.DRIFT, new Item.Settings()));
+    public static final Item WHEELS_DRIFT_PLUS = registerItem("wheels_drift_plus", new WheelsItem(WheelType.DRIFT_PLUS, new Item.Settings()));
+    public static final Item WHEELS_OFFROAD = registerItem("wheels_offroad", new WheelsItem(WheelType.OFFROAD, new Item.Settings()));
+    public static final Item WHEELS_SPIKES = registerItem("wheels_spikes", new WheelsItem(WheelType.SPIKES, new Item.Settings()));
     // engines
-    public static final Item ENGINE_COPPER = registerItem("engine_copper", new EngineItem(new Item.Settings()));
-    public static final Item ENGINE_IRON = registerItem("engine_iron", new EngineItem(new Item.Settings()));
-    public static final Item ENGINE_GOLD = registerItem("engine_gold", new EngineItem(new Item.Settings()));
-    public static final Item ENGINE_DIAMOND = registerItem("engine_diamond", new EngineItem(new Item.Settings()));
-    public static final Item ENGINE_NETHERITE = registerItem("engine_netherite", new EngineItem(new Item.Settings()));
+    public static final Item ENGINE_COPPER = registerItem("engine_copper", new EngineItem(EngineType.ENGINE_COPPER, new Item.Settings()));
+    public static final Item ENGINE_IRON = registerItem("engine_iron", new EngineItem(EngineType.ENGINE_IRON, new Item.Settings()));
+    public static final Item ENGINE_GOLD = registerItem("engine_gold", new EngineItem(EngineType.ENGINE_GOLD, new Item.Settings()));
+    public static final Item ENGINE_DIAMOND = registerItem("engine_diamond", new EngineItem(EngineType.ENGINE_DIAMOND, new Item.Settings()));
+    public static final Item ENGINE_NETHERITE = registerItem("engine_netherite", new EngineItem(EngineType.ENGINE_NETHERITE, new Item.Settings()));
     // spoilers
-    public static final Item SPOILER_STREET = registerItem("spoiler_street", new SpoilerItem(new Item.Settings()));
-    public static final Item SPOILER_STREET_CARBON = registerItem("spoiler_street_carbon", new SpoilerItem(new Item.Settings()));
-    public static final Item SPOILER_RACE = registerItem("spoiler_race", new SpoilerItem(new Item.Settings()));
-    public static final Item SPOILER_RACE_CARBON = registerItem("spoiler_race_carbon", new SpoilerItem(new Item.Settings()));
-    public static final Item SPOILER_RACE_PRO_MAX = registerItem("spoiler_race_pro_max", new SpoilerItem(new Item.Settings()));
-    public static final Item SPOILER_RACE_PRO_MAX_CARBON = registerItem("spoiler_race_pro_max_carbon", new SpoilerItem(new Item.Settings()));
+    public static final Item SPOILER_STREET = registerItem("spoiler_street", new SpoilerItem(SpoilerType.STREET, new Item.Settings()));
+    public static final Item SPOILER_STREET_CARBON = registerItem("spoiler_street_carbon", new SpoilerItem(SpoilerType.STREET_CARBON, new Item.Settings()));
+    public static final Item SPOILER_RACE = registerItem("spoiler_race", new SpoilerItem(SpoilerType.RACE, new Item.Settings()));
+    public static final Item SPOILER_RACE_CARBON = registerItem("spoiler_race_carbon", new SpoilerItem(SpoilerType.RACE_CARBON, new Item.Settings()));
+    public static final Item SPOILER_RACE_PRO_MAX = registerItem("spoiler_race_pro_max", new SpoilerItem(SpoilerType.RACE_PLUS, new Item.Settings()));
+    public static final Item SPOILER_RACE_PRO_MAX_CARBON = registerItem("spoiler_race_pro_max_carbon", new SpoilerItem(SpoilerType.RACE_PLUS_CARBON, new Item.Settings()));
     // aero kits
-    public static final Item AERO_RACE = registerItem("aero_race", new AeroItem(new Item.Settings()));
-    public static final Item AERO_RACE_CARBON = registerItem("aero_race_carbon", new AeroItem(new Item.Settings()));
+    public static final Item AERO_RACE = registerItem("aero_race", new AeroItem(AeroType.RACE, new Item.Settings()));
+    public static final Item AERO_RACE_CARBON = registerItem("aero_race_carbon", new AeroItem(AeroType.RACE_CARBON, new Item.Settings()));
 
     // customization
     public static final Item LIVERY_TEMPLATE = registerItem("livery_template", new LiveryTemplate(LiveryTemplate.defaultLiverySettings()));
