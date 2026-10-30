@@ -1,6 +1,7 @@
 package de.cxlledjay.bokarts.entity.custom.kart.property;
 
 import java.util.function.IntFunction;
+import java.util.function.Supplier;
 
 import com.mojang.serialization.Codec;
 import de.cxlledjay.bokarts.BoKarts;
@@ -15,9 +16,12 @@ import net.minecraft.util.function.ValueLists;
 import org.jetbrains.annotations.Nullable;
 
 public enum AeroType implements StringIdentifiable {
-    NONE            (0,  "none",            "None",             0.0f,       0.0f,        0.0f,          null),
-    RACE            (1,  "race",            "Race (Normal)",    0.03f,      -0.01f,      0.045f,        ModItems.AERO_RACE),
-    RACE_CARBON     (2,  "race_carbon",     "Race (Carbon)",    0.04f,      -0.0125f,    0.06f,         ModItems.AERO_RACE_CARBON);
+    NONE            (0,  "none",            "None",                 0.0f,       0.0f,        0.0f,          () -> null),
+    RACE            (1,  "race",            "Race",                 0.03f,      -0.01f,      0.045f,        () -> ModItems.AERO_RACE),
+    RACE_CARBON     (2,  "race_carbon",     "Race (Carbon)",        0.04f,      -0.0125f,    0.06f,         () -> ModItems.AERO_RACE_CARBON),
+    TYPE_ONE        (3,  "type_one",        "Type One",             0.075f,     -0.02f,      0.15f,         () -> ModItems.AERO_TYPE_ONE),
+    TYPE_ONE_COLORED(4,  "type_one_colored","Type One (Colored)",   0.075f,     -0.02f,      0.15f,         () -> ModItems.AERO_TYPE_ONE_COLORED),
+    TYPE_ONE_CARBON (5,  "type_one_carbon", "Type One (Carbon)",    0.075f,     -0.02f,      0.15f,         () -> ModItems.AERO_TYPE_ONE_CARBON),;
 
     // id to value function
     private static final IntFunction<AeroType> INDEX_TO_VALUE = ValueLists.createIdToValueFunction(
@@ -37,11 +41,11 @@ public enum AeroType implements StringIdentifiable {
     private final float multiA;
     private final float multiV;
     private final float multiF;
-    private final Item item;
+    private final Supplier<Item> item;
     @Nullable
     private final Identifier texture;
 
-    AeroType(final int id, final String name, final String display_name, float multiA, float multiV, float multiF, Item item) {
+    AeroType(final int id, final String name, final String display_name, float multiA, float multiV, float multiF, Supplier<Item> item) {
         this.id = id;
         this.name = name;
         this.display_name = display_name;
@@ -73,6 +77,6 @@ public enum AeroType implements StringIdentifiable {
 
     // --- items ---
     public String getDisplayName() { return this.display_name; }
-    public Item getItem() { return this.item; }
+    public Item getItem() { return this.item == null ? null : this.item.get(); }
 
 }

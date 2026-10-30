@@ -65,11 +65,19 @@ public class ModItemGroups {
                         entries.add(new ItemStack(ModItems.SPOILER_STREET_CARBON));
                         entries.add(new ItemStack(ModItems.SPOILER_RACE));
                         entries.add(new ItemStack(ModItems.SPOILER_RACE_CARBON));
+                        entries.add(new ItemStack(ModItems.SPOILER_CUP));
+                        entries.add(new ItemStack(ModItems.SPOILER_CUP_CARBON));
+                        entries.add(new ItemStack(ModItems.SPOILER_TYPE_ONE));
+                        entries.add(new ItemStack(ModItems.SPOILER_TYPE_ONE_COLORED));
+                        entries.add(new ItemStack(ModItems.SPOILER_TYPE_ONE_CARBON));
                         entries.add(new ItemStack(ModItems.SPOILER_RACE_PRO_MAX));
                         entries.add(new ItemStack(ModItems.SPOILER_RACE_PRO_MAX_CARBON));
                         // aero
                         entries.add(new ItemStack(ModItems.AERO_RACE));
                         entries.add(new ItemStack(ModItems.AERO_RACE_CARBON));
+                        entries.add(new ItemStack(ModItems.AERO_TYPE_ONE));
+                        entries.add(new ItemStack(ModItems.AERO_TYPE_ONE_COLORED));
+                        entries.add(new ItemStack(ModItems.AERO_TYPE_ONE_CARBON));
 
 
                         // ----- customization -----

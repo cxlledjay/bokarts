@@ -4,9 +4,8 @@ import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.entity.client.kartv2.ChassisModel;
 import de.cxlledjay.bokarts.entity.client.kartv2.EngineModel;
 import de.cxlledjay.bokarts.entity.client.kartv2.aero.AeroRaceModel;
-import de.cxlledjay.bokarts.entity.client.kartv2.spoiler.SpoilerRaceModel;
-import de.cxlledjay.bokarts.entity.client.kartv2.spoiler.SpoilerRaceProMaxModel;
-import de.cxlledjay.bokarts.entity.client.kartv2.spoiler.SpoilerStreetModel;
+import de.cxlledjay.bokarts.entity.client.kartv2.aero.AeroTypeOneModel;
+import de.cxlledjay.bokarts.entity.client.kartv2.spoiler.*;
 import de.cxlledjay.bokarts.entity.client.kartv2.wheels.WheelsModelBase;
 import de.cxlledjay.bokarts.entity.client.kartv2.wheels.WheelsModelNormal;
 import de.cxlledjay.bokarts.entity.client.kartv2.wheels.WheelsModelOffroad;
@@ -71,12 +70,20 @@ public class KartRenderer extends EntityRenderer<KartEntity> {
         this.modelSpoiler.put(SpoilerType.STREET_CARBON, new SpoilerStreetModel<>(ctx.getPart(SpoilerStreetModel.ENTITY_MODEL_LAYER)));
         this.modelSpoiler.put(SpoilerType.RACE, new SpoilerRaceModel<>(ctx.getPart(SpoilerRaceModel.ENTITY_MODEL_LAYER)));
         this.modelSpoiler.put(SpoilerType.RACE_CARBON, new SpoilerRaceModel<>(ctx.getPart(SpoilerRaceModel.ENTITY_MODEL_LAYER)));
+        this.modelSpoiler.put(SpoilerType.CUP, new SpoilerCupModel<>(ctx.getPart(SpoilerCupModel.ENTITY_MODEL_LAYER)));
+        this.modelSpoiler.put(SpoilerType.CUP_CARBON, new SpoilerCupModel<>(ctx.getPart(SpoilerCupModel.ENTITY_MODEL_LAYER)));
+        this.modelSpoiler.put(SpoilerType.TYPE_ONE, new SpoilerTypeOneModel<>(ctx.getPart(SpoilerTypeOneModel.ENTITY_MODEL_LAYER)));
+        this.modelSpoiler.put(SpoilerType.TYPE_ONE_COLORED, new SpoilerTypeOneModel<>(ctx.getPart(SpoilerTypeOneModel.ENTITY_MODEL_LAYER)));
+        this.modelSpoiler.put(SpoilerType.TYPE_ONE_CARBON, new SpoilerTypeOneModel<>(ctx.getPart(SpoilerTypeOneModel.ENTITY_MODEL_LAYER)));
         this.modelSpoiler.put(SpoilerType.RACE_PLUS, new SpoilerRaceProMaxModel<>(ctx.getPart(SpoilerRaceProMaxModel.ENTITY_MODEL_LAYER)));
         this.modelSpoiler.put(SpoilerType.RACE_PLUS_CARBON, new SpoilerRaceProMaxModel<>(ctx.getPart(SpoilerRaceProMaxModel.ENTITY_MODEL_LAYER)));
 
         // aero
         this.modelAero.put(AeroType.RACE, new AeroRaceModel<>(ctx.getPart(AeroRaceModel.ENTITY_MODEL_LAYER)));
         this.modelAero.put(AeroType.RACE_CARBON, new AeroRaceModel<>(ctx.getPart(AeroRaceModel.ENTITY_MODEL_LAYER)));
+        this.modelAero.put(AeroType.TYPE_ONE, new AeroRaceModel<>(ctx.getPart(AeroTypeOneModel.ENTITY_MODEL_LAYER)));
+        this.modelAero.put(AeroType.TYPE_ONE_COLORED, new AeroRaceModel<>(ctx.getPart(AeroTypeOneModel.ENTITY_MODEL_LAYER)));
+        this.modelAero.put(AeroType.TYPE_ONE_CARBON, new AeroRaceModel<>(ctx.getPart(AeroTypeOneModel.ENTITY_MODEL_LAYER)));
     }
 
     @Override
@@ -217,9 +224,13 @@ public class KartRenderer extends EntityRenderer<KartEntity> {
         SinglePartEntityModel<KartEntity> spoilerModel = this.modelSpoiler.get(spoilerType);
         Identifier spoilerTexture = spoilerType.getTexture();
 
+        // get color
+        int color = 0xFFFFFFFF;
+        if(spoilerType.equals(SpoilerType.TYPE_ONE_COLORED)) color = entity.getBodyColor() | 0xFF000000;
+
         // render model
         VertexConsumer baseConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityCutoutNoCull(spoilerTexture));
-        spoilerModel.render(matrices, baseConsumer, light, OverlayTexture.DEFAULT_UV, 0xFFFFFFFF);
+        spoilerModel.render(matrices, baseConsumer, light, OverlayTexture.DEFAULT_UV, color);
     }
 
     private void renderOptionalAero(KartEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
@@ -232,9 +243,13 @@ public class KartRenderer extends EntityRenderer<KartEntity> {
         SinglePartEntityModel<KartEntity> aeroModel = this.modelAero.get(aeroType);
         Identifier aeroTexture = aeroType.getTexture();
 
+        // get color
+        int color = 0xFFFFFFFF;
+        if(aeroType.equals(AeroType.TYPE_ONE_COLORED)) color = entity.getBodyColor() | 0xFF000000;
+
         // render model
         VertexConsumer baseConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityCutoutNoCull(aeroTexture));
-        aeroModel.render(matrices, baseConsumer, light, OverlayTexture.DEFAULT_UV, 0xFFFFFFFF);
+        aeroModel.render(matrices, baseConsumer, light, OverlayTexture.DEFAULT_UV, color);
     }
 
 

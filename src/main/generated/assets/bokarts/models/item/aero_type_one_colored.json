@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "bokarts:item/wheels_semi_slick"
+    "layer0": "bokarts:item/aero_type_one_colored"
   }
 }

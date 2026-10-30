@@ -53,12 +53,20 @@ public class ModModelProvider extends FabricModelProvider {
         itemModelGenerator.register(ModItems.SPOILER_STREET, Models.GENERATED);
         itemModelGenerator.register(ModItems.SPOILER_STREET_CARBON, Models.GENERATED);
         itemModelGenerator.register(ModItems.SPOILER_RACE, Models.GENERATED);
+        itemModelGenerator.register(ModItems.SPOILER_CUP, Models.GENERATED);
+        itemModelGenerator.register(ModItems.SPOILER_CUP_CARBON, Models.GENERATED);
+        itemModelGenerator.register(ModItems.SPOILER_TYPE_ONE, Models.GENERATED);
+        itemModelGenerator.register(ModItems.SPOILER_TYPE_ONE_COLORED, Models.GENERATED);
+        itemModelGenerator.register(ModItems.SPOILER_TYPE_ONE_CARBON, Models.GENERATED);
         itemModelGenerator.register(ModItems.SPOILER_RACE_CARBON, Models.GENERATED);
         itemModelGenerator.register(ModItems.SPOILER_RACE_PRO_MAX, Models.GENERATED);
         itemModelGenerator.register(ModItems.SPOILER_RACE_PRO_MAX_CARBON, Models.GENERATED);
         // aero
         itemModelGenerator.register(ModItems.AERO_RACE, Models.GENERATED);
         itemModelGenerator.register(ModItems.AERO_RACE_CARBON, Models.GENERATED);
+        itemModelGenerator.register(ModItems.AERO_TYPE_ONE, Models.GENERATED);
+        itemModelGenerator.register(ModItems.AERO_TYPE_ONE_COLORED, Models.GENERATED);
+        itemModelGenerator.register(ModItems.AERO_TYPE_ONE_CARBON, Models.GENERATED);
 
         // accessories
         itemModelGenerator.register(ModItems.KEY_PAIRING_TOOL, Models.GENERATED);

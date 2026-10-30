@@ -48,11 +48,19 @@ public class ModItems {
     public static final Item SPOILER_STREET_CARBON = registerItem("spoiler_street_carbon", new SpoilerItem(SpoilerType.STREET_CARBON, new Item.Settings()));
     public static final Item SPOILER_RACE = registerItem("spoiler_race", new SpoilerItem(SpoilerType.RACE, new Item.Settings()));
     public static final Item SPOILER_RACE_CARBON = registerItem("spoiler_race_carbon", new SpoilerItem(SpoilerType.RACE_CARBON, new Item.Settings()));
+    public static final Item SPOILER_CUP = registerItem("spoiler_cup", new SpoilerItem(SpoilerType.CUP, new Item.Settings()));
+    public static final Item SPOILER_CUP_CARBON = registerItem("spoiler_cup_carbon", new SpoilerItem(SpoilerType.CUP_CARBON, new Item.Settings()));
+    public static final Item SPOILER_TYPE_ONE = registerItem("spoiler_type_one", new SpoilerItem(SpoilerType.TYPE_ONE, new Item.Settings()));
+    public static final Item SPOILER_TYPE_ONE_COLORED = registerItem("spoiler_type_one_colored", new SpoilerItem(SpoilerType.TYPE_ONE_COLORED, new Item.Settings()));
+    public static final Item SPOILER_TYPE_ONE_CARBON = registerItem("spoiler_type_one_carbon", new SpoilerItem(SpoilerType.TYPE_ONE_CARBON, new Item.Settings()));
     public static final Item SPOILER_RACE_PRO_MAX = registerItem("spoiler_race_pro_max", new SpoilerItem(SpoilerType.RACE_PLUS, new Item.Settings()));
     public static final Item SPOILER_RACE_PRO_MAX_CARBON = registerItem("spoiler_race_pro_max_carbon", new SpoilerItem(SpoilerType.RACE_PLUS_CARBON, new Item.Settings()));
     // aero kits
     public static final Item AERO_RACE = registerItem("aero_race", new AeroItem(AeroType.RACE, new Item.Settings()));
     public static final Item AERO_RACE_CARBON = registerItem("aero_race_carbon", new AeroItem(AeroType.RACE_CARBON, new Item.Settings()));
+    public static final Item AERO_TYPE_ONE = registerItem("aero_type_one", new AeroItem(AeroType.TYPE_ONE, new Item.Settings()));
+    public static final Item AERO_TYPE_ONE_COLORED = registerItem("aero_type_one_colored", new AeroItem(AeroType.TYPE_ONE_COLORED, new Item.Settings()));
+    public static final Item AERO_TYPE_ONE_CARBON = registerItem("aero_type_one_carbon", new AeroItem(AeroType.TYPE_ONE_COLORED, new Item.Settings()));
 
     // customization
     public static final Item LIVERY_TEMPLATE = registerItem("livery_template", new LiveryTemplate(LiveryTemplate.defaultLiverySettings()));

@@ -337,11 +337,12 @@ public class KartLiftBlockEntity extends BlockEntity implements ExtendedScreenHa
 
         // livery
         ItemStack liveryItemStack = ItemStack.EMPTY;
-        if(storedKart.getBodyType() != BodyType.NONE) liveryItemStack = new ItemStack(ModItems.LIVERY_TEMPLATE);
-
-        liveryItemStack.set(ModDataComponentTypes.KART_ITEM_BODY_TYPE, this.getKartEntity().getBodyType());
-        liveryItemStack.set(ModDataComponentTypes.KART_ITEM_BODY_COLOR, this.getKartEntity().getBodyColor());
-        liveryItemStack.set(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR, this.getKartEntity().getWheelColor());
+        if(storedKart.getBodyType() != BodyType.NONE) {
+            liveryItemStack = new ItemStack(ModItems.LIVERY_TEMPLATE);
+            liveryItemStack.set(ModDataComponentTypes.KART_ITEM_BODY_TYPE, this.getKartEntity().getBodyType());
+            liveryItemStack.set(ModDataComponentTypes.KART_ITEM_BODY_COLOR, this.getKartEntity().getBodyColor());
+            liveryItemStack.set(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR, this.getKartEntity().getWheelColor());
+        }
 
 
         // apply to inventory

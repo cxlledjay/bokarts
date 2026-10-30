@@ -6,10 +6,10 @@
       "item": "minecraft:iron_block"
     },
     "M": {
-      "item": "minecraft:honey_block"
+      "item": "minecraft:honey_bottle"
     },
     "W": {
-      "item": "minecraft:black_wool"
+      "item": "minecraft:yellow_wool"
     }
   },
   "pattern": [

@@ -1,21 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_black_wool": {
+    "has_gray_wool": {
       "conditions": {
         "items": [
           {
-            "items": "minecraft:black_wool"
-          }
-        ]
-      },
-      "trigger": "minecraft:inventory_changed"
-    },
-    "has_honey_block": {
-      "conditions": {
-        "items": [
-          {
-            "items": "minecraft:honey_block"
+            "items": "minecraft:gray_wool"
           }
         ]
       },
@@ -31,35 +21,34 @@
       },
       "trigger": "minecraft:inventory_changed"
     },
-    "has_shears": {
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "bokarts:wheels_medium"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    },
+    "has_white_wool": {
       "conditions": {
         "items": [
           {
-            "items": "minecraft:shears"
+            "items": "minecraft:white_wool"
           }
         ]
       },
       "trigger": "minecraft:inventory_changed"
-    },
-    "has_the_recipe": {
-      "conditions": {
-        "recipe": "bokarts:wheels_semi_slick"
-      },
-      "trigger": "minecraft:recipe_unlocked"
     }
   },
   "requirements": [
     [
       "has_the_recipe",
-      "has_black_wool",
+      "has_white_wool",
       "has_iron_block",
-      "has_honey_block",
-      "has_shears"
+      "has_gray_wool"
     ]
   ],
   "rewards": {
     "recipes": [
-      "bokarts:wheels_semi_slick"
+      "bokarts:wheels_medium"
     ]
   }
 }
