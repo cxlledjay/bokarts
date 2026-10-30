@@ -17,17 +17,17 @@ import org.jetbrains.annotations.Nullable;
 
 public enum SpoilerType implements StringIdentifiable {
     NONE                (0, "none",             "None",                     0.0f,       0.0f,           0.0f,       () -> null),
-    STREET              (1, "street",           "Street",                   0.04f,      -0.01f,         0.03f,      () -> ModItems.SPOILER_STREET),
-    STREET_CARBON       (2, "street_carbon",    "Street (Carbon)",          0.05f,      -0.0125f,       0.0325f,    () -> ModItems.SPOILER_STREET_CARBON),
-    RACE                (3, "race",             "Race",                     0.07f,      -0.0175f,       0.0525f,    () -> ModItems.SPOILER_RACE),
-    RACE_CARBON         (4, "race_carbon",      "Race (Carbon)",            0.075f,     -0.02f,         0.06f,      () -> ModItems.SPOILER_RACE_CARBON),
-    CUP                 (5, "cup",              "Cup",                      0.09f,      -0.025f,        0.07f,      () -> ModItems.SPOILER_CUP),
-    CUP_CARBON          (6, "cup_carbon",       "Cup (Carbon)",             0.095f,     -0.0275f,       0.0725f,    () -> ModItems.SPOILER_CUP_CARBON),
-    TYPE_ONE            (7, "type_one",         "Type One",                 0.12f,      -0.0375f,       0.15f,      () -> ModItems.SPOILER_TYPE_ONE),
-    TYPE_ONE_COLORED    (8, "type_one_colored", "Type One (Colored)",       0.12f,      -0.0375f,       0.15f,      () -> ModItems.SPOILER_TYPE_ONE_COLORED),
-    TYPE_ONE_CARBON     (9, "type_one_carbon",  "Type One (Carbon)",        0.12f,      -0.0375f,       0.15f,      () -> ModItems.SPOILER_TYPE_ONE_CARBON),
-    RACE_PLUS           (10,"race_plus",        "Race Pro Max",             0.09f,      -0.12f,         0.35f,      () -> ModItems.SPOILER_RACE_PRO_MAX),
-    RACE_PLUS_CARBON    (11,"race_plus_carbon", "Race Pro Max (Carbon)",    0.1f,       -0.11f,         0.42f,      () -> ModItems.SPOILER_RACE_PRO_MAX_CARBON);
+    STREET              (1, "street",           "Street",                   0.04f,      -0.01f,         0.1f,       () -> ModItems.SPOILER_STREET),
+    STREET_CARBON       (2, "street_carbon",    "Street (Carbon)",          0.05f,      -0.0125f,       0.125f,     () -> ModItems.SPOILER_STREET_CARBON),
+    RACE                (3, "race",             "Race",                     0.07f,      -0.0175f,       0.175f,     () -> ModItems.SPOILER_RACE),
+    RACE_CARBON         (4, "race_carbon",      "Race (Carbon)",            0.075f,     -0.02f,         0.2f,       () -> ModItems.SPOILER_RACE_CARBON),
+    CUP                 (5, "cup",              "Cup",                      0.09f,      -0.025f,        0.225f,     () -> ModItems.SPOILER_CUP),
+    CUP_CARBON          (6, "cup_carbon",       "Cup (Carbon)",             0.095f,     -0.0275f,       0.25f,      () -> ModItems.SPOILER_CUP_CARBON),
+    TYPE_ONE            (7, "type_one",         "Type One",                 0.15f,      0.0325f,        0.75f,      () -> ModItems.SPOILER_TYPE_ONE),
+    TYPE_ONE_COLORED    (8, "type_one_colored", "Type One (Colored)",       0.155f,     0.035f,         0.775f,     () -> ModItems.SPOILER_TYPE_ONE_COLORED),
+    TYPE_ONE_CARBON     (9, "type_one_carbon",  "Type One (Carbon)",        0.16f,      0.0375f,        0.8f,       () -> ModItems.SPOILER_TYPE_ONE_CARBON),
+    RACE_PLUS           (10,"race_plus",        "Race Pro Max",             0.1f,       -0.12f,         0.35f,      () -> ModItems.SPOILER_RACE_PRO_MAX),
+    RACE_PLUS_CARBON    (11,"race_plus_carbon", "Race Pro Max (Carbon)",    0.125f,     -0.11f,         0.42f,      () -> ModItems.SPOILER_RACE_PRO_MAX_CARBON);
 
     // id to value function
     private static final IntFunction<SpoilerType> INDEX_TO_VALUE = ValueLists.createIdToValueFunction(

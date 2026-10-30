@@ -10,7 +10,8 @@ public class ModTags {
 
     public static class Blocks {
         public static final TagKey<Block> DRIVABLE_BLOCKS = createTag("driveable_blocks");
-        public static final TagKey<Block> DRIVABLE_BLOCKS_SLOWED = createTag("driveable_blocks_slowed");
+        public static final TagKey<Block> DRIVABLE_BLOCKS_SLOWED33 = createTag("driveable_blocks_slowed33");
+        public static final TagKey<Block> DRIVABLE_BLOCKS_SLOWED67 = createTag("driveable_blocks_slowed67");
 
         private static TagKey<Block> createTag(String name) {
             return TagKey.of(RegistryKeys.BLOCK, BoKarts.id(name));

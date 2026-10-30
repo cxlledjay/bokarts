@@ -2,7 +2,6 @@
   "replace": false,
   "values": [
     "minecraft:white_concrete_powder",
-    "minecraft:red_concrete_powder",
-    "minecraft:green_concrete_powder"
+    "minecraft:red_concrete_powder"
     ]
 }
