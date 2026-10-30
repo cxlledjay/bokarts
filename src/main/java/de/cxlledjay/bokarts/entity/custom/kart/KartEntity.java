@@ -65,23 +65,9 @@ public class KartEntity extends Entity implements RideableInventory{
     protected static final TrackedData<Integer> DAMAGE_WOBBLE_TICKS = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.INTEGER);
     protected static final TrackedData<Integer> DAMAGE_WOBBLE_SIDE = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.INTEGER);
     protected static final TrackedData<Float> DAMAGE_WOBBLE_STRENGTH = DataTracker.registerData(KartEntity.class, TrackedDataHandlerRegistry.FLOAT);
-    private float ticksUnderwater;
+    private float ticksTouchingWater;
     private float yawVelocity;
-    private int lerpTicks;
-    private double x;
-    private double y;
-    private double z;
-    private double boatYaw;
-    private double boatPitch;
-    private double waterLevel;
-    private KartEntity.Location location;
-    public enum Location {
-        IN_WATER,
-        UNDER_WATER,
-        UNDER_FLOWING_WATER,
-        ON_LAND,
-        IN_AIR;
-    }
+
 
     // kart specific variables
 
@@ -203,49 +189,29 @@ public class KartEntity extends Entity implements RideableInventory{
 
     @Override
     public void updateTrackedPositionAndAngles(double x, double y, double z, float yaw, float pitch, int interpolationSteps) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.boatYaw = yaw;
-        this.boatPitch = pitch;
-        this.lerpTicks = 10;
+
+        // distance to actual position
+        double desyncOffset = this.squaredDistanceTo(x, y, z);
+
+        if (desyncOffset > 25.0) {
+            // huge lag => reset syncing
+            this.setPosition(x, y, z);
+            this.setYaw(yaw);
+        } else {
+            // smoothly sync
+            this.setPosition(
+                    this.getX() + (x - this.getX()) * 0.3,
+                    this.getY() + (y - this.getY()) * 0.3,
+                    this.getZ() + (z - this.getZ()) * 0.3
+            );
+            this.setYaw(this.getYaw() + MathHelper.wrapDegrees(yaw - this.getYaw()) * 0.3f);
+        }
     }
 
     private void updatePositionAndRotation() {
         if (this.isLogicalSideForUpdatingMovement()) {
-            this.lerpTicks = 0;
             this.updateTrackedPosition(this.getX(), this.getY(), this.getZ());
         }
-
-        if (this.lerpTicks > 0) {
-            this.lerpPosAndRotation(this.lerpTicks, this.x, this.y, this.z, this.boatYaw, this.boatPitch);
-            this.lerpTicks--;
-        }
-    }
-
-    @Override
-    public double getLerpTargetX() {
-        return this.lerpTicks > 0 ? this.x : this.getX();
-    }
-
-    @Override
-    public double getLerpTargetY() {
-        return this.lerpTicks > 0 ? this.y : this.getY();
-    }
-
-    @Override
-    public double getLerpTargetZ() {
-        return this.lerpTicks > 0 ? this.z : this.getZ();
-    }
-
-    @Override
-    public float getLerpTargetPitch() {
-        return this.lerpTicks > 0 ? (float)this.boatPitch : this.getPitch();
-    }
-
-    @Override
-    public float getLerpTargetYaw() {
-        return this.lerpTicks > 0 ? (float)this.boatYaw : this.getYaw();
     }
 
     @Override
@@ -308,75 +274,6 @@ public class KartEntity extends Entity implements RideableInventory{
 
 
 
-    // ==================== water stuff from boat code ==================== TODO: check it is needed...
-
-    private boolean checkBoatInWater() {
-        Box box = this.getBoundingBox();
-        int i = MathHelper.floor(box.minX);
-        int j = MathHelper.ceil(box.maxX);
-        int k = MathHelper.floor(box.minY);
-        int l = MathHelper.ceil(box.minY + 0.001);
-        int m = MathHelper.floor(box.minZ);
-        int n = MathHelper.ceil(box.maxZ);
-        boolean bl = false;
-        this.waterLevel = -Double.MAX_VALUE;
-        BlockPos.Mutable mutable = new BlockPos.Mutable();
-
-        for (int o = i; o < j; o++) {
-            for (int p = k; p < l; p++) {
-                for (int q = m; q < n; q++) {
-                    mutable.set(o, p, q);
-                    FluidState fluidState = this.getWorld().getFluidState(mutable);
-                    if (fluidState.isIn(FluidTags.WATER)) {
-                        float f = p + fluidState.getHeight(this.getWorld(), mutable);
-                        this.waterLevel = Math.max(f, this.waterLevel);
-                        bl |= box.minY < f;
-                    }
-                }
-            }
-        }
-
-        return bl;
-    }
-
-    @Nullable
-    private KartEntity.Location getUnderWaterLocation() {
-        Box box = this.getBoundingBox();
-        double d = box.maxY + 0.001;
-        int i = MathHelper.floor(box.minX);
-        int j = MathHelper.ceil(box.maxX);
-        int k = MathHelper.floor(box.maxY);
-        int l = MathHelper.ceil(d);
-        int m = MathHelper.floor(box.minZ);
-        int n = MathHelper.ceil(box.maxZ);
-        boolean bl = false;
-        BlockPos.Mutable mutable = new BlockPos.Mutable();
-
-        for (int o = i; o < j; o++) {
-            for (int p = k; p < l; p++) {
-                for (int q = m; q < n; q++) {
-                    mutable.set(o, p, q);
-                    FluidState fluidState = this.getWorld().getFluidState(mutable);
-                    if (fluidState.isIn(FluidTags.WATER) && d < mutable.getY() + fluidState.getHeight(this.getWorld(), mutable)) {
-                        if (!fluidState.isStill()) {
-                            return KartEntity.Location.UNDER_FLOWING_WATER;
-                        }
-
-                        bl = true;
-                    }
-                }
-            }
-        }
-
-        return bl ? KartEntity.Location.UNDER_WATER : null;
-    }
-
-    @Override
-    public boolean isSubmergedInWater() {
-        return this.location == KartEntity.Location.UNDER_WATER || this.location == KartEntity.Location.UNDER_FLOWING_WATER;
-    }
-
-
 
 
 
@@ -393,7 +290,7 @@ public class KartEntity extends Entity implements RideableInventory{
             return ActionResult.PASS;
         }
 
-        if (this.ticksUnderwater < 60.0F) {
+        if (this.ticksTouchingWater < 60.0F) {
             if (!this.getWorld().isClient) {
                 return player.startRiding(this) ? ActionResult.CONSUME : ActionResult.PASS;
             } else {
@@ -803,18 +700,6 @@ public class KartEntity extends Entity implements RideableInventory{
         return blockState.isIn(ModTags.Blocks.DRIVABLE_BLOCKS);
     }
 
-    private KartEntity.Location checkLocation() {
-        KartEntity.Location location = this.getUnderWaterLocation();
-        if (location != null) {
-            this.waterLevel = this.getBoundingBox().maxY;
-            return location;
-        } else if (this.checkBoatInWater()) {
-            return KartEntity.Location.IN_WATER;
-        } else {
-            return KartEntity.Location.ON_LAND;
-        }
-    }
-
 
 
 
@@ -933,12 +818,11 @@ public class KartEntity extends Entity implements RideableInventory{
     public void tick() {
 
         // underwater check
-        this.location = this.checkLocation();
 
-        if (this.location != Location.UNDER_WATER && this.location != Location.UNDER_FLOWING_WATER && this.location != Location.IN_WATER) {
-            this.ticksUnderwater = 0.0F;
+        if (!this.isTouchingWater()) {
+            this.ticksTouchingWater = 0.0F;
         } else {
-            this.ticksUnderwater++;
+            this.ticksTouchingWater++;
         }
 
 
@@ -955,7 +839,7 @@ public class KartEntity extends Entity implements RideableInventory{
         this.updatePositionAndRotation();
 
 
-        // ==================== movement physics ====================
+        // -------------------- input handling --------------------
         if (this.isLogicalSideForUpdatingMovement()) {
 
             // set inputs
@@ -967,34 +851,9 @@ public class KartEntity extends Entity implements RideableInventory{
 
                 this.setInputs(left, right, forward, backward);
             }
+        }
 
-            this.updateMovement();
-            if (this.getWorld().isClient && !this.canNotDrive()) {
-                this.updateAcceleration();
-            }
-
-            // --- interpolate steps for fast vehicles ---
-            Vec3d totalVel = this.getVelocity();
-            double horizontalSpeed = Math.sqrt(totalVel.x * totalVel.x + totalVel.z * totalVel.z);
-            // moving faster than 2 bps => steps > 1
-            int steps = (int) Math.ceil(horizontalSpeed);
-            if (steps > 1) {
-                // get equal sized chunks
-                Vec3d chunkVel = totalVel.multiply(1.0 / steps);
-                // call move function multiple times with chunked velocity
-                for (int i = 0; i < steps; i++) {
-                    this.move(MovementType.SELF, chunkVel);
-                    if (this.horizontalCollision) {
-                        break;
-                    }
-                }
-            } else {
-                // as normal
-                this.move(MovementType.SELF, totalVel);
-            }
-        } else {
-            this.setVelocity(Vec3d.ZERO);
-
+        else {
             // track input from all other clients spectating the kart
             if (this.getWorld().isClient()) {
                 byte flags = this.getPlayerInput();
@@ -1005,6 +864,34 @@ public class KartEntity extends Entity implements RideableInventory{
                 this.pressingSlow    = (flags & FLAG_SLOW) != 0;
             }
         }
+
+
+        // ==================== movement physics ====================
+        this.updateMovement();
+        if (!this.canNotDrive()) {
+            this.updateAcceleration();
+        }
+
+        // --- interpolate steps for fast vehicles ---
+        Vec3d totalVel = this.getVelocity();
+        double horizontalSpeed = Math.sqrt(totalVel.x * totalVel.x + totalVel.z * totalVel.z);
+        // moving faster than 2 bps => steps > 1
+        int steps = (int) Math.ceil(horizontalSpeed);
+        if (steps > 1) {
+            // get equal sized chunks
+            Vec3d chunkVel = totalVel.multiply(1.0 / steps);
+            // call move function multiple times with chunked velocity
+            for (int i = 0; i < steps; i++) {
+                this.move(MovementType.SELF, chunkVel);
+                if (this.horizontalCollision) {
+                    break;
+                }
+            }
+        } else {
+            // as normal
+            this.move(MovementType.SELF, totalVel);
+        }
+
 
         // ==================== post movement calculations ====================
         if(!hasTrackedPos) {
@@ -1049,7 +936,7 @@ public class KartEntity extends Entity implements RideableInventory{
         if (!this.getWorld().isClient()) {
 
             // spend too long in water => kaboom
-            if (this.ticksUnderwater >= ClientSyncedConfig.getMaxTicksInWater()) {
+            if (this.ticksTouchingWater >= ClientSyncedConfig.getMaxTicksInWater()) {
 
                 // eject passengers
                 this.removeAllPassengers();
