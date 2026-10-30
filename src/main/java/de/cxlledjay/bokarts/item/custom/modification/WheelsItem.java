@@ -45,4 +45,8 @@ public class WheelsItem extends Item {
 
         super.appendTooltip(stack, context, tooltip, type);
     }
+
+    public WheelType getWheelType() {
+        return wheels;
+    }
 }

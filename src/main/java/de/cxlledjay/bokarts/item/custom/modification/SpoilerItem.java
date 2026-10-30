@@ -41,4 +41,8 @@ public class SpoilerItem extends Item {
 
         super.appendTooltip(stack, context, tooltip, type);
     }
+
+    public SpoilerType getSpoilerType() {
+        return spoiler;
+    }
 }

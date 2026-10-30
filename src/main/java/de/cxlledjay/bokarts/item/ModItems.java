@@ -28,9 +28,11 @@ public class ModItems {
     public static final Item CHASSIS_BLUEPRINT = registerItem("chassis_blueprint", new Item(new Item.Settings()));
     // wheels
     public static final Item WHEELS_STREET = registerItem("wheels_street", new WheelsItem(WheelType.STREET, new Item.Settings()));
-    public static final Item WHEELS_SEMI_SLICK = registerItem("wheels_semi_slick", new WheelsItem(WheelType.SEMI_SLICK, new Item.Settings()));
+    public static final Item WHEELS_SUPER_SOFT = registerItem("wheels_super_soft", new WheelsItem(WheelType.SUPER_SOFT, new Item.Settings()));
     public static final Item WHEELS_SOFT = registerItem("wheels_soft", new WheelsItem(WheelType.SOFT, new Item.Settings()));
+    public static final Item WHEELS_MEDIUM = registerItem("wheels_medium", new WheelsItem(WheelType.MEDIUM, new Item.Settings()));
     public static final Item WHEELS_HARD = registerItem("wheels_hard", new WheelsItem(WheelType.HARD, new Item.Settings()));
+    public static final Item WHEELS_SUPER_HARD = registerItem("wheels_super_hard", new WheelsItem(WheelType.SUPER_HARD, new Item.Settings()));
     public static final Item WHEELS_DRIFT = registerItem("wheels_drift", new WheelsItem(WheelType.DRIFT, new Item.Settings()));
     public static final Item WHEELS_DRIFT_PLUS = registerItem("wheels_drift_plus", new WheelsItem(WheelType.DRIFT_PLUS, new Item.Settings()));
     public static final Item WHEELS_OFFROAD = registerItem("wheels_offroad", new WheelsItem(WheelType.OFFROAD, new Item.Settings()));

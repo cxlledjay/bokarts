@@ -41,4 +41,8 @@ public class AeroItem extends Item {
 
         super.appendTooltip(stack, context, tooltip, type);
     }
+
+    public AeroType getAeroType() {
+        return aero;
+    }
 }

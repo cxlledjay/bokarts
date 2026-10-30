@@ -242,15 +242,8 @@ public class KartLiftBlockEntity extends BlockEntity implements ExtendedScreenHa
         Item item = stack.getItem();
 
         WheelType wheelType = WheelType.NONE;
-        if(item instanceof WheelsItem) {
-            if(item == ModItems.WHEELS_STREET) wheelType = WheelType.STREET;
-            if(item == ModItems.WHEELS_SEMI_SLICK) wheelType = WheelType.SEMI_SLICK;
-            if(item == ModItems.WHEELS_SOFT) wheelType = WheelType.SOFT;
-            if(item == ModItems.WHEELS_HARD) wheelType = WheelType.HARD;
-            else if(item == ModItems.WHEELS_DRIFT) wheelType = WheelType.DRIFT;
-            else if(item == ModItems.WHEELS_DRIFT_PLUS) wheelType = WheelType.DRIFT_PLUS;
-            else if(item == ModItems.WHEELS_OFFROAD) wheelType = WheelType.OFFROAD;
-            else if(item == ModItems.WHEELS_SPIKES) wheelType = WheelType.SPIKES;
+        if(item instanceof WheelsItem wheelsItem) {
+            wheelType = wheelsItem.getWheelType();
         }
         storedKart.setWheelType(wheelType);
     }
@@ -260,12 +253,8 @@ public class KartLiftBlockEntity extends BlockEntity implements ExtendedScreenHa
         Item item = stack.getItem();
 
         EngineType engineType = EngineType.ENGINE_NONE;
-        if(item instanceof EngineItem) {
-            if(item == ModItems.ENGINE_COPPER) engineType = EngineType.ENGINE_COPPER;
-            else if(item == ModItems.ENGINE_IRON) engineType = EngineType.ENGINE_IRON;
-            else if(item == ModItems.ENGINE_GOLD) engineType = EngineType.ENGINE_GOLD;
-            else if(item == ModItems.ENGINE_DIAMOND) engineType = EngineType.ENGINE_DIAMOND;
-            else if(item == ModItems.ENGINE_NETHERITE) engineType = EngineType.ENGINE_NETHERITE;
+        if(item instanceof EngineItem  engineItem) {
+            engineType = engineItem.getEngineType();
         }
         storedKart.setEngineType(engineType);
     }
@@ -275,13 +264,8 @@ public class KartLiftBlockEntity extends BlockEntity implements ExtendedScreenHa
         Item item = stack.getItem();
 
         SpoilerType spoilerType = SpoilerType.NONE;
-        if(item instanceof SpoilerItem) {
-            if(item == ModItems.SPOILER_STREET) spoilerType = SpoilerType.STREET;
-            else if(item == ModItems.SPOILER_STREET_CARBON) spoilerType = SpoilerType.STREET_CARBON;
-            else if(item == ModItems.SPOILER_RACE) spoilerType = SpoilerType.RACE;
-            else if(item == ModItems.SPOILER_RACE_CARBON) spoilerType = SpoilerType.RACE_CARBON;
-            else if(item == ModItems.SPOILER_RACE_PRO_MAX) spoilerType = SpoilerType.RACE_PLUS;
-            else if(item == ModItems.SPOILER_RACE_PRO_MAX_CARBON) spoilerType = SpoilerType.RACE_PLUS_CARBON;
+        if(item instanceof SpoilerItem spoilerItem) {
+            spoilerType = spoilerItem.getSpoilerType();
         }
         storedKart.setSpoilerType(spoilerType);
     }
@@ -291,9 +275,8 @@ public class KartLiftBlockEntity extends BlockEntity implements ExtendedScreenHa
         Item item = stack.getItem();
 
         AeroType aeroType = AeroType.NONE;
-        if(item instanceof AeroItem) {
-            if(item == ModItems.AERO_RACE)  aeroType = AeroType.RACE;
-            else if(item == ModItems.AERO_RACE_CARBON)  aeroType = AeroType.RACE_CARBON;
+        if(item instanceof AeroItem  aeroItem) {
+            aeroType = aeroItem.getAeroType();
         }
         storedKart.setAeroType(aeroType);
     }
@@ -337,59 +320,37 @@ public class KartLiftBlockEntity extends BlockEntity implements ExtendedScreenHa
         // get all item stacks from kart
 
         // wheels
-        ItemStack wheelItem = switch(this.getKartEntity().getWheelType()) {
-            case STREET -> new ItemStack(ModItems.WHEELS_STREET);
-            case SEMI_SLICK -> new ItemStack(ModItems.WHEELS_SEMI_SLICK);
-            case SOFT -> new ItemStack(ModItems.WHEELS_SOFT);
-            case HARD -> new ItemStack(ModItems.WHEELS_HARD);
-            case DRIFT -> new ItemStack(ModItems.WHEELS_DRIFT);
-            case DRIFT_PLUS -> new ItemStack(ModItems.WHEELS_DRIFT_PLUS);
-            case OFFROAD -> new ItemStack(ModItems.WHEELS_OFFROAD);
-            case SPIKES -> new ItemStack(ModItems.WHEELS_SPIKES);
-            default -> ItemStack.EMPTY;
-        };
+        Item wheelItem = this.getKartEntity().getWheelType().getItem();
+        ItemStack wheelItemStack = (wheelItem == null) ? (ItemStack.EMPTY) : new ItemStack(wheelItem);
+
         // engines
-        ItemStack engineItem = switch(this.getKartEntity().getEngineType()) {
-            case ENGINE_COPPER -> new ItemStack(ModItems.ENGINE_COPPER);
-            case ENGINE_IRON -> new ItemStack(ModItems.ENGINE_IRON);
-            case ENGINE_GOLD -> new ItemStack(ModItems.ENGINE_GOLD);
-            case ENGINE_DIAMOND -> new ItemStack(ModItems.ENGINE_DIAMOND);
-            case ENGINE_NETHERITE ->  new ItemStack(ModItems.ENGINE_NETHERITE);
-            default -> ItemStack.EMPTY;
-        };
+        Item engineItem = this.getKartEntity().getEngineType().getItem();
+        ItemStack engineItemStack = (engineItem == null) ? (ItemStack.EMPTY) : new ItemStack(engineItem);
+
         // spoilers
-        ItemStack spoilerItem = switch(this.getKartEntity().getSpoilerType()) {
-            case STREET -> new ItemStack(ModItems.SPOILER_STREET);
-            case STREET_CARBON ->  new ItemStack(ModItems.SPOILER_STREET_CARBON);
-            case RACE  -> new ItemStack(ModItems.SPOILER_RACE);
-            case RACE_CARBON -> new ItemStack(ModItems.SPOILER_RACE_CARBON);
-            case RACE_PLUS -> new ItemStack(ModItems.SPOILER_RACE_PRO_MAX);
-            case RACE_PLUS_CARBON -> new ItemStack(ModItems.SPOILER_RACE_PRO_MAX_CARBON);
-            default -> ItemStack.EMPTY;
-        };
+        Item spoilerItem = this.getKartEntity().getSpoilerType().getItem();
+        ItemStack spoilerItemStack = (spoilerItem == null) ? (ItemStack.EMPTY) : new ItemStack(spoilerItem);
+
         // aero
-        ItemStack aeroItem = switch(this.getKartEntity().getAeroType()) {
-            case RACE  -> new ItemStack(ModItems.AERO_RACE);
-            case RACE_CARBON -> new ItemStack(ModItems.AERO_RACE_CARBON);
-            default -> ItemStack.EMPTY;
-        };
+        Item aeroItem = this.getKartEntity().getAeroType().getItem();
+        ItemStack aeroItemStack = (aeroItem == null) ? (ItemStack.EMPTY) : new ItemStack(aeroItem);
 
         // livery
-        ItemStack liveryItem = ItemStack.EMPTY;
-        if(storedKart.getBodyType() != BodyType.NONE) liveryItem = new ItemStack(ModItems.LIVERY_TEMPLATE);
+        ItemStack liveryItemStack = ItemStack.EMPTY;
+        if(storedKart.getBodyType() != BodyType.NONE) liveryItemStack = new ItemStack(ModItems.LIVERY_TEMPLATE);
 
-        liveryItem.set(ModDataComponentTypes.KART_ITEM_BODY_TYPE, this.getKartEntity().getBodyType());
-        liveryItem.set(ModDataComponentTypes.KART_ITEM_BODY_COLOR, this.getKartEntity().getBodyColor());
-        liveryItem.set(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR, this.getKartEntity().getWheelColor());
+        liveryItemStack.set(ModDataComponentTypes.KART_ITEM_BODY_TYPE, this.getKartEntity().getBodyType());
+        liveryItemStack.set(ModDataComponentTypes.KART_ITEM_BODY_COLOR, this.getKartEntity().getBodyColor());
+        liveryItemStack.set(ModDataComponentTypes.KART_ITEM_WHEEL_COLOR, this.getKartEntity().getWheelColor());
 
 
         // apply to inventory
         KartLiftInventory temp = new KartLiftInventory(KartLiftScreenHandler.LIFT_INVENTORY_SIZE, this);
-        temp.setStack(0,wheelItem);
-        temp.setStack(1,engineItem);
-        temp.setStack(2,spoilerItem);
-        temp.setStack(3,aeroItem);
-        temp.setStack(4,liveryItem);
+        temp.setStack(0,wheelItemStack);
+        temp.setStack(1,engineItemStack);
+        temp.setStack(2,spoilerItemStack);
+        temp.setStack(3,aeroItemStack);
+        temp.setStack(4,liveryItemStack);
 
         return temp;
     }

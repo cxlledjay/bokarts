@@ -53,9 +53,11 @@ public class KartRenderer extends EntityRenderer<KartEntity> {
 
         // wheels
         this.modelWheels.put(WheelType.STREET, new WheelsModelNormal<>(ctx.getPart(WheelsModelNormal.ENTITY_MODEL_LAYER)));
-        this.modelWheels.put(WheelType.SEMI_SLICK, new WheelsModelNormal<>(ctx.getPart(WheelsModelNormal.ENTITY_MODEL_LAYER)));
+        this.modelWheels.put(WheelType.SUPER_SOFT, new WheelsModelNormal<>(ctx.getPart(WheelsModelNormal.ENTITY_MODEL_LAYER)));
         this.modelWheels.put(WheelType.SOFT, new WheelsModelNormal<>(ctx.getPart(WheelsModelNormal.ENTITY_MODEL_LAYER)));
+        this.modelWheels.put(WheelType.MEDIUM, new WheelsModelNormal<>(ctx.getPart(WheelsModelNormal.ENTITY_MODEL_LAYER)));
         this.modelWheels.put(WheelType.HARD, new WheelsModelNormal<>(ctx.getPart(WheelsModelNormal.ENTITY_MODEL_LAYER)));
+        this.modelWheels.put(WheelType.SUPER_HARD, new WheelsModelNormal<>(ctx.getPart(WheelsModelNormal.ENTITY_MODEL_LAYER)));
         this.modelWheels.put(WheelType.DRIFT, new WheelsModelNormal<>(ctx.getPart(WheelsModelNormal.ENTITY_MODEL_LAYER)));
         this.modelWheels.put(WheelType.DRIFT_PLUS, new WheelsModelNormal<>(ctx.getPart(WheelsModelNormal.ENTITY_MODEL_LAYER)));
         this.modelWheels.put(WheelType.OFFROAD, new WheelsModelOffroad<>(ctx.getPart(WheelsModelOffroad.ENTITY_MODEL_LAYER)));

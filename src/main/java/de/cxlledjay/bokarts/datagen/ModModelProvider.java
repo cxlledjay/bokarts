@@ -34,9 +34,11 @@ public class ModModelProvider extends FabricModelProvider {
         itemModelGenerator.register(ModItems.DYE_MIX, Models.GENERATED);
         // wheels
         itemModelGenerator.register(ModItems.WHEELS_STREET, Models.GENERATED);
-        itemModelGenerator.register(ModItems.WHEELS_SEMI_SLICK, Models.GENERATED);
+        itemModelGenerator.register(ModItems.WHEELS_SUPER_SOFT, Models.GENERATED);
         itemModelGenerator.register(ModItems.WHEELS_SOFT, Models.GENERATED);
+        itemModelGenerator.register(ModItems.WHEELS_MEDIUM, Models.GENERATED);
         itemModelGenerator.register(ModItems.WHEELS_HARD, Models.GENERATED);
+        itemModelGenerator.register(ModItems.WHEELS_SUPER_HARD, Models.GENERATED);
         itemModelGenerator.register(ModItems.WHEELS_DRIFT, Models.GENERATED);
         itemModelGenerator.register(ModItems.WHEELS_DRIFT_PLUS, Models.GENERATED);
         itemModelGenerator.register(ModItems.WHEELS_OFFROAD, Models.GENERATED);

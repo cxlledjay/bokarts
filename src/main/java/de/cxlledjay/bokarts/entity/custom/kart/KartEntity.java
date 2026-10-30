@@ -700,6 +700,10 @@ public class KartEntity extends Entity implements RideableInventory{
         return blockState.isIn(ModTags.Blocks.DRIVABLE_BLOCKS);
     }
 
+    private boolean isDrivableBlockSlowed(BlockState blockState) {
+        return blockState.isIn(ModTags.Blocks.DRIVABLE_BLOCKS_SLOWED);
+    }
+
 
 
 
@@ -711,7 +715,12 @@ public class KartEntity extends Entity implements RideableInventory{
             // when somebody is driving on ground, apply normal friction
             BlockState groundBlock = this.getWorld().getBlockState(this.getSteppingPos());
             if(getControllingPassenger() instanceof PlayerEntity) {
-                appliedFriction = (isDrivableBlock(groundBlock)) ? (this.wheelFriction) : (this.wheelFriction + this.frictionPenalty);
+                // on drivable block (street)
+                if(isDrivableBlock(groundBlock)) appliedFriction = this.wheelFriction;
+                // on drivable block slowed (curb)
+                else if(isDrivableBlockSlowed(groundBlock)) appliedFriction = this.wheelFriction + this.frictionPenalty * 0.42f;
+                // offroad
+                else appliedFriction = this.wheelFriction + this.frictionPenalty;
             }
         } else if(this.isTouchingWater()) {
             // in water => higher friction + gravity

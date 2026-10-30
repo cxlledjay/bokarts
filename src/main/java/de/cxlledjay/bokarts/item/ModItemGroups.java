@@ -45,9 +45,11 @@ public class ModItemGroups {
                         entries.add(new ItemStack(ModItems.DYE_MIX));
                         // wheels
                         entries.add(new ItemStack(ModItems.WHEELS_STREET));
-                        entries.add(new ItemStack(ModItems.WHEELS_SEMI_SLICK));
+                        entries.add(new ItemStack(ModItems.WHEELS_SUPER_SOFT));
                         entries.add(new ItemStack(ModItems.WHEELS_SOFT));
+                        entries.add(new ItemStack(ModItems.WHEELS_MEDIUM));
                         entries.add(new ItemStack(ModItems.WHEELS_HARD));
+                        entries.add(new ItemStack(ModItems.WHEELS_SUPER_HARD));
                         entries.add(new ItemStack(ModItems.WHEELS_DRIFT));
                         entries.add(new ItemStack(ModItems.WHEELS_DRIFT_PLUS));
                         entries.add(new ItemStack(ModItems.WHEELS_OFFROAD));

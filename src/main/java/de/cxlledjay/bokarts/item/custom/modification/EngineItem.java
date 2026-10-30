@@ -1,7 +1,6 @@
 package de.cxlledjay.bokarts.item.custom.modification;
 
 import de.cxlledjay.bokarts.entity.custom.kart.property.EngineType;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
@@ -39,5 +38,9 @@ public class EngineItem extends Item {
         tooltip.add(fuelMultiText);
 
         super.appendTooltip(stack, context, tooltip, type);
+    }
+
+    public EngineType getEngineType() {
+        return engine;
     }
 }
