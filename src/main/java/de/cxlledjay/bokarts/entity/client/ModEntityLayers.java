@@ -5,6 +5,7 @@ import de.cxlledjay.bokarts.entity.client.kartv2.ChassisModel;
 import de.cxlledjay.bokarts.entity.client.kartv2.EngineModel;
 import de.cxlledjay.bokarts.entity.client.kartv2.aero.AeroRaceModel;
 import de.cxlledjay.bokarts.entity.client.kartv2.spoiler.SpoilerRaceModel;
+import de.cxlledjay.bokarts.entity.client.kartv2.spoiler.SpoilerRaceProMaxModel;
 import de.cxlledjay.bokarts.entity.client.kartv2.spoiler.SpoilerStreetModel;
 import de.cxlledjay.bokarts.entity.client.kartv2.wheels.WheelsModelNormal;
 import de.cxlledjay.bokarts.entity.client.kartv2.wheels.WheelsModelOffroad;
@@ -22,6 +23,7 @@ public class ModEntityLayers {
         EntityModelLayerRegistry.registerModelLayer(AeroRaceModel.ENTITY_MODEL_LAYER, AeroRaceModel::getTexturedModelData);
         EntityModelLayerRegistry.registerModelLayer(SpoilerStreetModel.ENTITY_MODEL_LAYER, SpoilerStreetModel::getTexturedModelData);
         EntityModelLayerRegistry.registerModelLayer(SpoilerRaceModel.ENTITY_MODEL_LAYER, SpoilerRaceModel::getTexturedModelData);
+        EntityModelLayerRegistry.registerModelLayer(SpoilerRaceProMaxModel.ENTITY_MODEL_LAYER, SpoilerRaceProMaxModel::getTexturedModelData);
         EntityRendererRegistry.register(ModEntities.KART_ENTITY_TYPE, KartRenderer::new);
     }
 }

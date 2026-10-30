@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "minecraft:coal_block"
+    },
+    "C": {
+      "item": "minecraft:chain"
+    },
+    "D": {
+      "item": "minecraft:diamond"
+    }
+  },
+  "pattern": [
+    "BBB",
+    "DDD",
+    "C C"
+  ],
+  "result": {
+    "count": 1,
+    "id": "bokarts:spoiler_race_pro_max_carbon"
+  }
+}

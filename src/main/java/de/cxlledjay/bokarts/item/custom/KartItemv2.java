@@ -273,6 +273,9 @@ public class KartItemv2 extends Item {
                     kart.setCustomName(itemStack.get(DataComponentTypes.CUSTOM_NAME));
                     kart.setCustomNameVisible(false);
                 }
+                // calculate its physics before spawning
+                kart.recalculateKartPhysics();
+                // now spawn it
                 world.spawnEntity(kart);
                 world.emitGameEvent(user, GameEvent.ENTITY_PLACE, hitResult.getPos());
                 itemStack.decrementUnlessCreative(1, user);

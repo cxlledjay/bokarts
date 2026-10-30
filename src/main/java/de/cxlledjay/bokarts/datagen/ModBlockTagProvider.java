@@ -21,7 +21,9 @@ public class ModBlockTagProvider extends FabricTagProvider.BlockTagProvider {
                 .add(ModBlocks.KART_LIFT_DUMMY)
                 .add(ModBlocks.LIVERY_WORKBENCH)
                 .add(ModBlocks.PAINT_BUCKET)
-                .add(ModBlocks.TROPHY)
+                .add(ModBlocks.TROPHY_GOLD)
+                .add(ModBlocks.TROPHY_SILVER)
+                .add(ModBlocks.TROPHY_BRONZE)
                 .add(ModBlocks.TRACK_TIMER_BLOCK)
                 .add(ModBlocks.TRACK_TIMER_REFLECTOR_BLOCK);
 
@@ -30,7 +32,9 @@ public class ModBlockTagProvider extends FabricTagProvider.BlockTagProvider {
                 .add(ModBlocks.KART_LIFT_DUMMY)
                 .add(ModBlocks.LIVERY_WORKBENCH)
                 .add(ModBlocks.PAINT_BUCKET)
-                .add(ModBlocks.TROPHY)
+                .add(ModBlocks.TROPHY_GOLD)
+                .add(ModBlocks.TROPHY_SILVER)
+                .add(ModBlocks.TROPHY_BRONZE)
                 .add(ModBlocks.TRACK_TIMER_BLOCK)
                 .add(ModBlocks.TRACK_TIMER_REFLECTOR_BLOCK);
 

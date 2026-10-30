@@ -1,8 +1,10 @@
-// 1.21.1	2026-10-21T17:12:52.0839069	BoKarts/Block Loot Tables
+// 1.21.1	2026-10-28T13:20:23.6917326	BoKarts/Block Loot Tables
 f75317a0bee0d3e09e02161d6729baf6706837c8 data\bokarts\loot_table\blocks\track_timer_reflector_block.json
 64571e34d4ee8ba76101c7b5a4158820e977d6c2 data\bokarts\loot_table\blocks\kart_lift_block.json
 21685ffdbd366852f649467976d2495653a6fefd data\bokarts\loot_table\blocks\track_timer_block.json
 97d9a70d7e0e0fc48ff8b67868195901fbc85ef0 data\bokarts\loot_table\blocks\livery_workbench.json
 d980a04ac3a3161e5f0df66976f438c7ddabc44a data\bokarts\loot_table\blocks\paint_bucket.json
+5a1bde3eb3cbf5f7233e685d028ee28e11e6a729 data\bokarts\loot_table\blocks\trophy_gold.json
 0e3b00ccf026e599bf6405661a3657bf59f5b8f3 data\bokarts\loot_table\blocks\horn_block.json
-5aa41b84ec07ccf4e470dce854b64425c23dd313 data\bokarts\loot_table\blocks\trophy.json
+4326612420d267eafffa3b0d2b97a1a84367d402 data\bokarts\loot_table\blocks\trophy_bronze.json
+638125e159bbaec67917a774b0b6f4dd0972b22b data\bokarts\loot_table\blocks\trophy_silver.json

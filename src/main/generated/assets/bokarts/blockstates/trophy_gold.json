@@ -1,18 +1,18 @@
 {
   "variants": {
     "facing=east": {
-      "model": "bokarts:block/trophy",
+      "model": "bokarts:block/trophy_gold",
       "y": 90
     },
     "facing=north": {
-      "model": "bokarts:block/trophy"
+      "model": "bokarts:block/trophy_gold"
     },
     "facing=south": {
-      "model": "bokarts:block/trophy",
+      "model": "bokarts:block/trophy_gold",
       "y": 180
     },
     "facing=west": {
-      "model": "bokarts:block/trophy",
+      "model": "bokarts:block/trophy_gold",
       "y": 270
     }
   }

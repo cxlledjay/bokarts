@@ -102,6 +102,7 @@ public class KartHudOverlay {
             int speedStringX = speedoX + (int) (speedoSize / (64.0f/19.0f));
             int speedStringY = speedoY + (int) (speedoSize / (64.0f/44.0f));
             float sizeScaling = (float) speedoSize / 55;
+            int textColor = Integer.decode(BoKartsConfig.kartHudTextColor);
 
             // draw speed
             context.getMatrices().push();
@@ -111,7 +112,7 @@ public class KartHudOverlay {
                     client.textRenderer,
                     speedString,
                     0, 0,
-                    BoKartsConfig.kartHudTextColor,
+                    textColor,
                     false
             );
             context.getMatrices().pop();

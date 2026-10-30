@@ -27,7 +27,7 @@ public class BoKartsConfig extends MidnightConfig {
     public static float kartHudTransparency = 0.8f;
 
     @Entry(category = "client", isColor = true)
-    public static int kartHudTextColor = 0x54B3F2;
+    public static String kartHudTextColor = "#54B3F2";
 
     @Entry(category = "client")
     public static KartSpeedUnit kartHudSpeedUnit = KartSpeedUnit.BLOCKS_PER_SECOND;

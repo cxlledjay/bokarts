@@ -1,4 +1,4 @@
-// 1.21.1	2026-10-21T17:12:52.0839069	BoKarts/Tags for minecraft:block
+// 1.21.1	2026-10-28T13:20:23.6917326	BoKarts/Tags for minecraft:block
 7b4845e8c9f712798d2602a04a58631b1c865341 data\minecraft\tags\block\mineable\axe.json
-c286c6a78357b10f8d824177f443dfef22c598b7 data\minecraft\tags\block\needs_iron_tool.json
-c286c6a78357b10f8d824177f443dfef22c598b7 data\minecraft\tags\block\mineable\pickaxe.json
+beda24ba06a2fb14591839f3f5318482da9cf9fd data\minecraft\tags\block\needs_iron_tool.json
+beda24ba06a2fb14591839f3f5318482da9cf9fd data\minecraft\tags\block\mineable\pickaxe.json

@@ -3,6 +3,7 @@ package de.cxlledjay.bokarts;
 import de.cxlledjay.bokarts.block.entity.ModBlockEntities;
 import de.cxlledjay.bokarts.block.entity.client.KartLiftArmsModel;
 import de.cxlledjay.bokarts.block.entity.client.KartLiftBlockEntityRenderer;
+import de.cxlledjay.bokarts.block.entity.client.TrophyBlockEntityRenderer;
 import de.cxlledjay.bokarts.config.ClientSyncedConfig;
 import de.cxlledjay.bokarts.entity.client.ModEntityLayers;
 import de.cxlledjay.bokarts.event.ModClientEvents;
@@ -38,6 +39,7 @@ public class BoKartsClient implements ClientModInitializer {
         // kart lift rendering
         EntityModelLayerRegistry.registerModelLayer(KartLiftArmsModel.KART_LIFT_ARMS_LAYER, KartLiftArmsModel::getTexturedModelData);
         BlockEntityRendererFactories.register(ModBlockEntities.KART_LIFT_BE, KartLiftBlockEntityRenderer::new);
+        BlockEntityRendererFactories.register(ModBlockEntities.TROPHY_BE, TrophyBlockEntityRenderer::new);
 
         // init config sync server sided
         ClientSyncedConfig.initSyncedConfigClientEvent();

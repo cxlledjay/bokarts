@@ -2,6 +2,8 @@ package de.cxlledjay.bokarts.screen.client;
 
 import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.block.entity.custom.KartLiftBlockEntity;
+import de.cxlledjay.bokarts.config.BoKartsConfig;
+import de.cxlledjay.bokarts.config.ClientSyncedConfig;
 import de.cxlledjay.bokarts.entity.custom.kart.KartEntity;
 import de.cxlledjay.bokarts.networking.packet.KartLiftChangeStateC2S;
 import de.cxlledjay.bokarts.networking.packet.KartLiftModifyRaceNumberC2S;
@@ -25,6 +27,7 @@ public class KartLiftScreen extends HandledScreen<KartLiftScreenHandler> {
     // ----- textures -----
     // background
     private static final Identifier BACKGROUND_TEXTURE = BoKarts.id("textures/gui/kart_lift/background.png");
+    private static final Identifier BACKGROUND_STATS_SCREEN_TEXTURE = BoKarts.id("textures/gui/kart_lift/stats_display.png");
     // overlays
     private static final Identifier OVERLAY_KART_ITEM_INSERT = BoKarts.id("textures/gui/kart_lift/kart_item_insert_overlay.png");
     private static final Identifier OVERLAY_KART_ITEM_INSERT_LOCKED = BoKarts.id("textures/gui/kart_lift/kart_item_insert_overlay_locked.png");
@@ -77,7 +80,7 @@ public class KartLiftScreen extends HandledScreen<KartLiftScreenHandler> {
 
         // set to correct background size
         this.backgroundWidth = 235;
-        this.backgroundHeight = 182;
+        this.backgroundHeight = 188;
 
         // set title position (title + "inventory")
         this.titleX = 36;
@@ -290,6 +293,12 @@ public class KartLiftScreen extends HandledScreen<KartLiftScreenHandler> {
             context.drawTexture(OVERLAY_KART_ITEM_INSERT, this.x, this.y, 0, 0, this.backgroundWidth, this.backgroundHeight);
         }
 
+
+        // tuning stats
+        if(this.handler.getCurrentTab() == KartLiftScreenHandler.KartLiftTab.MODIFICATION) {
+            context.drawTexture(BACKGROUND_STATS_SCREEN_TEXTURE, this.x + 219, this.y + 21, 0, 0, 202, 147);
+        }
+
         // and also render the kart
         KartEntity kart = this.handler.getLiftEntity().getKartEntity();
         int i = (this.width - this.backgroundWidth) / 2;
@@ -304,5 +313,71 @@ public class KartLiftScreen extends HandledScreen<KartLiftScreenHandler> {
         this.renderBackground(context, mouseX, mouseY, delta);
         super.render(context, mouseX, mouseY, delta);
         this.drawMouseoverTooltip(context, mouseX, mouseY);
+
+        // tuning stats
+        if(this.handler.getCurrentTab() == KartLiftScreenHandler.KartLiftTab.MODIFICATION) {
+
+            // get kart
+            KartEntity kart =  this.handler.getLiftEntity().getKartEntity();
+
+            String header =             "======== [Kart Stats] ========";
+
+            // speed
+            String acceleration = switch(BoKartsConfig.kartHudSpeedUnit) {
+                case KILOMETRES_PER_HOUR -> "Acceleration: " + String.format("%.2f", kart.acceleration * 400 * 3.6) + " kph/s";
+                case BURGERS_PER_FREEDOM -> "Acceleration: " + String.format("%.2f", kart.acceleration * 400 * 2.237) + " mph/s";
+                default -> "Acceleration: " + String.format("%.2f", kart.acceleration * 400) + " b/s²";
+            };
+            String vMax = switch(BoKartsConfig.kartHudSpeedUnit) {
+                case KILOMETRES_PER_HOUR -> "Top Speed: " + String.format("%.2f", kart.vMax * 20 * 3.6) + " kph";
+                case BURGERS_PER_FREEDOM -> "Top Speed: " + String.format("%.2f", kart.vMax * 20 * 2.237) + " mph";
+                default -> "Top Speed: " + String.format("%.2f", kart.vMax * 20) + " bps";
+            };
+            String zeroTo100 = getZeroTo100Text(kart.vMax, kart.acceleration);
+
+            // grip
+            String friction =           "Grip: " + String.format("%.2f", kart.wheelFriction * 20) + " µ";
+            String frictionPenalty =    "Grip Penalty: " + String.format("%.2f", kart.frictionPenalty * 20) + " µ";
+            String stepHeight =         "Step Height: " + String.format("%.2f", kart.stepHeight) + " blocks";
+
+
+            // range
+            float consumptionBase = kart.fuelConsumptionBase;
+            float capacity = ClientSyncedConfig.getMaxFuelCapacity();
+
+            float minRangeKm = ((capacity / (consumptionBase * 1.5f)) * kart.vMax) / 1000.0f;
+            float maxRangeKm = ((capacity / (consumptionBase * 0.5f)) * (kart.vMax / 2.5f)) / 1000.0f;
+
+            // 6. Format for the UI
+            String rangeTextHeader = "Theoretical Range: ";
+            String rangeText = String.format("%.1f - %.1f km", minRangeKm, maxRangeKm);
+
+            context.drawText(this.textRenderer, header,             this.x + 244, this.y + 30,      0xFFFFFF, false);
+
+            context.drawText(this.textRenderer, acceleration,       this.x + 254, this.y + 48,      0x00FFFF, false);
+            context.drawText(this.textRenderer, vMax,               this.x + 254, this.y + 60,      0x00FFFF, false);
+            context.drawText(this.textRenderer, zeroTo100,          this.x + 254, this.y + 72,      0x00FFFF, false);
+
+            context.drawText(this.textRenderer, friction,           this.x + 254, this.y + 90,      0x00FFFF, false);
+            context.drawText(this.textRenderer, frictionPenalty,    this.x + 254, this.y + 102,     0x00FFFF, false);
+            context.drawText(this.textRenderer, stepHeight,         this.x + 254, this.y + 114,     0x00FFFF, false);
+
+            context.drawText(this.textRenderer, rangeTextHeader,    this.x + 254, this.y + 134,     0x00FFFF, false);
+            context.drawText(this.textRenderer, rangeText,          this.x + 254, this.y + 146,     0x00FFFF, false);
+        }
+
+    }
+
+    private String getZeroTo100Text(float vmax, float acceleration) {
+        float targetSpeedBlocksPerTick = 100.0f / (20.0f * 3.6f);
+
+        if (vmax <= targetSpeedBlocksPerTick) {
+            return "0-100: N/A";
+        }
+        double k = 1.0 - (acceleration / vmax);
+        double ticks = Math.log(1.0 - (targetSpeedBlocksPerTick / vmax)) / Math.log(k);
+        double seconds = ticks / 20.0;
+
+        return "0-100: " + String.format("%.2f", seconds) + " s";
     }
 }

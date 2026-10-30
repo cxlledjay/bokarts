@@ -3,8 +3,8 @@
 	"credit": "Made with Blockbench",
 	"texture_size": [64, 64],
 	"textures": {
-		"0": "bokarts:block/trophy",
-		"particle": "bokarts:block/trophy_particle"
+		"0": "bokarts:block/trophy_gold",
+		"particle": "bokarts:block/trophy_gold_particle"
 	},
 	"elements": [
 		{

@@ -18,7 +18,9 @@ public class ModModelProvider extends FabricModelProvider {
     public void generateBlockStateModels(BlockStateModelGenerator blockStateModelGenerator) {
         blockStateModelGenerator.registerNorthDefaultHorizontalRotation(ModBlocks.LIVERY_WORKBENCH);
         blockStateModelGenerator.registerNorthDefaultHorizontalRotation(ModBlocks.PAINT_BUCKET);
-        blockStateModelGenerator.registerNorthDefaultHorizontalRotation(ModBlocks.TROPHY);
+        blockStateModelGenerator.registerNorthDefaultHorizontalRotation(ModBlocks.TROPHY_GOLD);
+        blockStateModelGenerator.registerNorthDefaultHorizontalRotation(ModBlocks.TROPHY_SILVER);
+        blockStateModelGenerator.registerNorthDefaultHorizontalRotation(ModBlocks.TROPHY_BRONZE);
         blockStateModelGenerator.registerSimpleCubeAll(ModBlocks.HORN_BLOCK);
     }
 
@@ -32,8 +34,13 @@ public class ModModelProvider extends FabricModelProvider {
         itemModelGenerator.register(ModItems.DYE_MIX, Models.GENERATED);
         // wheels
         itemModelGenerator.register(ModItems.WHEELS_STREET, Models.GENERATED);
+        itemModelGenerator.register(ModItems.WHEELS_SEMI_SLICK, Models.GENERATED);
+        itemModelGenerator.register(ModItems.WHEELS_SOFT, Models.GENERATED);
+        itemModelGenerator.register(ModItems.WHEELS_HARD, Models.GENERATED);
         itemModelGenerator.register(ModItems.WHEELS_DRIFT, Models.GENERATED);
+        itemModelGenerator.register(ModItems.WHEELS_DRIFT_PLUS, Models.GENERATED);
         itemModelGenerator.register(ModItems.WHEELS_OFFROAD, Models.GENERATED);
+        itemModelGenerator.register(ModItems.WHEELS_SPIKES, Models.GENERATED);
         // engines
         itemModelGenerator.register(ModItems.ENGINE_COPPER, Models.GENERATED);
         itemModelGenerator.register(ModItems.ENGINE_IRON, Models.GENERATED);
@@ -45,6 +52,8 @@ public class ModModelProvider extends FabricModelProvider {
         itemModelGenerator.register(ModItems.SPOILER_STREET_CARBON, Models.GENERATED);
         itemModelGenerator.register(ModItems.SPOILER_RACE, Models.GENERATED);
         itemModelGenerator.register(ModItems.SPOILER_RACE_CARBON, Models.GENERATED);
+        itemModelGenerator.register(ModItems.SPOILER_RACE_PRO_MAX, Models.GENERATED);
+        itemModelGenerator.register(ModItems.SPOILER_RACE_PRO_MAX_CARBON, Models.GENERATED);
         // aero
         itemModelGenerator.register(ModItems.AERO_RACE, Models.GENERATED);
         itemModelGenerator.register(ModItems.AERO_RACE_CARBON, Models.GENERATED);
