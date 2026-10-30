@@ -412,8 +412,10 @@ public class KartEntity extends Entity implements RideableInventory{
             passenger.setHeadYaw(passenger.getHeadYaw() + this.yawVelocity);
             this.clampPassengerYaw(passenger);
         } else {
-            passenger.setYaw(passenger.getYaw() + this.yawVelocity);
-            passenger.setHeadYaw(passenger.getHeadYaw() + this.yawVelocity);
+            float deltaYaw = this.getYaw() - this.prevYaw;
+            passenger.setYaw(passenger.getYaw() + deltaYaw);
+            passenger.setHeadYaw(passenger.getHeadYaw() + deltaYaw);
+            passenger.setBodyYaw(this.getYaw());
         }
     }
 
@@ -452,6 +454,20 @@ public class KartEntity extends Entity implements RideableInventory{
         passenger.setYaw(this.getYaw());
         passenger.setHeadYaw(this.getYaw());
         passenger.setBodyYaw(this.getYaw());
+    }
+
+    @Override
+    protected void removePassenger(Entity passenger) {
+        // stop animations etc
+        if(passenger instanceof PlayerEntity && passenger == this.getControllingPassenger()) {
+            if(this.getWorld().isClient) {
+                this.engineRevs = 0.0f;
+                this.engineRevsPrev = 0.0f;
+            } else {
+                this.setInputsByServer(false,false,false,false,false);
+            }
+        }
+        super.removePassenger(passenger);
     }
 
     @Override
@@ -845,6 +861,7 @@ public class KartEntity extends Entity implements RideableInventory{
 
             // current speed
             Vec3d currentVel = this.getVelocity();
+            float yawRad = this.getYaw() * (float) (Math.PI / 180.0);
             float v = (float) Math.sqrt(currentVel.x * currentVel.x + currentVel.z * currentVel.z);
 
             // physics
@@ -877,9 +894,9 @@ public class KartEntity extends Entity implements RideableInventory{
 
             this.setVelocity(
                     this.getVelocity().add(
-                            MathHelper.sin(-this.getYaw() * (float) (Math.PI / 180.0)) * appliedAcceleration,
+                            MathHelper.sin(-yawRad) * appliedAcceleration,
                             0.0,
-                            MathHelper.cos(this.getYaw() * (float) (Math.PI / 180.0)) * appliedAcceleration
+                            MathHelper.cos(yawRad) * appliedAcceleration
             ));
         }
     }
@@ -955,7 +972,26 @@ public class KartEntity extends Entity implements RideableInventory{
             if (this.getWorld().isClient && !this.canNotDrive()) {
                 this.updateAcceleration();
             }
-            this.move(MovementType.SELF, this.getVelocity());
+
+            // --- interpolate steps for fast vehicles ---
+            Vec3d totalVel = this.getVelocity();
+            double horizontalSpeed = Math.sqrt(totalVel.x * totalVel.x + totalVel.z * totalVel.z);
+            // moving faster than 2 bps => steps > 1
+            int steps = (int) Math.ceil(horizontalSpeed);
+            if (steps > 1) {
+                // get equal sized chunks
+                Vec3d chunkVel = totalVel.multiply(1.0 / steps);
+                // call move function multiple times with chunked velocity
+                for (int i = 0; i < steps; i++) {
+                    this.move(MovementType.SELF, chunkVel);
+                    if (this.horizontalCollision) {
+                        break;
+                    }
+                }
+            } else {
+                // as normal
+                this.move(MovementType.SELF, totalVel);
+            }
         } else {
             this.setVelocity(Vec3d.ZERO);
 
