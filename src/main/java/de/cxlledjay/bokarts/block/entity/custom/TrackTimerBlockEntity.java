@@ -269,7 +269,7 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
     }
 
 
-    private ItemStack createTimeAttackItemStack(PlayerEntity player, long bestLap, long duration) {
+    private ItemStack createTimeAttackItemStack(PlayerEntity player, long bestLap, long duration, int laps) {
         ItemStack res = ItemStack.EMPTY;
 
         if(this.participantInfo.containsKey(player.getUuid())) {
@@ -278,6 +278,7 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
             String todayAsString = today.format(formatter);
             String bestLapString = getFormattedLapTime(bestLap);
+            String avgLapString = getFormattedLapTime(duration / laps);
             String durationString = getFormattedLapTime(duration);
 
             // create item
@@ -285,6 +286,7 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
 
             res.set(ModDataComponentTypes.TRACK_REPORT_PLAYER_NAME, player.getNameForScoreboard());
             res.set(ModDataComponentTypes.TRACK_REPORT_BEST_LAP_TIME, bestLapString);
+            res.set(ModDataComponentTypes.TRACK_REPORT_AVG_LAP_TIME, avgLapString);
             res.set(ModDataComponentTypes.TRACK_REPORT_DATE, todayAsString);
             res.set(ModDataComponentTypes.TRACK_REPORT_DURATION, durationString);
         }
@@ -301,6 +303,7 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
             String todayAsString = today.format(formatter);
             String bestLapString = getFormattedLapTime(bestLap);
+            String avgLapString = getFormattedLapTime(duration / totalLaps);
             String durationString = getFormattedLapTime(duration);
 
             // create item
@@ -309,6 +312,7 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
             res.set(ModDataComponentTypes.KART_ITEM_RACE_NUMBER, kart.getRaceNumber());
             res.set(ModDataComponentTypes.TRACK_REPORT_PLAYER_NAME, player.getNameForScoreboard());
             res.set(ModDataComponentTypes.TRACK_REPORT_BEST_LAP_TIME, bestLapString);
+            res.set(ModDataComponentTypes.TRACK_REPORT_AVG_LAP_TIME, avgLapString);
             res.set(ModDataComponentTypes.TRACK_REPORT_DATE, todayAsString);
             res.set(ModDataComponentTypes.TRACK_REPORT_DURATION, durationString);
             res.set(ModDataComponentTypes.TRACK_REPORT_PLACEMENT, placement);
@@ -576,10 +580,11 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
 
         TrackTimerKartStats stats = this.participantInfo.get(player.getUuid());
         if(stats.best() <= 0) return;
+        if(stats.laps() <= 0) return;
 
         long duration = stats.timestamp() - this.raceStart;
 
-        ItemStack trackReport = createTimeAttackItemStack(player, stats.best(), duration);
+        ItemStack trackReport = createTimeAttackItemStack(player, stats.best(), duration, stats.laps());
         if(trackReport != null) this.tryPrintingTrackReport(trackReport);
     }
 

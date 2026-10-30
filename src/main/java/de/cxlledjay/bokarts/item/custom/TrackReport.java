@@ -69,6 +69,13 @@ public class TrackReport extends Item {
             );
         }
 
+        if(stack.contains(ModDataComponentTypes.TRACK_REPORT_AVG_LAP_TIME)) {
+            tooltip.add(
+                    Text.literal("Avg Lap Time: ").formatted(Formatting.WHITE).append(
+                    Text.literal(stack.getOrDefault(ModDataComponentTypes.TRACK_REPORT_AVG_LAP_TIME, "N/A")).formatted(Formatting.WHITE))
+            );
+        }
+
         super.appendTooltip(stack, context, tooltip, type);
     }
 }
