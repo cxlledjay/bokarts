@@ -700,8 +700,8 @@ public class KartEntity extends Entity implements RideableInventory{
         return blockState.isIn(ModTags.Blocks.DRIVABLE_BLOCKS);
     }
 
-    private boolean isDrivableBlockSlowed33(BlockState blockState) {
-        return blockState.isIn(ModTags.Blocks.DRIVABLE_BLOCKS_SLOWED33);
+    private boolean isDrivableBlockSlowed15(BlockState blockState) {
+        return blockState.isIn(ModTags.Blocks.DRIVABLE_BLOCKS_SLOWED15);
     }
 
     private boolean isDrivableBlockSlowed67(BlockState blockState) {
@@ -726,9 +726,9 @@ public class KartEntity extends Entity implements RideableInventory{
                 // on drivable block (street)
                 if(isDrivableBlock(groundBlock)) penaltyMultiplier = 0.0f;
                 // on drivable block slowed (curb)
-                else if(isDrivableBlockSlowed33(groundBlock)) penaltyMultiplier = 1.0f/3.0f;
+                else if(isDrivableBlockSlowed15(groundBlock)) penaltyMultiplier = 0.15f;
                 // on drivable block slowed (curb)
-                else if(isDrivableBlockSlowed67(groundBlock)) penaltyMultiplier = 2.0f/3.0f;
+                else if(isDrivableBlockSlowed67(groundBlock)) penaltyMultiplier = 0.67f;
 
 
                 appliedFriction = this.wheelFriction + this.frictionPenalty * penaltyMultiplier;

@@ -3,6 +3,7 @@ package de.cxlledjay.bokarts.entity.client;
 import de.cxlledjay.bokarts.entity.ModEntities;
 import de.cxlledjay.bokarts.entity.client.kartv2.ChassisModel;
 import de.cxlledjay.bokarts.entity.client.kartv2.EngineModel;
+import de.cxlledjay.bokarts.entity.client.kartv2.aero.AeroCupModel;
 import de.cxlledjay.bokarts.entity.client.kartv2.aero.AeroRaceModel;
 import de.cxlledjay.bokarts.entity.client.kartv2.aero.AeroTypeOneModel;
 import de.cxlledjay.bokarts.entity.client.kartv2.spoiler.*;
@@ -20,6 +21,7 @@ public class ModEntityLayers {
         EntityModelLayerRegistry.registerModelLayer(WheelsModelOffroad.ENTITY_MODEL_LAYER, WheelsModelOffroad::getTexturedModelData);
         EntityModelLayerRegistry.registerModelLayer(EngineModel.ENTITY_MODEL_LAYER, EngineModel::getTexturedModelData);
         EntityModelLayerRegistry.registerModelLayer(AeroRaceModel.ENTITY_MODEL_LAYER, AeroRaceModel::getTexturedModelData);
+        EntityModelLayerRegistry.registerModelLayer(AeroCupModel.ENTITY_MODEL_LAYER, AeroCupModel::getTexturedModelData);
         EntityModelLayerRegistry.registerModelLayer(AeroTypeOneModel.ENTITY_MODEL_LAYER, AeroTypeOneModel::getTexturedModelData);
         EntityModelLayerRegistry.registerModelLayer(SpoilerStreetModel.ENTITY_MODEL_LAYER, SpoilerStreetModel::getTexturedModelData);
         EntityModelLayerRegistry.registerModelLayer(SpoilerRaceModel.ENTITY_MODEL_LAYER, SpoilerRaceModel::getTexturedModelData);

@@ -64,6 +64,8 @@ public class ModModelProvider extends FabricModelProvider {
         // aero
         itemModelGenerator.register(ModItems.AERO_RACE, Models.GENERATED);
         itemModelGenerator.register(ModItems.AERO_RACE_CARBON, Models.GENERATED);
+        itemModelGenerator.register(ModItems.AERO_CUP, Models.GENERATED);
+        itemModelGenerator.register(ModItems.AERO_CUP_CARBON, Models.GENERATED);
         itemModelGenerator.register(ModItems.AERO_TYPE_ONE, Models.GENERATED);
         itemModelGenerator.register(ModItems.AERO_TYPE_ONE_COLORED, Models.GENERATED);
         itemModelGenerator.register(ModItems.AERO_TYPE_ONE_CARBON, Models.GENERATED);

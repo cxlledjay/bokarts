@@ -3,6 +3,7 @@ package de.cxlledjay.bokarts.entity.client;
 import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.entity.client.kartv2.ChassisModel;
 import de.cxlledjay.bokarts.entity.client.kartv2.EngineModel;
+import de.cxlledjay.bokarts.entity.client.kartv2.aero.AeroCupModel;
 import de.cxlledjay.bokarts.entity.client.kartv2.aero.AeroRaceModel;
 import de.cxlledjay.bokarts.entity.client.kartv2.aero.AeroTypeOneModel;
 import de.cxlledjay.bokarts.entity.client.kartv2.spoiler.*;
@@ -81,9 +82,11 @@ public class KartRenderer extends EntityRenderer<KartEntity> {
         // aero
         this.modelAero.put(AeroType.RACE, new AeroRaceModel<>(ctx.getPart(AeroRaceModel.ENTITY_MODEL_LAYER)));
         this.modelAero.put(AeroType.RACE_CARBON, new AeroRaceModel<>(ctx.getPart(AeroRaceModel.ENTITY_MODEL_LAYER)));
-        this.modelAero.put(AeroType.TYPE_ONE, new AeroRaceModel<>(ctx.getPart(AeroTypeOneModel.ENTITY_MODEL_LAYER)));
-        this.modelAero.put(AeroType.TYPE_ONE_COLORED, new AeroRaceModel<>(ctx.getPart(AeroTypeOneModel.ENTITY_MODEL_LAYER)));
-        this.modelAero.put(AeroType.TYPE_ONE_CARBON, new AeroRaceModel<>(ctx.getPart(AeroTypeOneModel.ENTITY_MODEL_LAYER)));
+        this.modelAero.put(AeroType.CUP, new AeroCupModel<>(ctx.getPart(AeroCupModel.ENTITY_MODEL_LAYER)));
+        this.modelAero.put(AeroType.CUP_CARBON, new AeroCupModel<>(ctx.getPart(AeroCupModel.ENTITY_MODEL_LAYER)));
+        this.modelAero.put(AeroType.TYPE_ONE, new AeroTypeOneModel<>(ctx.getPart(AeroTypeOneModel.ENTITY_MODEL_LAYER)));
+        this.modelAero.put(AeroType.TYPE_ONE_COLORED, new AeroTypeOneModel<>(ctx.getPart(AeroTypeOneModel.ENTITY_MODEL_LAYER)));
+        this.modelAero.put(AeroType.TYPE_ONE_CARBON, new AeroTypeOneModel<>(ctx.getPart(AeroTypeOneModel.ENTITY_MODEL_LAYER)));
     }
 
     @Override

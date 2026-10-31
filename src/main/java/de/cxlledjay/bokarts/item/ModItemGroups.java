@@ -43,6 +43,17 @@ public class ModItemGroups {
                         entries.add(new ItemStack(ModItems.STEERING_WHEEL));
                         entries.add(new ItemStack(ModItems.SEAT));
                         entries.add(new ItemStack(ModItems.DYE_MIX));
+
+                        // ----- customization -----
+                        // livery
+                        entries.add(new ItemStack(ModItems.LIVERY_TEMPLATE));
+
+                        // ----- accessories -----
+                        entries.add(new ItemStack(ModItems.KEY_BLANK));
+                        //entries.add(new ItemStack(ModItems.KEY_PAIRED));
+                        entries.add(new ItemStack(ModItems.KEY_PAIRING_TOOL));
+
+
                         // wheels
                         entries.add(new ItemStack(ModItems.WHEELS_STREET));
                         entries.add(new ItemStack(ModItems.WHEELS_SUPER_SOFT));
@@ -75,19 +86,11 @@ public class ModItemGroups {
                         // aero
                         entries.add(new ItemStack(ModItems.AERO_RACE));
                         entries.add(new ItemStack(ModItems.AERO_RACE_CARBON));
+                        entries.add(new ItemStack(ModItems.AERO_CUP));
+                        entries.add(new ItemStack(ModItems.AERO_CUP_CARBON));
                         entries.add(new ItemStack(ModItems.AERO_TYPE_ONE));
                         entries.add(new ItemStack(ModItems.AERO_TYPE_ONE_COLORED));
                         entries.add(new ItemStack(ModItems.AERO_TYPE_ONE_CARBON));
-
-
-                        // ----- customization -----
-                        // livery
-                        entries.add(new ItemStack(ModItems.LIVERY_TEMPLATE));
-
-                        // ----- accessories -----
-                        entries.add(new ItemStack(ModItems.KEY_BLANK));
-                        //entries.add(new ItemStack(ModItems.KEY_PAIRED));
-                        entries.add(new ItemStack(ModItems.KEY_PAIRING_TOOL));
 
                     }).build());
 

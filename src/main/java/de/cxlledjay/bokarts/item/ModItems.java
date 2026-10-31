@@ -58,6 +58,8 @@ public class ModItems {
     // aero kits
     public static final Item AERO_RACE = registerItem("aero_race", new AeroItem(AeroType.RACE, new Item.Settings()));
     public static final Item AERO_RACE_CARBON = registerItem("aero_race_carbon", new AeroItem(AeroType.RACE_CARBON, new Item.Settings()));
+    public static final Item AERO_CUP = registerItem("aero_cup", new AeroItem(AeroType.CUP, new Item.Settings()));
+    public static final Item AERO_CUP_CARBON = registerItem("aero_cup_carbon", new AeroItem(AeroType.CUP_CARBON, new Item.Settings()));
     public static final Item AERO_TYPE_ONE = registerItem("aero_type_one", new AeroItem(AeroType.TYPE_ONE, new Item.Settings()));
     public static final Item AERO_TYPE_ONE_COLORED = registerItem("aero_type_one_colored", new AeroItem(AeroType.TYPE_ONE_COLORED, new Item.Settings()));
     public static final Item AERO_TYPE_ONE_CARBON = registerItem("aero_type_one_carbon", new AeroItem(AeroType.TYPE_ONE_CARBON, new Item.Settings()));

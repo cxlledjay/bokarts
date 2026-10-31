@@ -1,10 +1,11 @@
-// 1.21.1	2026-10-30T19:54:16.1211348	BoKarts/Model Definitions
+// 1.21.1	2026-10-31T16:47:37.4360673	BoKarts/Model Definitions
 9c39f9d13ac9976ca84230e07b27c9a3e09d4f97 assets\bokarts\models\item\wheels_spikes.json
 751e0dcd1490da8231f53fd734bebae94487c482 assets\bokarts\models\item\engine_copper.json
 28c584f8499b07df6b20deaa77d2e64aff49d2a0 assets\bokarts\models\item\engine_netherite.json
 f3b4c38cf3b68d672942c24d43a535da5d0b5296 assets\bokarts\models\item\spoiler_race_carbon.json
 e91d428592c0959940ce2236f5239587a8215539 assets\bokarts\models\item\key_pairing_tool.json
 16824965922085e0b492c1cc32d15bbadb79a451 assets\bokarts\models\item\wheels_super_hard.json
+d7bee948e2c628c844d924344cefbeabac45d0c8 assets\bokarts\models\item\aero_cup_carbon.json
 eb779717a4fd5be79127a52179eff6bc3df2732e assets\bokarts\models\item\trophy_silver.json
 f7dab1ebd2c2bb71791c0b24230d5debfd08a721 assets\bokarts\models\block\horn_block.json
 8d677eab65e78c8b7b02cf18c8f22f92e325e92e assets\bokarts\models\item\spoiler_race.json
@@ -24,11 +25,12 @@ a28e608b9402a053c9dde9968dca59418ad95d0e assets\bokarts\models\item\dye_mix.json
 2152daea18bc0a2f9e9c7233989c1cec3a23be78 assets\bokarts\models\item\spoiler_race_pro_max_carbon.json
 28f07512e18d64b8cd2bc218490078fe131dd65c assets\bokarts\models\item\horn_block.json
 d2b6d85192940f1da83fa98263ff0993d99f0c6c assets\bokarts\blockstates\trophy_gold.json
+0086bf178214fe133210bf71180c743274bf61b0 assets\bokarts\models\item\aero_cup.json
 8c4b7521b7bf4f788d9d0d6c20e3e010f242b1fb assets\bokarts\models\item\wheels_drift_plus.json
-5df90c180ffd17b16fe8647c664cb4d65bc9e825 assets\bokarts\models\item\chassis_blueprint.json
 7c77a0fc74fd39eb8080b3ec731953b93db347d8 assets\bokarts\models\item\wheels_medium.json
-e9e465e3e9e8c922620c2244f2aa3ebdb8e08873 assets\bokarts\blockstates\horn_block.json
+5df90c180ffd17b16fe8647c664cb4d65bc9e825 assets\bokarts\models\item\chassis_blueprint.json
 c933f04d97d5302bee2909ebd72b8e00b660a16e assets\bokarts\models\item\engine_iron.json
+e9e465e3e9e8c922620c2244f2aa3ebdb8e08873 assets\bokarts\blockstates\horn_block.json
 afec71c794aaf9bfc3e0c18cd67583f7aeb0b840 assets\bokarts\models\item\paint_bucket.json
 d6eedc19f3f301e6468610b2f63a40097ec1f3fd assets\bokarts\models\item\engine_gold.json
 30668f67b4859ec6413b2f6ddb6edca427614ea1 assets\bokarts\models\item\spoiler_type_one_carbon.json

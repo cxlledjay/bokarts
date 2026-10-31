@@ -17,11 +17,13 @@ import org.jetbrains.annotations.Nullable;
 
 public enum AeroType implements StringIdentifiable {
     NONE            (0,  "none",            "None",                 0.0f,       0.0f,        0.0f,          () -> null),
-    RACE            (1,  "race",            "Race",                 0.03f,      -0.01f,      0.125f,        () -> ModItems.AERO_RACE),
+    RACE            (1,  "race",            "Race",                 0.035f,     -0.01f,      0.125f,        () -> ModItems.AERO_RACE),
     RACE_CARBON     (2,  "race_carbon",     "Race (Carbon)",        0.04f,      -0.0125f,    0.15f,         () -> ModItems.AERO_RACE_CARBON),
-    TYPE_ONE        (3,  "type_one",        "Type One",             0.15f,      0.0325f,     0.75f,         () -> ModItems.AERO_TYPE_ONE),
-    TYPE_ONE_COLORED(4,  "type_one_colored","Type One (Colored)",   0.155f,     0.035f,      0.775f,        () -> ModItems.AERO_TYPE_ONE_COLORED),
-    TYPE_ONE_CARBON (5,  "type_one_carbon", "Type One (Carbon)",    0.16f,      0.0375f,     0.8f,          () -> ModItems.AERO_TYPE_ONE_CARBON),;
+    CUP             (3,  "cup",             "Cup",                  0.055f,     -0.015f,     0.175f,        () -> ModItems.AERO_CUP),
+    CUP_CARBON      (4,  "cup_carbon",      "Cup (Carbon)",         0.06f,      -0.0175f,    0.2f,          () -> ModItems.AERO_CUP_CARBON),
+    TYPE_ONE        (5,  "type_one",        "Type One",             0.15f,      0.0325f,     0.75f,         () -> ModItems.AERO_TYPE_ONE),
+    TYPE_ONE_COLORED(6,  "type_one_colored","Type One (Colored)",   0.155f,     0.035f,      0.775f,        () -> ModItems.AERO_TYPE_ONE_COLORED),
+    TYPE_ONE_CARBON (7,  "type_one_carbon", "Type One (Carbon)",    0.16f,      0.0375f,     0.8f,          () -> ModItems.AERO_TYPE_ONE_CARBON),;
 
     // id to value function
     private static final IntFunction<AeroType> INDEX_TO_VALUE = ValueLists.createIdToValueFunction(
