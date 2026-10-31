@@ -54,13 +54,13 @@ public class LiveryWorkbenchScreen extends HandledScreen<LiveryWorkbenchScreenHa
         this.scrollOffset = 0;
         this.mouseClicked = false;
 
-        // init random preview kart
+        // init preview kart
         this.kartPreview = new KartEntity(ModEntities.KART_ENTITY_TYPE, inventory.player.getWorld());
-        Random rng = new Random();
-        this.kartPreview.setWheelType(WheelType.fromId(rng.nextInt(WheelType.values().length)));
-        this.kartPreview.setEngineType(EngineType.fromId(rng.nextInt(EngineType.values().length)));
-        this.kartPreview.setSpoilerType(SpoilerType.fromId(rng.nextInt(SpoilerType.values().length)));
-        this.kartPreview.setAeroType(AeroType.fromId(rng.nextInt(AeroType.values().length)));
+
+        this.kartPreview.setWheelType(WheelType.STREET);
+        this.kartPreview.setEngineType(EngineType.ENGINE_COPPER);
+        this.kartPreview.setSpoilerType(SpoilerType.NONE);
+        this.kartPreview.setAeroType(AeroType.NONE);
     }
 
 

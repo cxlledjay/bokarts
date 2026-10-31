@@ -39,6 +39,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -93,6 +94,7 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
     private int currentTopPlace = 1;
     Map<UUID, TrackTimerKartStats> participantInfo = new HashMap<>();
     UUID firstPlaceUuid = null;
+    UUID followUpPlaceUuid = null;
     int highestLap = 0;
     long bestLapTime = 0;
     long raceStart = 0;
@@ -153,6 +155,8 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
             // set new PB
             if(newPB || best == 0) best = lapTime;
 
+            // delta to follow up
+            long deltaToNext = 0;
             // is he the first?
             long deltaToFirst = 0;
             if(this.highestLap < laps) {
@@ -161,7 +165,9 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
                 this.firstPlaceUuid = playerUuid;
             } else {
                 if(this.firstPlaceUuid != null) deltaToFirst = timestamp - this.participantInfo.get(this.firstPlaceUuid).timestamp();
+                if(this.followUpPlaceUuid != null) deltaToNext = timestamp - this.participantInfo.get(this.followUpPlaceUuid).timestamp();
             }
+            this.followUpPlaceUuid = playerUuid;
 
             // is it the fastest lap on track?
             long deltaToBestLap = lapTime - this.bestLapTime;
@@ -177,7 +183,13 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
                     if(newBestGlobal) flags = 1;
                     else if(newPB) flags = 2;
 
-                    this.sendGrandPrixLapMessages(player.getNameForScoreboard(), kart.getRaceNumber(), laps, lapTime, deltaToFirst, flags);
+                    String nextPlayer = "N/A";
+                    if(this.world != null && this.followUpPlaceUuid != null) {
+                        PlayerEntity nextPlayerEntity = this.world.getPlayerByUuid(this.followUpPlaceUuid);
+                        if(nextPlayerEntity != null) nextPlayer = nextPlayerEntity.getNameForScoreboard();
+                    }
+
+                    this.sendGrandPrixLapMessages(player.getNameForScoreboard(), kart.getRaceNumber(), laps, lapTime, deltaToFirst, deltaToNext, nextPlayer, flags);
 
                     if(laps >= this.settingLapCount) {
                         long duration = timestamp - this.raceStart;
@@ -222,7 +234,7 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
         player.sendMessage(message);
     }
 
-    private void sendGrandPrixLapMessages(String playerName, int kartNr, int laps, long lapTime, long deltaToFirst, byte best) {
+    private void sendGrandPrixLapMessages(String playerName, int kartNr, int laps, long lapTime, long deltaToFirst, long deltaToNext, String nextPlayer, byte best) {
         if(this.world == null) return;
         // craft message
 
@@ -239,8 +251,14 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
 
         if(deltaToFirst > 0) {
             String deltaLapTimeString = getFormattedLapTime(Math.abs(deltaToFirst));
-            message = message.append(Text.literal(" (+" + deltaLapTimeString + ")").formatted(Formatting.RED));
+            message = message.append(Text.literal(" (▲ +" + deltaLapTimeString + " to #1)").formatted(Formatting.RED));
         }
+
+        if(deltaToNext > 0) {
+            String deltaLapTimeString = getFormattedLapTime(Math.abs(deltaToNext));
+            message = message.append(Text.literal(" | (▲ +" + deltaLapTimeString + " to " + nextPlayer + ")").setStyle(Style.EMPTY.withColor(0xFF6A00)));
+        }
+
 
         // send messages
         for(UUID playerUuid : this.participantInfo.keySet()) {
@@ -299,9 +317,9 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
 
         if(this.participantInfo.containsKey(player.getUuid())) {
             // retrieve all data
-            LocalDate today = LocalDate.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-            String todayAsString = today.format(formatter);
+            LocalDateTime now = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy, HH:mm:ss");
+            String todayAsString = now.format(formatter);
             String bestLapString = getFormattedLapTime(bestLap);
             String avgLapString = getFormattedLapTime(duration / totalLaps);
             String durationString = getFormattedLapTime(duration);
@@ -563,6 +581,7 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
             this.participantInfo.clear();
 
             this.firstPlaceUuid = null;
+            this.followUpPlaceUuid = null;
             this.highestLap = 0;
             this.bestLapTime = 0;
             this.raceStart = 0;
@@ -614,6 +633,7 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
         nbt.putBoolean("HasStarted", this.hasStarted);
         nbt.putInt("CurrentTopPlace", this.currentTopPlace);
         if(this.firstPlaceUuid != null) nbt.putUuid("FirstPlaceUuid", this.firstPlaceUuid);
+        if(this.followUpPlaceUuid != null) nbt.putUuid("FollowUpPlaceUuid", this.followUpPlaceUuid);
         nbt.putInt("HighestLap", this.highestLap);
         nbt.putLong("BestLapTime", this.bestLapTime);
         nbt.putLong("RaceStart", this.raceStart);
@@ -650,6 +670,7 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
         this.currentTopPlace = nbt.getInt("CurrentTopPlace");
         this.trackWidth = nbt.getInt("TrackWidth");
         if(nbt.contains("FirstPlaceUuid")) this.firstPlaceUuid = nbt.getUuid("FirstPlaceUuid");
+        if(nbt.contains("FollowUpPlaceUuid")) this.followUpPlaceUuid = nbt.getUuid("FollowUpPlaceUuid");
         this.highestLap = nbt.getInt("HighestLap");
         this.bestLapTime = nbt.getLong("BestLapTime");
         this.raceStart = nbt.getLong("RaceStart");

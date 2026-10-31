@@ -61,13 +61,13 @@ public class PaintBucketScreen extends HandledScreen<PaintBucketScreenHandler> {
         this.titleX += 27;
         this.playerInventoryTitleX += 27;
 
-        // init random preview kart
+        // init preview kart
         this.kartPreview = new KartEntity(ModEntities.KART_ENTITY_TYPE, inventory.player.getWorld());
-        Random rng = new Random();
-        this.kartPreview.setWheelType(WheelType.fromId(rng.nextInt(1, WheelType.values().length)));
-        this.kartPreview.setEngineType(EngineType.fromId(rng.nextInt(EngineType.values().length)));
-        this.kartPreview.setSpoilerType(SpoilerType.fromId(rng.nextInt(SpoilerType.values().length)));
-        this.kartPreview.setAeroType(AeroType.fromId(rng.nextInt(AeroType.values().length)));
+
+        this.kartPreview.setWheelType(WheelType.STREET);
+        this.kartPreview.setEngineType(EngineType.ENGINE_COPPER);
+        this.kartPreview.setSpoilerType(SpoilerType.NONE);
+        this.kartPreview.setAeroType(AeroType.NONE);
 
         // init local values
         this.localColor = handler.getActiveColor();
