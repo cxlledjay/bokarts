@@ -11,6 +11,9 @@ public class ModPackets {
     public static void registerPayloads() {
         // S2C
         PayloadTypeRegistry.playS2C().register(ConfigSyncS2C.ID, ConfigSyncS2C.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(LeaderboardUpdatePersonalS2C.ID, LeaderboardUpdatePersonalS2C.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(LeaderboardUpdateEntriesS2C.ID, LeaderboardUpdateEntriesS2C.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(LeaderboardResetS2C.ID, LeaderboardResetS2C.STREAM_CODEC);
 
         // C2S
         PayloadTypeRegistry.playC2S().register(HornPlayPayloadC2S.ID, HornPlayPayloadC2S.STREAM_CODEC);
@@ -35,6 +38,9 @@ public class ModPackets {
 
     public static void registerS2CPackets(){
         ClientPlayNetworking.registerGlobalReceiver(ConfigSyncS2C.ID, ConfigSyncS2C::receive);
+        ClientPlayNetworking.registerGlobalReceiver(LeaderboardUpdatePersonalS2C.ID, LeaderboardUpdatePersonalS2C::receive);
+        ClientPlayNetworking.registerGlobalReceiver(LeaderboardUpdateEntriesS2C.ID, LeaderboardUpdateEntriesS2C::receive);
+        ClientPlayNetworking.registerGlobalReceiver(LeaderboardResetS2C.ID, LeaderboardResetS2C::receive);
     }
 
 }

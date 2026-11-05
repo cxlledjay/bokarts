@@ -3,11 +3,17 @@ package de.cxlledjay.bokarts.block.entity.custom;
 import de.cxlledjay.bokarts.block.ModBlocks;
 import de.cxlledjay.bokarts.block.custom.TrackTimer;
 import de.cxlledjay.bokarts.block.entity.ModBlockEntities;
+import de.cxlledjay.bokarts.block.entity.custom.race.LeaderboardEntry;
+import de.cxlledjay.bokarts.block.entity.custom.race.ParticipantInfo;
 import de.cxlledjay.bokarts.component.ModDataComponentTypes;
 import de.cxlledjay.bokarts.entity.custom.kart.KartEntity;
 import de.cxlledjay.bokarts.item.ModItems;
 import de.cxlledjay.bokarts.item.custom.TrackReport;
+import de.cxlledjay.bokarts.networking.packet.LeaderboardResetS2C;
+import de.cxlledjay.bokarts.networking.packet.LeaderboardUpdateEntriesS2C;
+import de.cxlledjay.bokarts.networking.packet.LeaderboardUpdatePersonalS2C;
 import de.cxlledjay.bokarts.screen.custom.TrackTimerScreenHandler;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -26,6 +32,7 @@ import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
@@ -91,14 +98,11 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
 
     // --- race stats
     private boolean hasStarted = false;
-    private int currentTopPlace = 1;
-    Map<UUID, TrackTimerKartStats> participantInfo = new HashMap<>();
-    UUID firstPlaceUuid = null;
-    UUID followUpPlaceUuid = null;
-    int highestLap = 0;
-    long bestLapTime = 0;
-    long raceStart = 0;
+    long trackRecordLapTime = 0;
+    long raceStartTimestamp = 0;
 
+    // race participant stats
+    Map<UUID, ParticipantInfo> participantInfo = new HashMap<>();
 
 
 
@@ -110,180 +114,301 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
 
     // -------------------- racing business logic --------------------
 
+
+    private void initiateParticipation(long timestamp, PlayerEntity player, KartEntity kart) {
+
+        // init stat tracking data
+        ParticipantInfo newStats = new ParticipantInfo(timestamp, 0, 0, false);
+        this.participantInfo.put(player.getUuid(), newStats);
+
+        // duration tracking
+        if(this.raceStartTimestamp == 0) this.raceStartTimestamp = timestamp;
+
+        // send message to player
+        Text msg = null;
+        if(this.settingCurrentMode == TrackTimerMode.TIME_ATTACK) {
+            msg = getPrefix().append(Text.literal("Time tracking started!").formatted(Formatting.WHITE));
+        } else if(this.settingCurrentMode == TrackTimerMode.GRAND_PRIX) {
+            msg = getPrefix().append(Text.literal("Race tracking started! Remaining Laps: " + this.settingLapCount).formatted(Formatting.WHITE));
+            // reset / init leaderboard for player
+            if (player instanceof ServerPlayerEntity serverPlayer) {
+                LeaderboardResetS2C leaderboardResetS2C = new LeaderboardResetS2C();
+                ServerPlayNetworking.send(serverPlayer, leaderboardResetS2C);
+            }
+        }
+        if(msg != null) player.sendMessage(msg);
+
+        // and sync (notify writing to nbt)
+        this.markDirty();
+    }
+
+
     private void handleLineCrossing(KartEntity kart, long timestamp) {
+        if(this.world == null) return;
         if(kart.getControllingPassenger() == null) return;
         if(kart.getControllingPassenger() instanceof PlayerEntity player) {
 
             // retrieve info
             UUID playerUuid = player.getUuid();
-            TrackTimerKartStats stats = this.participantInfo.get(playerUuid);
+            ParticipantInfo stats = this.participantInfo.get(playerUuid);
 
-            // first time seeing kart?
+            // first time seeing kart? => init
             if(stats == null) {
-
-                // init stat tracking data
-                TrackTimerKartStats newStats = new TrackTimerKartStats(timestamp, 0, 0, false);
-                this.participantInfo.put(playerUuid, newStats);
-
-                // duration tracking
-                if(this.raceStart == 0) this.raceStart = timestamp;
-
-                // send message to player
-                Text msg = null;
-                if(this.settingCurrentMode == TrackTimerMode.TIME_ATTACK) {
-                    msg = getPrefix().append(Text.literal("Time tracking started!").formatted(Formatting.WHITE));
-                } else if(this.settingCurrentMode == TrackTimerMode.GRAND_PRIX) {
-                    msg = getPrefix().append(Text.literal("Race tracking started! Remaining Laps: " + this.settingLapCount).formatted(Formatting.WHITE));
-                }
-                if(msg != null) player.sendMessage(msg);
-
-                // and sync (notify writing to nbt)
-                this.markDirty();
+                initiateParticipation(timestamp, player, kart);
                 return;
             }
 
-            // get / calculate stats
-            long lapTime =  timestamp - stats.timestamp();
-            long best = stats.best();
-            int laps = stats.laps() + 1;
-            boolean finished = stats.finished();
+            // player has finished => no more tracking
+            if(stats.finished()) return;
 
-            // calc delta time and PB
-            long deltaTime = lapTime - best;
-            boolean newPB = deltaTime < 0;
 
-            // set new PB
-            if(newPB || best == 0) best = lapTime;
+            // ----- lap time comparison -----
 
-            // delta to follow up
-            long deltaToNext = 0;
-            // is he the first?
-            long deltaToFirst = 0;
-            if(this.highestLap < laps) {
-                //yes
-                this.highestLap = laps;
-                this.firstPlaceUuid = playerUuid;
-            } else {
-                if(this.firstPlaceUuid != null) deltaToFirst = timestamp - this.participantInfo.get(this.firstPlaceUuid).timestamp();
-                if(this.followUpPlaceUuid != null) deltaToNext = timestamp - this.participantInfo.get(this.followUpPlaceUuid).timestamp();
-            }
-            this.followUpPlaceUuid = playerUuid;
+            // retrieve stats
+            long currentLapTime = timestamp - stats.lastSeenTimestamp();
+            int currentLap = stats.laps() + 1;
+            long bestLapTime = stats.best();
 
-            // is it the fastest lap on track?
-            long deltaToBestLap = lapTime - this.bestLapTime;
-            boolean newBestGlobal = deltaToBestLap < 0;
-            if(newBestGlobal || this.bestLapTime == 0) this.bestLapTime = lapTime;
+            // --- lap time records
+            // 1) personal best
+            long deltaToBest = currentLapTime - bestLapTime;
+            boolean isNewPB = deltaToBest < 0;
+            if(isNewPB || bestLapTime == 0) bestLapTime = currentLapTime;
+            // 2) track best
+            long deltaToRecord = currentLapTime - this.trackRecordLapTime;
+            boolean isNewRecord = deltaToRecord < 0;
+            if(isNewRecord || this.trackRecordLapTime == 0) this.trackRecordLapTime = currentLapTime;
 
-            // lap finished logic
+            // check finished
+            boolean hasFinished = ((this.settingCurrentMode == TrackTimerMode.GRAND_PRIX) && currentLap >= this.settingLapCount);
+
+
+
+            // --- update entry
+            ParticipantInfo updatedStats = new ParticipantInfo(timestamp, bestLapTime, currentLap, hasFinished);
+            this.participantInfo.put(playerUuid, updatedStats);
+
+
+            // ----- leaderboard calculation -----
+
+            // dynamic calculated leaderboard
+            List<Map.Entry<UUID, ParticipantInfo>> leaderboard = new ArrayList<>(this.participantInfo.entrySet());
+
+            // sort the leaderboard
+            leaderboard.sort((entry1, entry2) -> {
+                ParticipantInfo stats1 = entry1.getValue();
+                ParticipantInfo stats2 = entry2.getValue();
+
+                // 1) compare hasFinished (descending)
+                int finishedCompare = Boolean.compare(stats2.finished(), stats1.finished());
+                if (finishedCompare != 0) {
+                    return finishedCompare;
+                }
+
+                // 2) compare laps (descending)
+                int lapsCompare = Integer.compare(stats2.laps(), stats1.laps());
+                if (lapsCompare != 0) {
+                    return lapsCompare;
+                }
+
+                // 3) compare timestamps (ascending)
+                return Long.compare(stats1.lastSeenTimestamp(), stats2.lastSeenTimestamp());
+            });
+
+
+
+
+            // ----- handling of information -----
+
+            byte flagsPB = 0;
+            if(isNewRecord) flagsPB = 1;
+            else if(isNewPB) flagsPB = 2;
+
+            // a) time attack
             if(this.settingCurrentMode == TrackTimerMode.TIME_ATTACK) {
-                this.sendTimeAttackMessage(player, laps, lapTime, deltaTime, newPB);
-            } else if(this.settingCurrentMode == TrackTimerMode.GRAND_PRIX) {
-                if(!finished) {
-                    byte flags = 0;
-                    if(newBestGlobal) flags = 1;
-                    else if(newPB) flags = 2;
 
-                    String nextPlayer = "N/A";
-                    if(this.world != null && this.followUpPlaceUuid != null) {
-                        PlayerEntity nextPlayerEntity = this.world.getPlayerByUuid(this.followUpPlaceUuid);
-                        if(nextPlayerEntity != null) nextPlayer = nextPlayerEntity.getNameForScoreboard();
-                    }
+                // create message
+                Text msg = this.createTimeAttackMessage(player.getNameForScoreboard(), currentLap, currentLapTime, deltaToBest, flagsPB);
 
-                    this.sendGrandPrixLapMessages(player.getNameForScoreboard(), kart.getRaceNumber(), laps, lapTime, deltaToFirst, deltaToNext, nextPlayer, flags);
-
-                    if(laps >= this.settingLapCount) {
-                        long duration = timestamp - this.raceStart;
-
-                        // completed the race
-                        this.sendGrandPrixPlacementMessages(player.getNameForScoreboard(), kart.getRaceNumber(), this.currentTopPlace, best);
-
-                        // print track report
-                        ItemStack trackReport = createGrandPrixItemStack(kart, player, best, this.currentTopPlace, this.settingLapCount, duration);
-                        if(trackReport != null) this.tryPrintingTrackReport(trackReport);
-
-                        // prepare next place
-                        this.currentTopPlace++;
-                        finished = true;
-                    }
+                // send messages
+                for(UUID uuid : this.participantInfo.keySet()) {
+                    PlayerEntity p = this.world.getPlayerByUuid(uuid);
+                    if(p != null) p.sendMessage(msg);
                 }
             }
 
-            // update entry
-            TrackTimerKartStats updatedStats = new TrackTimerKartStats(timestamp, best, laps, finished);
-            this.participantInfo.put(playerUuid, updatedStats);
+            // b) grand prix
+            else if(this.settingCurrentMode == TrackTimerMode.GRAND_PRIX) {
+
+                // only update if the player has not yet finished -- important: hasFinished will be true here if it is the last lap!
+                if(currentLap <= this.settingLapCount) {
+
+                    // create chat messages
+                    Text msg = this.createGrandPrixLapMessage(player.getNameForScoreboard(), kart.getRaceNumber(), currentLap, currentLapTime, flagsPB);
+                    Text msgFinished = null;
+
+
+                    // check for race completion
+                    if(currentLap == this.settingLapCount) {
+
+                        // calculate placement
+                        int placement = -1;
+                        for (int i = 0; i < leaderboard.size(); i++) {
+                            if (leaderboard.get(i).getKey().equals(playerUuid)) {
+                                placement = i + 1;
+                                break;
+                            }
+                        }
+
+                        // total race duration
+                        long duration = timestamp - this.raceStartTimestamp;
+
+                        // completed the race
+                        msgFinished = this.createGrandPrixPlacementMessage(player.getNameForScoreboard(), kart.getRaceNumber(), placement, bestLapTime);
+
+                        // print track report
+                        ItemStack trackReport = createGrandPrixItemStack(kart, player, bestLapTime, placement, this.settingLapCount, duration);
+                        if(trackReport != null) this.tryPrintingTrackReport(trackReport);
+                    }
+
+
+                    // create leaderboard entries
+                    List<LeaderboardEntry> leaderboardEntries = new ArrayList<>();
+                    ParticipantInfo firstPlace = leaderboard.getFirst().getValue();
+                    for(Map.Entry<UUID, ParticipantInfo> entry : this.participantInfo.entrySet()) {
+
+                        // get data
+                        PlayerEntity p = this.world.getPlayerByUuid(entry.getKey());
+                        ParticipantInfo me =  entry.getValue();
+                        KartEntity k = null;
+                        if(p != null && p.hasVehicle() && p.getVehicle() instanceof KartEntity) {
+                            k =  (KartEntity) p.getVehicle();
+                        }
+
+                        // display name in format: ABC(12). ABC from the player name (first 3 letters) plus kart nr
+                        String name = "N/A(--)";
+                        if(p != null) name = p.getNameForScoreboard().toUpperCase(Locale.ROOT)
+                                .substring(0, Math.min(p.getNameForScoreboard().toUpperCase(Locale.ROOT).length(), 3));
+                        if(k != null) name += "(" + String.format("%02d", k.getRaceNumber()) + ")";
+
+                        // distance to first
+                        long delta = firstPlace.lastSeenTimestamp() - me.lastSeenTimestamp();
+                        int lapDiff = firstPlace.laps() - me.laps();
+                        boolean lapped = lapDiff > 0;
+                        if(lapped) {
+                            delta = lapDiff;
+                        }
+
+                        // tires
+                        String tires = "/";
+                        if(k != null) tires = k.getWheelType().getShortForm();
+
+                        // create entry
+                        leaderboardEntries.add(new LeaderboardEntry(
+                                name,
+                                delta,
+                                lapped,
+                                tires,
+                                entry.getValue().finished()
+                        ));
+                    }
+
+
+                    // update each participant
+                    for(UUID uuid : this.participantInfo.keySet()) {
+                        PlayerEntity p = this.world.getPlayerByUuid(uuid);
+                        if(p == null) break;
+
+                        // send messages
+                        p.sendMessage(msg);
+                        if(msgFinished != null) p.sendMessage(msgFinished);
+
+                        // update leaderboard
+                        if (player instanceof ServerPlayerEntity serverPlayer) {
+                            LeaderboardUpdateEntriesS2C leaderboardUpdateEntriesS2C = new LeaderboardUpdateEntriesS2C(leaderboardEntries);
+                            ServerPlayNetworking.send(serverPlayer, leaderboardUpdateEntriesS2C);
+                        }
+                    }
+
+                    // update local stats for player who crossed line
+                    if (player instanceof ServerPlayerEntity serverPlayer) {
+                        LeaderboardUpdatePersonalS2C leaderboardUpdatePersonalS2C = new LeaderboardUpdatePersonalS2C(
+                                player.getNameForScoreboard() + " (" + String.format("%02d", kart.getRaceNumber()) + ")",
+                                currentLapTime,
+                                bestLapTime,
+                                currentLap,
+                                this.settingLapCount
+                        );
+                        ServerPlayNetworking.send(serverPlayer, leaderboardUpdatePersonalS2C);
+                    }
+
+
+                }
+            }
 
             // and sync (notify writing to nbt)
             this.markDirty();
         }
     }
 
-    private void sendTimeAttackMessage(PlayerEntity player, int laps, long lapTime, long deltaTime, boolean newPB) {
-        // craft message
-        Formatting lapTimeFormat = (newPB) ? (Formatting.LIGHT_PURPLE) : (Formatting.WHITE);
-        Formatting deltaTimeFormat = (deltaTime > 0) ? (Formatting.RED) : (Formatting.GREEN);
-        char deltaTimePrefix = (deltaTime > 0) ? ('+') : ('-');
-        String lapTimeString = getFormattedLapTime(lapTime);
-        String deltaLapTimeString = getFormattedLapTime(Math.abs(deltaTime));
 
-        Text message = getPrefix()
-                .append(Text.literal("Lap " + laps + ": "))
+
+
+    private Text createTimeAttackMessage(String playerName, int currentLap, long lapTime, long deltaToPB, byte flagsPB) {
+
+        // formatting
+        Formatting lapTimeFormat = switch(flagsPB) {
+            case 1 -> Formatting.LIGHT_PURPLE;
+            case 2 -> Formatting.GREEN;
+            default -> Formatting.WHITE;
+        };
+        Formatting deltaTimeFormat = (deltaToPB > 0) ? (Formatting.RED) : (Formatting.GREEN);
+
+        // times to string
+        char deltaTimePrefix = (deltaToPB > 0) ? ('+') : ('-');
+        String lapTimeString = getFormattedLapTime(lapTime);
+        String deltaLapTimeString = getFormattedLapTime(Math.abs(deltaToPB));
+
+        // craft message
+        return getPrefix()
+                .append(Text.literal(playerName))
+                .append(Text.literal(", [Lap " + currentLap + "] : "))
                 .append(Text.literal(lapTimeString + " ").formatted(lapTimeFormat))
                 .append(Text.literal("(" + deltaTimePrefix + deltaLapTimeString + ")").formatted(deltaTimeFormat));
-
-        // send message
-        player.sendMessage(message);
     }
 
-    private void sendGrandPrixLapMessages(String playerName, int kartNr, int laps, long lapTime, long deltaToFirst, long deltaToNext, String nextPlayer, byte best) {
-        if(this.world == null) return;
-        // craft message
+    private Text createGrandPrixLapMessage(String playerName, int kartNr, int laps, long lapTime, byte flagsPB) {
 
-        Formatting lapTimeFormat = switch(best) {
+        // formatting
+        Formatting lapTimeFormat = switch(flagsPB) {
             case 1 -> Formatting.LIGHT_PURPLE;
             case 2 -> Formatting.GREEN;
             default -> Formatting.WHITE;
         };
 
+        // times to string
         String lapTimeString = getFormattedLapTime(lapTime);
-        MutableText message = getPrefix()
+
+        // craft message
+        return getPrefix()
                 .append(Text.literal(playerName + " (" + kartNr + ") completed [Lap " + laps + "]: ").formatted(Formatting.WHITE))
                 .append(Text.literal(lapTimeString).formatted(lapTimeFormat));
-
-        if(deltaToFirst > 0) {
-            String deltaLapTimeString = getFormattedLapTime(Math.abs(deltaToFirst));
-            message = message.append(Text.literal(" (▲ +" + deltaLapTimeString + " to #1)").formatted(Formatting.RED));
-        }
-
-        if(deltaToNext > 0) {
-            String deltaLapTimeString = getFormattedLapTime(Math.abs(deltaToNext));
-            message = message.append(Text.literal(" | (▲ +" + deltaLapTimeString + " to " + nextPlayer + ")").setStyle(Style.EMPTY.withColor(0xFF6A00)));
-        }
-
-
-        // send messages
-        for(UUID playerUuid : this.participantInfo.keySet()) {
-            PlayerEntity p = this.world.getPlayerByUuid(playerUuid);
-            if(p != null) p.sendMessage(message);
-        }
     }
 
-    private void sendGrandPrixPlacementMessages(String playerName, int kartNr, int placement, long best) {
-        if(this.world == null) return;
-        // craft message
+    private Text createGrandPrixPlacementMessage(String playerName, int kartNr, int placement, long best) {
+
+        // formatting
         int playerNameColor = TrackReport.getPlacementColor(placement);
+
+        // times to string
         String deltaLapTimeString = getFormattedLapTime(Math.abs(best));
 
-        Text message = getPrefix()
+        // craft message
+        return getPrefix()
                 .append(Text.literal(playerName + " (" + kartNr + ")").setStyle(Style.EMPTY.withColor(playerNameColor)))
                 .append(Text.literal(" placed ").formatted(Formatting.WHITE))
                 .append(Text.literal("#" + placement).setStyle(Style.EMPTY.withColor(playerNameColor)))
                 .append(Text.literal(" (" + deltaLapTimeString + ")").formatted(Formatting.AQUA));
-
-        // send messages
-        for(UUID uuid : this.participantInfo.keySet()) {
-            PlayerEntity p = this.world.getPlayerByUuid(uuid);
-            if(p != null) p.sendMessage(message);
-        }
     }
 
 
@@ -577,14 +702,20 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
             this.trackWidth = 0;
 
             this.hasStarted = false;
-            this.currentTopPlace = 1;
-            this.participantInfo.clear();
+            this.trackRecordLapTime = 0;
+            this.raceStartTimestamp = 0;
 
-            this.firstPlaceUuid = null;
-            this.followUpPlaceUuid = null;
-            this.highestLap = 0;
-            this.bestLapTime = 0;
-            this.raceStart = 0;
+
+            // broadcast race stopped to players => stops hud overlay
+            for(UUID uuid : this.participantInfo.keySet()) {
+                PlayerEntity p = this.world.getPlayerByUuid(uuid);
+                if(p instanceof ServerPlayerEntity serverPlayer) {
+                        LeaderboardResetS2C leaderboardResetS2C = new LeaderboardResetS2C();
+                        ServerPlayNetworking.send(serverPlayer, leaderboardResetS2C);
+                }
+            }
+            // and clear participants
+            this.participantInfo.clear();
 
             Text msg = getPrefix().append(Text.literal("Timer has stopped and reset. Ready to start again!").formatted(Formatting.GREEN));
             player.sendMessage(msg);
@@ -597,11 +728,11 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
     public void printTimeAttackTrackRecord(PlayerEntity player) {
         if(!this.participantInfo.containsKey(player.getUuid())) return;
 
-        TrackTimerKartStats stats = this.participantInfo.get(player.getUuid());
+        ParticipantInfo stats = this.participantInfo.get(player.getUuid());
         if(stats.best() <= 0) return;
         if(stats.laps() <= 0) return;
 
-        long duration = stats.timestamp() - this.raceStart;
+        long duration = stats.lastSeenTimestamp() - this.raceStartTimestamp;
 
         ItemStack trackReport = createTimeAttackItemStack(player, stats.best(), duration, stats.laps());
         if(trackReport != null) this.tryPrintingTrackReport(trackReport);
@@ -631,15 +762,11 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
 
         // race stats
         nbt.putBoolean("HasStarted", this.hasStarted);
-        nbt.putInt("CurrentTopPlace", this.currentTopPlace);
-        if(this.firstPlaceUuid != null) nbt.putUuid("FirstPlaceUuid", this.firstPlaceUuid);
-        if(this.followUpPlaceUuid != null) nbt.putUuid("FollowUpPlaceUuid", this.followUpPlaceUuid);
-        nbt.putInt("HighestLap", this.highestLap);
-        nbt.putLong("BestLapTime", this.bestLapTime);
-        nbt.putLong("RaceStart", this.raceStart);
+        nbt.putLong("TrackRecordLapTime", this.trackRecordLapTime);
+        nbt.putLong("RaceStartTimestamp", this.raceStartTimestamp);
 
         NbtList playerListTag = new NbtList();
-        for (Map.Entry<UUID, TrackTimerKartStats> entry : this.participantInfo.entrySet()) {
+        for (Map.Entry<UUID, ParticipantInfo> entry : this.participantInfo.entrySet()) {
             NbtCompound playerTag = new NbtCompound();
             playerTag.putUuid("KartUUID", entry.getKey());
             playerTag.put("Stats", entry.getValue().toNbt());
@@ -667,13 +794,9 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
 
         // race stats
         this.hasStarted = nbt.getBoolean("HasStarted");
-        this.currentTopPlace = nbt.getInt("CurrentTopPlace");
         this.trackWidth = nbt.getInt("TrackWidth");
-        if(nbt.contains("FirstPlaceUuid")) this.firstPlaceUuid = nbt.getUuid("FirstPlaceUuid");
-        if(nbt.contains("FollowUpPlaceUuid")) this.followUpPlaceUuid = nbt.getUuid("FollowUpPlaceUuid");
-        this.highestLap = nbt.getInt("HighestLap");
-        this.bestLapTime = nbt.getLong("BestLapTime");
-        this.raceStart = nbt.getLong("RaceStart");
+        this.trackRecordLapTime = nbt.getLong("TrackRecordLapTime");
+        this.raceStartTimestamp = nbt.getLong("RaceStartTimestamp");
 
         this.participantInfo.clear();
         if (nbt.contains("PlayerInfo", NbtElement.LIST_TYPE)) {
@@ -682,7 +805,7 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
                 NbtCompound playerTag = playerListTag.getCompound(i);
 
                 UUID uuid = playerTag.getUuid("KartUUID");
-                TrackTimerKartStats stats = TrackTimerKartStats.fromNbt(playerTag.getCompound("Stats"));
+                ParticipantInfo stats = ParticipantInfo.fromNbt(playerTag.getCompound("Stats"));
 
                 this.participantInfo.put(uuid, stats);
             }
