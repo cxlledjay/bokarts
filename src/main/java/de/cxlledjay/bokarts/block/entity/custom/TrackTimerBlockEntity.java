@@ -275,7 +275,7 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
                     // create leaderboard entries
                     List<LeaderboardEntry> leaderboardEntries = new ArrayList<>();
                     ParticipantInfo firstPlace = leaderboard.getFirst().getValue();
-                    for(Map.Entry<UUID, ParticipantInfo> entry : this.participantInfo.entrySet()) {
+                    for(Map.Entry<UUID, ParticipantInfo> entry : leaderboard) {
 
                         // get data
                         PlayerEntity p = this.world.getPlayerByUuid(entry.getKey());
@@ -309,7 +309,7 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
                                 delta,
                                 lapped,
                                 tires,
-                                entry.getValue().finished()
+                                me.finished()
                         ));
                     }
 
@@ -336,6 +336,7 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
                                 player.getNameForScoreboard() + " (" + String.format("%02d", kart.getRaceNumber()) + ")",
                                 currentLapTime,
                                 bestLapTime,
+                                bestLapTime == this.trackRecordLapTime,
                                 currentLap,
                                 this.settingLapCount
                         );
@@ -586,7 +587,7 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
     }
 
     // formatted time strings
-    private static String getFormattedLapTime(long lapTime) {
+    public static String getFormattedLapTime(long lapTime) {
 
         // convert to milliseconds
         long deltaMillis = lapTime * 50;

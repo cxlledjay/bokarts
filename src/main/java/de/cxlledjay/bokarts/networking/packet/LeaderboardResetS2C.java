@@ -1,6 +1,7 @@
 package de.cxlledjay.bokarts.networking.packet;
 
 import de.cxlledjay.bokarts.BoKarts;
+import de.cxlledjay.bokarts.hud.custom.gpleaderboard.LeaderboardHudOverlay;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.packet.CustomPayload;
@@ -30,9 +31,6 @@ public record LeaderboardResetS2C() implements CustomPayload {
 
 
     public static void receive(LeaderboardResetS2C payload, ClientPlayNetworking.Context ctx) {
-        ctx.client().execute(() -> {
-            // TODO: reset HUD
-            BoKarts.LOGGER.info("RESET F1 HUD");
-        });
+        ctx.client().execute(LeaderboardHudOverlay.LEADERBOARD_DATA::reset);
     }
 }

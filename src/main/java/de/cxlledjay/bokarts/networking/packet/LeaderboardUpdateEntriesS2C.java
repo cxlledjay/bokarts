@@ -2,6 +2,7 @@ package de.cxlledjay.bokarts.networking.packet;
 
 import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.block.entity.custom.race.LeaderboardEntry;
+import de.cxlledjay.bokarts.hud.custom.gpleaderboard.LeaderboardHudOverlay;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.packet.CustomPayload;
@@ -44,9 +45,6 @@ public record LeaderboardUpdateEntriesS2C(
 
 
     public static void receive(LeaderboardUpdateEntriesS2C payload, ClientPlayNetworking.Context ctx) {
-        ctx.client().execute(() -> {
-            // TODO: update HUD
-            BoKarts.LOGGER.info("Received LeaderboardUpdateEntriesS2C");
-        });
+        ctx.client().execute(() -> LeaderboardHudOverlay.LEADERBOARD_DATA.update(payload));
     }
 }
