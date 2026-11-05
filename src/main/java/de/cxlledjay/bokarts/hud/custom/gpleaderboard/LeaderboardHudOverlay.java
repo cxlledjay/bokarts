@@ -74,10 +74,10 @@ public class LeaderboardHudOverlay {
         currentY += 5;
 
         // lap times
-        context.drawTextWithShadow(client.textRenderer, Text.literal("best: ").formatted(Formatting.WHITE), PADDING, currentY, 0xFFFFFF);
+        context.drawTextWithShadow(client.textRenderer, Text.literal("best: ").formatted(Formatting.WHITE), LINE_SPACING, currentY, 0xFFFFFF);
         context.drawTextWithShadow(client.textRenderer, LEADERBOARD_DATA.myStats.best(), TOTAL_WIDTH / 2, currentY, 0xFFFFFF);
         currentY += LINE_SPACING;
-        context.drawTextWithShadow(client.textRenderer, Text.literal("last: ").formatted(Formatting.WHITE), PADDING, currentY, 0xFFFFFF);
+        context.drawTextWithShadow(client.textRenderer, Text.literal("last: ").formatted(Formatting.WHITE), LINE_SPACING, currentY, 0xFFFFFF);
         context.drawTextWithShadow(client.textRenderer, LEADERBOARD_DATA.myStats.last(), TOTAL_WIDTH / 2, currentY, 0xFFFFFF);
         currentY += 11;
 

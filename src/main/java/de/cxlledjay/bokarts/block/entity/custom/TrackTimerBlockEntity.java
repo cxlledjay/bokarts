@@ -292,7 +292,7 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
                         if(k != null) name += "(" + String.format("%02d", k.getRaceNumber()) + ")";
 
                         // distance to first
-                        long delta = firstPlace.lastSeenTimestamp() - me.lastSeenTimestamp();
+                        long delta = me.lastSeenTimestamp() - firstPlace.lastSeenTimestamp();
                         int lapDiff = firstPlace.laps() - me.laps();
                         boolean lapped = lapDiff > 0;
                         if(lapped) {
@@ -317,14 +317,14 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
                     // update each participant
                     for(UUID uuid : this.participantInfo.keySet()) {
                         PlayerEntity p = this.world.getPlayerByUuid(uuid);
-                        if(p == null) break;
+                        if(p == null) continue;
 
                         // send messages
                         p.sendMessage(msg);
                         if(msgFinished != null) p.sendMessage(msgFinished);
 
                         // update leaderboard
-                        if (player instanceof ServerPlayerEntity serverPlayer) {
+                        if (p instanceof ServerPlayerEntity serverPlayer) {
                             LeaderboardUpdateEntriesS2C leaderboardUpdateEntriesS2C = new LeaderboardUpdateEntriesS2C(leaderboardEntries);
                             ServerPlayNetworking.send(serverPlayer, leaderboardUpdateEntriesS2C);
                         }
