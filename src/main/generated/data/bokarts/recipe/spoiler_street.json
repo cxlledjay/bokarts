@@ -2,15 +2,15 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "B": {
-      "item": "minecraft:black_concrete"
-    },
     "C": {
       "item": "minecraft:chain"
+    },
+    "S": {
+      "item": "minecraft:polished_deepslate_slab"
     }
   },
   "pattern": [
-    "BBB",
+    "SSS",
     "C C"
   ],
   "result": {

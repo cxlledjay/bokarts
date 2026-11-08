@@ -3,19 +3,16 @@
   "category": "misc",
   "key": {
     "B": {
-      "item": "minecraft:coal_block"
+      "item": "bokarts:aero_race"
     },
     "C": {
-      "item": "minecraft:chain"
-    },
-    "I": {
-      "item": "minecraft:iron_bars"
+      "item": "minecraft:coal"
     }
   },
   "pattern": [
-    "CIC",
+    "CCC",
     "CBC",
-    "BBB"
+    "CCC"
   ],
   "result": {
     "count": 1,

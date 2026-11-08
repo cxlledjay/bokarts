@@ -3,15 +3,16 @@
   "category": "misc",
   "key": {
     "B": {
-      "item": "minecraft:coal_block"
+      "item": "bokarts:spoiler_street"
     },
     "C": {
-      "item": "minecraft:chain"
+      "item": "minecraft:coal"
     }
   },
   "pattern": [
-    "BBB",
-    "C C"
+    "CCC",
+    "CBC",
+    "CCC"
   ],
   "result": {
     "count": 1,

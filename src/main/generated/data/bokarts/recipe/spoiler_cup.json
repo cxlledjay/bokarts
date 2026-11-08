@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "minecraft:polished_deepslate_stairs"
+    },
+    "C": {
+      "item": "minecraft:chain"
+    },
+    "S": {
+      "item": "minecraft:polished_deepslate_slab"
+    }
+  },
+  "pattern": [
+    "BSB",
+    "BSB",
+    "C C"
+  ],
+  "result": {
+    "count": 1,
+    "id": "bokarts:spoiler_cup"
+  }
+}

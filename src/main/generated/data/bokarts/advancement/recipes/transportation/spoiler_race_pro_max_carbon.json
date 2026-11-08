@@ -1,31 +1,21 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_chain": {
+    "has_coal": {
       "conditions": {
         "items": [
           {
-            "items": "minecraft:chain"
+            "items": "minecraft:coal"
           }
         ]
       },
       "trigger": "minecraft:inventory_changed"
     },
-    "has_coal_block": {
+    "has_spoiler_race_pro_max": {
       "conditions": {
         "items": [
           {
-            "items": "minecraft:coal_block"
-          }
-        ]
-      },
-      "trigger": "minecraft:inventory_changed"
-    },
-    "has_diamond": {
-      "conditions": {
-        "items": [
-          {
-            "items": "minecraft:diamond"
+            "items": "bokarts:spoiler_race_pro_max"
           }
         ]
       },
@@ -41,9 +31,8 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_coal_block",
-      "has_chain",
-      "has_diamond"
+      "has_spoiler_race_pro_max",
+      "has_coal"
     ]
   ],
   "rewards": {

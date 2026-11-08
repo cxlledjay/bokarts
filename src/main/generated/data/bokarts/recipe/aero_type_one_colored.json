@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "bokarts:aero_type_one"
+    },
+    "D": {
+      "item": "bokarts:dye_mix"
+    },
+    "P": {
+      "item": "minecraft:paper"
+    }
+  },
+  "pattern": [
+    "PPP",
+    "DBD",
+    "PPP"
+  ],
+  "result": {
+    "count": 1,
+    "id": "bokarts:aero_type_one_colored"
+  }
+}

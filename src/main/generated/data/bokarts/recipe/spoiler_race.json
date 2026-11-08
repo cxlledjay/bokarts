@@ -3,15 +3,17 @@
   "category": "misc",
   "key": {
     "B": {
-      "item": "minecraft:black_concrete"
+      "item": "minecraft:polished_deepslate_stairs"
     },
     "C": {
       "item": "minecraft:chain"
+    },
+    "S": {
+      "item": "minecraft:polished_deepslate_slab"
     }
   },
   "pattern": [
-    "BBB",
-    "BBB",
+    "BSB",
     "C C"
   ],
   "result": {

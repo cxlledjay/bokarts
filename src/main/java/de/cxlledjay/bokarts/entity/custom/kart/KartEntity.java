@@ -24,17 +24,12 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
-import net.minecraft.entity.mob.WaterCreatureEntity;
-import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.FluidState;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.StopSoundS2CPacket;
 import net.minecraft.predicate.entity.EntityPredicates;
-import net.minecraft.registry.tag.EntityTypeTags;
 import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -200,11 +195,11 @@ public class KartEntity extends Entity implements RideableInventory{
         } else {
             // smoothly sync
             this.setPosition(
-                    this.getX() + (x - this.getX()) * 0.3,
-                    this.getY() + (y - this.getY()) * 0.3,
-                    this.getZ() + (z - this.getZ()) * 0.3
+                    this.getX() + (x - this.getX()) * 0.1,
+                    this.getY() + (y - this.getY()) * 0.1,
+                    this.getZ() + (z - this.getZ()) * 0.1
             );
-            this.setYaw(this.getYaw() + MathHelper.wrapDegrees(yaw - this.getYaw()) * 0.3f);
+            this.setYaw(this.getYaw() + MathHelper.wrapDegrees(yaw - this.getYaw()) * 0.1f);
         }
     }
 
@@ -700,12 +695,12 @@ public class KartEntity extends Entity implements RideableInventory{
         return blockState.isIn(ModTags.Blocks.DRIVABLE_BLOCKS);
     }
 
-    private boolean isDrivableBlockSlowed15(BlockState blockState) {
-        return blockState.isIn(ModTags.Blocks.DRIVABLE_BLOCKS_SLOWED15);
+    private boolean isDrivableBlockCurb(BlockState blockState) {
+        return blockState.isIn(ModTags.Blocks.DRIVABLE_BLOCKS_CURB);
     }
 
-    private boolean isDrivableBlockSlowed67(BlockState blockState) {
-        return blockState.isIn(ModTags.Blocks.DRIVABLE_BLOCKS_SLOWED67);
+    private boolean isDrivableBlockOfftrack(BlockState blockState) {
+        return blockState.isIn(ModTags.Blocks.DRIVEABLE_BLOCKS_OFFTRACK);
     }
 
 
@@ -726,9 +721,9 @@ public class KartEntity extends Entity implements RideableInventory{
                 // on drivable block (street)
                 if(isDrivableBlock(groundBlock)) penaltyMultiplier = 0.0f;
                 // on drivable block slowed (curb)
-                else if(isDrivableBlockSlowed15(groundBlock)) penaltyMultiplier = 0.15f;
+                else if(isDrivableBlockCurb(groundBlock)) penaltyMultiplier = 0.1f;
                 // on drivable block slowed (curb)
-                else if(isDrivableBlockSlowed67(groundBlock)) penaltyMultiplier = 0.67f;
+                else if(isDrivableBlockOfftrack(groundBlock)) penaltyMultiplier = 0.5f;
 
 
                 appliedFriction = this.wheelFriction + this.frictionPenalty * penaltyMultiplier;
@@ -1166,7 +1161,11 @@ public class KartEntity extends Entity implements RideableInventory{
     }
 
     // horn
-    public void playHornSound() {
+    public void playHornSound(ServerPlayerEntity player) {
+
+        // only driver can honk
+        if(this.getControllingPassenger() != player) return;
+
         if(this.currentHornTicks != 0) return; // on cooldown
         this.currentHornTicks = HORN_COOLDOWN; // set cooldown
 
@@ -1185,6 +1184,9 @@ public class KartEntity extends Entity implements RideableInventory{
     }
 
     public void cycleHornSound(ServerPlayerEntity player, int direction) {
+
+        // only driver can change horn
+        if(this.getControllingPassenger() != player) return;
 
         // calculate HornSound
         HornType newHorn;
@@ -1217,6 +1219,9 @@ public class KartEntity extends Entity implements RideableInventory{
     @Override
     public void openInventory(PlayerEntity player) {
         if(!this.getWorld().isClient) {
+
+            // kart inventory only openable by driver
+            if(this.getControllingPassenger() != player) return; // idea for v1.2: open inventory upgrade, if equipped
 
             Text kartName = this.getCustomName();
             if(kartName == null || kartName.equals(Text.translatable("item.bokarts.kart_item"))) {

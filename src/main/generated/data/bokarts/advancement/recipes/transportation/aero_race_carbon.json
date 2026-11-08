@@ -1,31 +1,21 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_chain": {
+    "has_aero_race": {
       "conditions": {
         "items": [
           {
-            "items": "minecraft:chain"
+            "items": "bokarts:aero_race"
           }
         ]
       },
       "trigger": "minecraft:inventory_changed"
     },
-    "has_coal_block": {
+    "has_coal": {
       "conditions": {
         "items": [
           {
-            "items": "minecraft:coal_block"
-          }
-        ]
-      },
-      "trigger": "minecraft:inventory_changed"
-    },
-    "has_iron_bars": {
-      "conditions": {
-        "items": [
-          {
-            "items": "minecraft:iron_bars"
+            "items": "minecraft:coal"
           }
         ]
       },
@@ -41,9 +31,8 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_iron_bars",
-      "has_coal_block",
-      "has_chain"
+      "has_aero_race",
+      "has_coal"
     ]
   ],
   "rewards": {

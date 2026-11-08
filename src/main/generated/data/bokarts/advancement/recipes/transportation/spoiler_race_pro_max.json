@@ -1,16 +1,6 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_black_concrete": {
-      "conditions": {
-        "items": [
-          {
-            "items": "minecraft:black_concrete"
-          }
-        ]
-      },
-      "trigger": "minecraft:inventory_changed"
-    },
     "has_chain": {
       "conditions": {
         "items": [
@@ -21,11 +11,11 @@
       },
       "trigger": "minecraft:inventory_changed"
     },
-    "has_diamond": {
+    "has_polished_deepslate_slab": {
       "conditions": {
         "items": [
           {
-            "items": "minecraft:diamond"
+            "items": "minecraft:polished_deepslate_slab"
           }
         ]
       },
@@ -41,9 +31,8 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_black_concrete",
-      "has_chain",
-      "has_diamond"
+      "has_polished_deepslate_slab",
+      "has_chain"
     ]
   ],
   "rewards": {

@@ -3,19 +3,16 @@
   "category": "misc",
   "key": {
     "B": {
-      "item": "minecraft:coal_block"
+      "item": "bokarts:spoiler_race_pro_max"
     },
     "C": {
-      "item": "minecraft:chain"
-    },
-    "D": {
-      "item": "minecraft:diamond"
+      "item": "minecraft:coal"
     }
   },
   "pattern": [
-    "BBB",
-    "DDD",
-    "C C"
+    "CCC",
+    "CBC",
+    "CCC"
   ],
   "result": {
     "count": 1,
