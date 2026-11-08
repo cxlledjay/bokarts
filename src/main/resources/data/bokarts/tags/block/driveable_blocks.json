@@ -1,8 +1,6 @@
 {
   "replace": false,
   "values": [
-    "minecraft:air",
-
     "minecraft:gray_concrete_powder",
 
     "minecraft:blackstone",

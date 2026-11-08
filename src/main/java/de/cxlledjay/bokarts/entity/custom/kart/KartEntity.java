@@ -733,8 +733,9 @@ public class KartEntity extends Entity implements RideableInventory{
             gravity = -7.0E-4;
             appliedFriction = Math.min(0.8f, this.wheelFriction + this.frictionPenalty * 2);
         } else {
-            // in air => a bit more friction
-            appliedFriction = this.wheelFriction * 1.25f;
+            // in air
+            appliedFriction = this.wheelFriction;
+            gravity *= 1.5;
         }
 
 
