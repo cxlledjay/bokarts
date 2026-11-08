@@ -29,7 +29,7 @@ public class LeaderboardHudOverlay {
     public static void render(DrawContext context, RenderTickCounter tickCounter) {
 
         // do nothing if no leaderboard is active
-        if(!BoKartsConfig.enableKartHud) return;
+        if(!BoKartsConfig.enableLeaderboard) return;
 
         if(!LEADERBOARD_DATA.isActive()) return;
         if(LEADERBOARD_DATA.myStats == null || LEADERBOARD_DATA.playerStats == null) return;

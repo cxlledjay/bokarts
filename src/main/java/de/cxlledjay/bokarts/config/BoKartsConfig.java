@@ -11,25 +11,25 @@ public class BoKartsConfig extends MidnightConfig {
 
     // HUD SETTINGS
 
-    @Comment(category = "client", centered = true)
+    @Comment(category = "hud", centered = true)
     public static Comment headingHud;
 
-    @Entry(category = "client")
+    @Entry(category = "hud")
     public static boolean enableKartHud = false;
 
-    @Entry(category = "client", min = 0.1f, max = 2.0f, isSlider = true)
+    @Entry(category = "hud", min = 0.1f, max = 2.0f, isSlider = true)
     public static float kartHudScale = 1.0f;
 
-    @Entry(category = "client")
+    @Entry(category = "hud")
     public static int kartHudPadding = 10;
 
-    @Entry(category = "client", min = 0.1f, max = 1.0f, isSlider = true)
+    @Entry(category = "hud", min = 0.1f, max = 1.0f, isSlider = true)
     public static float kartHudTransparency = 0.8f;
 
-    @Entry(category = "client", isColor = true)
+    @Entry(category = "hud", isColor = true)
     public static String kartHudTextColor = "#54B3F2";
 
-    @Entry(category = "client")
+    @Entry(category = "hud")
     public static KartSpeedUnit kartHudSpeedUnit = KartSpeedUnit.BLOCKS_PER_SECOND;
 
     public enum KartSpeedUnit {
@@ -40,6 +40,9 @@ public class BoKartsConfig extends MidnightConfig {
 
 
 
+
+    @Comment(category = "race", centered = true)
+    public static Comment headingLeaderboard;
 
     @Entry(category = "race")
     public static boolean enableLeaderboard = false;
@@ -53,10 +56,10 @@ public class BoKartsConfig extends MidnightConfig {
 
     // sounds
 
-    @Comment(category = "client", centered = true)
+    @Comment(category = "sounds", centered = true)
     public static Comment headingSounds;
 
-    @Entry(category = "client", min = 0.0f, max = 1.0f, isSlider = true)
+    @Entry(category = "sounds", min = 0.0f, max = 1.0f, isSlider = true)
     public static float hornPreviewVolume = 0.75f;
 
 

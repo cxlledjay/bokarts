@@ -131,8 +131,10 @@
 
 
 
-  "bokarts.midnightconfig.category.server": "Server Settings",
-  "bokarts.midnightconfig.category.client": "Client Settings",
+  "bokarts.midnightconfig.category.hud": "Kart HUD",
+  "bokarts.midnightconfig.category.race": "Race",
+  "bokarts.midnightconfig.category.sounds": "Sound",
+  "bokarts.midnightconfig.category.server": "Server Only",
 
   "bokarts.midnightconfig.headingHud": "Kart HUD Settings",
 
@@ -147,6 +149,13 @@
   "bokarts.midnightconfig.enum.KartSpeedUnit.BLOCKS_PER_SECOND": "Blocks per Second (bps)",
   "bokarts.midnightconfig.enum.KartSpeedUnit.KILOMETRES_PER_HOUR": "Kilometers per Hour (kph)",
   "bokarts.midnightconfig.enum.KartSpeedUnit.BURGERS_PER_FREEDOM": "Burgers per Freedom (mph)",
+
+  "bokarts.midnightconfig.headingLeaderboard": "Kart Race Leaderboard Settings",
+
+  "bokarts.midnightconfig.enableLeaderboard": "Enable Leaderboard",
+  "bokarts.midnightconfig.displayOnLeft": "Display on Left Side",
+  "bokarts.midnightconfig.leaderboardScale": "Scale",
+
 
   "bokarts.midnightconfig.headingSounds": "Sound Settings",
   "bokarts.midnightconfig.hornPreviewVolume": "Horn preview volume",
