@@ -88,25 +88,25 @@ public class ModItems {
 
 
     // backwards compatability code
-    public static final Item KART_DEFAULT    = registerItem("kart/default",         new LegacyKartItemConverter(new Item.Settings(), ModItems.KART_ITEM));
-    public static final Item KART_WHITE      = registerItem("kart/white",           new LegacyKartItemConverter(new Item.Settings(), ModItems.KART_ITEM));
-    public static final Item KART_ORANGE     = registerItem("kart/orange",          new LegacyKartItemConverter(new Item.Settings(), ModItems.KART_ITEM));
-    public static final Item KART_MAGENTA    = registerItem("kart/magenta",         new LegacyKartItemConverter(new Item.Settings(), ModItems.KART_ITEM));
-    public static final Item KART_LIGHT_BLUE = registerItem("kart/light_blue",      new LegacyKartItemConverter(new Item.Settings(), ModItems.KART_ITEM));
-    public static final Item KART_YELLOW     = registerItem("kart/yellow",          new LegacyKartItemConverter(new Item.Settings(), ModItems.KART_ITEM));
-    public static final Item KART_LIME       = registerItem("kart/lime",            new LegacyKartItemConverter(new Item.Settings(), ModItems.KART_ITEM));
-    public static final Item KART_PINK       = registerItem("kart/pink",            new LegacyKartItemConverter(new Item.Settings(), ModItems.KART_ITEM));
-    public static final Item KART_GRAY       = registerItem("kart/gray",            new LegacyKartItemConverter(new Item.Settings(), ModItems.KART_ITEM));
-    public static final Item KART_LIGHT_GRAY = registerItem("kart/light_gray",      new LegacyKartItemConverter(new Item.Settings(), ModItems.KART_ITEM));
-    public static final Item KART_CYAN       = registerItem("kart/cyan",            new LegacyKartItemConverter(new Item.Settings(), ModItems.KART_ITEM));
-    public static final Item KART_PURPLE     = registerItem("kart/purple",          new LegacyKartItemConverter(new Item.Settings(), ModItems.KART_ITEM));
-    public static final Item KART_BLUE       = registerItem("kart/blue",            new LegacyKartItemConverter(new Item.Settings(), ModItems.KART_ITEM));
-    public static final Item KART_BROWN      = registerItem("kart/brown",           new LegacyKartItemConverter(new Item.Settings(), ModItems.KART_ITEM));
-    public static final Item KART_GREEN      = registerItem("kart/green",           new LegacyKartItemConverter(new Item.Settings(), ModItems.KART_ITEM));
-    public static final Item KART_RED        = registerItem("kart/red",             new LegacyKartItemConverter(new Item.Settings(), ModItems.KART_ITEM));
-    public static final Item KART_BLACK      = registerItem("kart/black",           new LegacyKartItemConverter(new Item.Settings(), ModItems.KART_ITEM));
-    public static final Item KART_PURPLE_GOLD = registerItem("kart/purple_gold",    new LegacyKartItemConverter(new Item.Settings(), ModItems.KART_ITEM));
-    public static final Item KART_FADE        = registerItem("kart/fade",           new LegacyKartItemConverter(new Item.Settings(), ModItems.KART_ITEM));
+    public static final Item KART_DEFAULT     = registerItem("kart/default",      new LegacyKartItemConverter(new Item.Settings(), ModItems.KART_ITEM, "default"));
+    public static final Item KART_WHITE       = registerItem("kart/white",        new LegacyKartItemConverter(new Item.Settings(), ModItems.KART_ITEM, "white"));
+    public static final Item KART_ORANGE      = registerItem("kart/orange",       new LegacyKartItemConverter(new Item.Settings(), ModItems.KART_ITEM, "orange"));
+    public static final Item KART_MAGENTA     = registerItem("kart/magenta",      new LegacyKartItemConverter(new Item.Settings(), ModItems.KART_ITEM, "magenta"));
+    public static final Item KART_LIGHT_BLUE  = registerItem("kart/light_blue",   new LegacyKartItemConverter(new Item.Settings(), ModItems.KART_ITEM, "light_blue"));
+    public static final Item KART_YELLOW      = registerItem("kart/yellow",       new LegacyKartItemConverter(new Item.Settings(), ModItems.KART_ITEM, "yellow"));
+    public static final Item KART_LIME        = registerItem("kart/lime",         new LegacyKartItemConverter(new Item.Settings(), ModItems.KART_ITEM, "lime"));
+    public static final Item KART_PINK        = registerItem("kart/pink",         new LegacyKartItemConverter(new Item.Settings(), ModItems.KART_ITEM, "pink"));
+    public static final Item KART_GRAY        = registerItem("kart/gray",         new LegacyKartItemConverter(new Item.Settings(), ModItems.KART_ITEM, "gray"));
+    public static final Item KART_LIGHT_GRAY  = registerItem("kart/light_gray",   new LegacyKartItemConverter(new Item.Settings(), ModItems.KART_ITEM, "light_gray"));
+    public static final Item KART_CYAN        = registerItem("kart/cyan",         new LegacyKartItemConverter(new Item.Settings(), ModItems.KART_ITEM, "cyan"));
+    public static final Item KART_PURPLE      = registerItem("kart/purple",       new LegacyKartItemConverter(new Item.Settings(), ModItems.KART_ITEM, "purple"));
+    public static final Item KART_BLUE        = registerItem("kart/blue",         new LegacyKartItemConverter(new Item.Settings(), ModItems.KART_ITEM, "blue"));
+    public static final Item KART_BROWN       = registerItem("kart/brown",        new LegacyKartItemConverter(new Item.Settings(), ModItems.KART_ITEM, "brown"));
+    public static final Item KART_GREEN       = registerItem("kart/green",        new LegacyKartItemConverter(new Item.Settings(), ModItems.KART_ITEM, "green"));
+    public static final Item KART_RED         = registerItem("kart/red",          new LegacyKartItemConverter(new Item.Settings(), ModItems.KART_ITEM, "red"));
+    public static final Item KART_BLACK       = registerItem("kart/black",        new LegacyKartItemConverter(new Item.Settings(), ModItems.KART_ITEM, "black"));
+    public static final Item KART_PURPLE_GOLD = registerItem("kart/purple_gold",  new LegacyKartItemConverter(new Item.Settings(), ModItems.KART_ITEM, "purple_gold"));
+    public static final Item KART_FADE        = registerItem("kart/fade",         new LegacyKartItemConverter(new Item.Settings(), ModItems.KART_ITEM, "fade"));
 
 
 
