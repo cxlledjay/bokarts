@@ -36,7 +36,12 @@ public class LeaderboardData {
         Text name = Text.literal(packet.name()).formatted(Formatting.YELLOW).formatted(Formatting.BOLD);
         Text best = Text.literal(TrackTimerBlockEntity.getFormattedLapTime(packet.best())).formatted(bestFormat);
         Text last = Text.literal(TrackTimerBlockEntity.getFormattedLapTime(packet.last())).formatted(lastFormat);
-        Text lapInfo = Text.literal("LAP " + packet.currentLap() + "/" + packet.totalLaps()).formatted(Formatting.WHITE).formatted(Formatting.BOLD);
+        Text lapInfo = Text.literal("LAP " + (packet.currentLap() + 1) + "/" + packet.totalLaps()).formatted(Formatting.WHITE).formatted(Formatting.BOLD);
+
+        // special init format
+        if(packet.best() == -1) best = Text.literal("--:--.---").formatted(Formatting.WHITE);
+        if(packet.last() == -1) last = Text.literal("--:--.---").formatted(Formatting.WHITE);
+        if(packet.currentLap() >= packet.totalLaps()) lapInfo = Text.literal("FINISHED").formatted(Formatting.WHITE).formatted(Formatting.BOLD);
 
         // save
         this.myStats = new PersonalStats(name, best, last, lapInfo);
@@ -55,7 +60,7 @@ public class LeaderboardData {
             Text delta = Text.literal("+" + TrackTimerBlockEntity.getFormattedLapTime(e.delta())).formatted(Formatting.RED);
 
             // different deltas
-            if (e.finished()) delta = Text.literal("Fin").formatted(Formatting.GRAY);
+            if (e.finished()) delta = Text.literal("Finished").formatted(Formatting.GRAY);
             else if (i == 0) delta = Text.literal("Leader").formatted(Formatting.WHITE);
             else if (e.lapped() && e.delta() == 1)  delta = Text.literal("+" + e.delta() + " LAP").formatted(Formatting.DARK_RED);
             else if (e.lapped() && e.delta() > 1)  delta = Text.literal("+" + e.delta() + " LAPS").formatted(Formatting.DARK_RED);

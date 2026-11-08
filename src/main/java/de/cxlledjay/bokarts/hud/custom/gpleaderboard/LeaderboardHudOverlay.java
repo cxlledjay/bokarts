@@ -14,7 +14,7 @@ public class LeaderboardHudOverlay {
 
     public static final LeaderboardData LEADERBOARD_DATA = new LeaderboardData();
 
-    private static final int TOTAL_WIDTH = 120;
+    private static final int TOTAL_WIDTH = 140;
     private static final int TOTAL_HEIGHT_TOP = 58;
 
     private static final int LINE_SPACING = 10;
@@ -48,14 +48,26 @@ public class LeaderboardHudOverlay {
         int screenHeight = context.getScaledWindowHeight();
         int currentY = PADDING;
 
+        int playerStatsSize = Math.min(screenHeight / 2 , LEADERBOARD_DATA.playerStats.size() * LINE_SPACING + LINE_SPACING);
+        int leaderboardTotalHeight = TOTAL_HEIGHT_TOP + PADDING + playerStatsSize;
+
+        float actualRenderedWidth = TOTAL_WIDTH * scale;
+        float actualRenderedHeight = leaderboardTotalHeight * scale;
+
         // colors
         int underscoreColor = 0x5FFFFFFF;
 
 
 
+
+
+
         // push to new layer for scaling
         context.getMatrices().push();
-        context.getMatrices().translate(PADDING, (float) screenHeight / 3, 0);
+        context.getMatrices().translate(
+                (BoKartsConfig.displayOnLeft) ? (PADDING) : (screenWidth - (actualRenderedWidth + PADDING)),
+                (((float) screenHeight / 2) - (actualRenderedHeight / 2)),
+                0);
         context.getMatrices().scale(scale, scale, 1);
 
 
@@ -74,11 +86,13 @@ public class LeaderboardHudOverlay {
         currentY += 5;
 
         // lap times
-        context.drawTextWithShadow(client.textRenderer, Text.literal("best: ").formatted(Formatting.WHITE), LINE_SPACING, currentY, 0xFFFFFF);
-        context.drawTextWithShadow(client.textRenderer, LEADERBOARD_DATA.myStats.best(), TOTAL_WIDTH / 2, currentY, 0xFFFFFF);
+        int rightAlignedBestX = TOTAL_WIDTH - PADDING - (client.textRenderer.getWidth(LEADERBOARD_DATA.myStats.best()));
+        context.drawTextWithShadow(client.textRenderer, Text.literal("best: ").formatted(Formatting.WHITE), PADDING, currentY, 0xFFFFFF);
+        context.drawTextWithShadow(client.textRenderer, LEADERBOARD_DATA.myStats.best(), rightAlignedBestX, currentY, 0xFFFFFF);
         currentY += LINE_SPACING;
-        context.drawTextWithShadow(client.textRenderer, Text.literal("last: ").formatted(Formatting.WHITE), LINE_SPACING, currentY, 0xFFFFFF);
-        context.drawTextWithShadow(client.textRenderer, LEADERBOARD_DATA.myStats.last(), TOTAL_WIDTH / 2, currentY, 0xFFFFFF);
+        int rightAlignedLastX = TOTAL_WIDTH - PADDING - (client.textRenderer.getWidth(LEADERBOARD_DATA.myStats.last()));
+        context.drawTextWithShadow(client.textRenderer, Text.literal("last: ").formatted(Formatting.WHITE), PADDING, currentY, 0xFFFFFF);
+        context.drawTextWithShadow(client.textRenderer, LEADERBOARD_DATA.myStats.last(), rightAlignedLastX, currentY, 0xFFFFFF);
         currentY += 11;
 
         // underscore
@@ -93,10 +107,9 @@ public class LeaderboardHudOverlay {
 
         // -------------------- player stats rendering --------------------
 
-        int playerStatsSize = Math.min(screenHeight / 2 , LEADERBOARD_DATA.playerStats.size() * LINE_SPACING + LINE_SPACING);
-
         // background
-        context.fill(0, currentY, TOTAL_WIDTH, currentY + playerStatsSize, 0x80000000);
+        context.fill(0, currentY, TOTAL_WIDTH - 19, currentY + playerStatsSize, 0x80000000);
+        context.fill(TOTAL_WIDTH - 20, currentY, TOTAL_WIDTH, currentY + playerStatsSize, 0xA0000000);
         currentY += 6;
 
         // print player info
@@ -108,9 +121,9 @@ public class LeaderboardHudOverlay {
             // current place
             Text place = Text.literal(String.valueOf(i + 1)).formatted(Formatting.WHITE);
             context.drawTextWithShadow(client.textRenderer, place, PADDING, currentY, 0xFFFFFF);
-            context.drawTextWithShadow(client.textRenderer, currentStat.name(), TOTAL_WIDTH / 8, currentY, 0xFFFFFF);
-            context.drawTextWithShadow(client.textRenderer, currentStat.delta(), TOTAL_WIDTH / 2, currentY, 0xFFFFFF);
-            context.drawTextWithShadow(client.textRenderer, currentStat.tires(), TOTAL_WIDTH * 8 / 9, currentY, 0xFFFFFF);
+            context.drawTextWithShadow(client.textRenderer, currentStat.name(), 15, currentY, 0xFFFFFF);
+            context.drawTextWithShadow(client.textRenderer, currentStat.delta(), 60, currentY, 0xFFFFFF);
+            context.drawTextWithShadow(client.textRenderer, currentStat.tires(), 125, currentY, 0xFFFFFF);
 
             // space text
             currentY += LINE_SPACING;

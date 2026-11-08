@@ -44,6 +44,9 @@ public class BoKartsConfig extends MidnightConfig {
     @Entry(category = "race")
     public static boolean enableLeaderboard = false;
 
+    @Entry(category = "race")
+    public static boolean displayOnLeft = true;
+
     @Entry(category = "race", min = 0.1f, max = 2.0f, isSlider = true)
     public static float leaderboardScale = 1.0f;
 

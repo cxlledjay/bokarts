@@ -82,6 +82,9 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
     private Direction drivingDirection = Direction.NORTH;
     private final Map<UUID, Vec3d> previousKartPosition = new HashMap<>();
 
+    // dynamic leaderboard calculation
+    private List<Map.Entry<UUID, ParticipantInfo>> dynamic_leaderboard = new ArrayList<>();
+
 
 
 
@@ -130,10 +133,27 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
             msg = getPrefix().append(Text.literal("Time tracking started!").formatted(Formatting.WHITE));
         } else if(this.settingCurrentMode == TrackTimerMode.GRAND_PRIX) {
             msg = getPrefix().append(Text.literal("Race tracking started! Remaining Laps: " + this.settingLapCount).formatted(Formatting.WHITE));
-            // reset / init leaderboard for player
+
             if (player instanceof ServerPlayerEntity serverPlayer) {
+
+                // reset leaderboard
                 LeaderboardResetS2C leaderboardResetS2C = new LeaderboardResetS2C();
                 ServerPlayNetworking.send(serverPlayer, leaderboardResetS2C);
+
+                // init personal data
+                LeaderboardUpdatePersonalS2C leaderboardUpdatePersonalS2C = new LeaderboardUpdatePersonalS2C(
+                        player.getNameForScoreboard() + " (" + String.format("%02d", kart.getRaceNumber()) + ")",
+                        -1,
+                        -1,
+                        false,
+                        0,
+                        this.settingLapCount
+                );
+                ServerPlayNetworking.send(serverPlayer, leaderboardUpdatePersonalS2C);
+
+                // init leaderboard data
+                this.calculateLeaderboard();
+                this.broadcastLeaderboardUpdate();
             }
         }
         if(msg != null) player.sendMessage(msg);
@@ -141,6 +161,95 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
         // and sync (notify writing to nbt)
         this.markDirty();
     }
+
+
+    // ----- leaderboard calculation -----
+    private void calculateLeaderboard() {
+
+        // create new list
+        this.dynamic_leaderboard = new ArrayList<>(this.participantInfo.entrySet());
+
+        // sort the leaderboard
+        this.dynamic_leaderboard.sort((entry1, entry2) -> {
+            ParticipantInfo stats1 = entry1.getValue();
+            ParticipantInfo stats2 = entry2.getValue();
+
+            // 1) compare hasFinished (descending)
+            int finishedCompare = Boolean.compare(stats2.finished(), stats1.finished());
+            if (finishedCompare != 0) {
+                return finishedCompare;
+            }
+
+            // 2) compare laps (descending)
+            int lapsCompare = Integer.compare(stats2.laps(), stats1.laps());
+            if (lapsCompare != 0) {
+                return lapsCompare;
+            }
+
+            // 3) compare timestamps (ascending)
+            return Long.compare(stats1.lastSeenTimestamp(), stats2.lastSeenTimestamp());
+        });
+    }
+
+    private void broadcastLeaderboardUpdate() {
+
+        // create leaderboard entries
+        List<LeaderboardEntry> leaderboardEntries = new ArrayList<>();
+        ParticipantInfo firstPlace = this.dynamic_leaderboard.getFirst().getValue();
+        for(Map.Entry<UUID, ParticipantInfo> entry : this.dynamic_leaderboard) {
+
+            // get data
+            PlayerEntity p = this.world.getPlayerByUuid(entry.getKey());
+            ParticipantInfo me =  entry.getValue();
+            KartEntity k = null;
+            if(p != null && p.hasVehicle() && p.getVehicle() instanceof KartEntity) {
+                k =  (KartEntity) p.getVehicle();
+            }
+
+            // display name in format: ABC(12). ABC from the player name (first 3 letters) plus kart nr
+            String name = "N/A(--)";
+            if(p != null) name = p.getNameForScoreboard().toUpperCase(Locale.ROOT)
+                    .substring(0, Math.min(p.getNameForScoreboard().toUpperCase(Locale.ROOT).length(), 3));
+            if(k != null) name += "(" + String.format("%02d", k.getRaceNumber()) + ")";
+
+            // distance to first
+            long delta = me.lastSeenTimestamp() - firstPlace.lastSeenTimestamp();
+            int lapDiff = firstPlace.laps() - me.laps();
+            boolean lapped = lapDiff > 0;
+            if(lapped) {
+                delta = lapDiff;
+            }
+
+            // tires
+            String tires = "/";
+            if(k != null) tires = k.getWheelType().getShortForm();
+
+            // create entry
+            leaderboardEntries.add(new LeaderboardEntry(
+                    name,
+                    delta,
+                    lapped,
+                    tires,
+                    me.finished()
+            ));
+        }
+
+
+        // update each participant
+        for(UUID uuid : this.participantInfo.keySet()) {
+            PlayerEntity p = this.world.getPlayerByUuid(uuid);
+            if(p == null) continue;
+
+            // update leaderboard
+            if (p instanceof ServerPlayerEntity serverPlayer) {
+                LeaderboardUpdateEntriesS2C leaderboardUpdateEntriesS2C = new LeaderboardUpdateEntriesS2C(leaderboardEntries);
+                ServerPlayNetworking.send(serverPlayer, leaderboardUpdateEntriesS2C);
+            }
+        }
+
+    }
+
+
 
 
     private void handleLineCrossing(KartEntity kart, long timestamp) {
@@ -189,31 +298,8 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
             this.participantInfo.put(playerUuid, updatedStats);
 
 
-            // ----- leaderboard calculation -----
-
-            // dynamic calculated leaderboard
-            List<Map.Entry<UUID, ParticipantInfo>> leaderboard = new ArrayList<>(this.participantInfo.entrySet());
-
-            // sort the leaderboard
-            leaderboard.sort((entry1, entry2) -> {
-                ParticipantInfo stats1 = entry1.getValue();
-                ParticipantInfo stats2 = entry2.getValue();
-
-                // 1) compare hasFinished (descending)
-                int finishedCompare = Boolean.compare(stats2.finished(), stats1.finished());
-                if (finishedCompare != 0) {
-                    return finishedCompare;
-                }
-
-                // 2) compare laps (descending)
-                int lapsCompare = Integer.compare(stats2.laps(), stats1.laps());
-                if (lapsCompare != 0) {
-                    return lapsCompare;
-                }
-
-                // 3) compare timestamps (ascending)
-                return Long.compare(stats1.lastSeenTimestamp(), stats2.lastSeenTimestamp());
-            });
+            // leaderboard recalculation
+            this.calculateLeaderboard();
 
 
 
@@ -253,8 +339,8 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
 
                         // calculate placement
                         int placement = -1;
-                        for (int i = 0; i < leaderboard.size(); i++) {
-                            if (leaderboard.get(i).getKey().equals(playerUuid)) {
+                        for (int i = 0; i < this.dynamic_leaderboard.size(); i++) {
+                            if (this.dynamic_leaderboard.get(i).getKey().equals(playerUuid)) {
                                 placement = i + 1;
                                 break;
                             }
@@ -272,48 +358,6 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
                     }
 
 
-                    // create leaderboard entries
-                    List<LeaderboardEntry> leaderboardEntries = new ArrayList<>();
-                    ParticipantInfo firstPlace = leaderboard.getFirst().getValue();
-                    for(Map.Entry<UUID, ParticipantInfo> entry : leaderboard) {
-
-                        // get data
-                        PlayerEntity p = this.world.getPlayerByUuid(entry.getKey());
-                        ParticipantInfo me =  entry.getValue();
-                        KartEntity k = null;
-                        if(p != null && p.hasVehicle() && p.getVehicle() instanceof KartEntity) {
-                            k =  (KartEntity) p.getVehicle();
-                        }
-
-                        // display name in format: ABC(12). ABC from the player name (first 3 letters) plus kart nr
-                        String name = "N/A(--)";
-                        if(p != null) name = p.getNameForScoreboard().toUpperCase(Locale.ROOT)
-                                .substring(0, Math.min(p.getNameForScoreboard().toUpperCase(Locale.ROOT).length(), 3));
-                        if(k != null) name += "(" + String.format("%02d", k.getRaceNumber()) + ")";
-
-                        // distance to first
-                        long delta = me.lastSeenTimestamp() - firstPlace.lastSeenTimestamp();
-                        int lapDiff = firstPlace.laps() - me.laps();
-                        boolean lapped = lapDiff > 0;
-                        if(lapped) {
-                            delta = lapDiff;
-                        }
-
-                        // tires
-                        String tires = "/";
-                        if(k != null) tires = k.getWheelType().getShortForm();
-
-                        // create entry
-                        leaderboardEntries.add(new LeaderboardEntry(
-                                name,
-                                delta,
-                                lapped,
-                                tires,
-                                me.finished()
-                        ));
-                    }
-
-
                     // update each participant
                     for(UUID uuid : this.participantInfo.keySet()) {
                         PlayerEntity p = this.world.getPlayerByUuid(uuid);
@@ -322,13 +366,11 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
                         // send messages
                         p.sendMessage(msg);
                         if(msgFinished != null) p.sendMessage(msgFinished);
-
-                        // update leaderboard
-                        if (p instanceof ServerPlayerEntity serverPlayer) {
-                            LeaderboardUpdateEntriesS2C leaderboardUpdateEntriesS2C = new LeaderboardUpdateEntriesS2C(leaderboardEntries);
-                            ServerPlayNetworking.send(serverPlayer, leaderboardUpdateEntriesS2C);
-                        }
                     }
+
+                    // update leaderboard
+                    this.broadcastLeaderboardUpdate();
+
 
                     // update local stats for player who crossed line
                     if (player instanceof ServerPlayerEntity serverPlayer) {
@@ -682,10 +724,10 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
                     player.sendMessage(msg);
                     return;
                 }
-                else if(!inspectedBlock.equals(Blocks.AIR)) {
+                else if(this.world.getBlockState(inspectedPos).getOpacity(world, pos) == 15) {
                     Text msg = getPrefix().append(Text.literal("Cannot find reflector. Maybe it is obstructed?").formatted(Formatting.RED));
                     player.sendMessage(msg);
-                    return; //< only air is valid
+                    return; //< only transparent blocks are valid
                 }
             }
             Text msg = getPrefix().append(Text.literal("Cannot find reflector. Maybe it is too far away? (max: " + MAX_TRACK_WIDTH + ")").formatted(Formatting.RED));
