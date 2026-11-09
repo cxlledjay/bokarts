@@ -1,7 +1,6 @@
 package de.cxlledjay.bokarts.entity.custom.kart;
 
 import com.google.common.collect.Lists;
-import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.component.ModDataComponentTypes;
 import de.cxlledjay.bokarts.config.BoKartsConfig;
 import de.cxlledjay.bokarts.config.ClientSyncedConfig;
@@ -67,7 +66,7 @@ public class KartEntity extends Entity implements RideableInventory{
     // kart specific variables
 
     // -------------------- constants --------------------
-    private static final float STEERING_SPEED = 20.0f;
+    private static final float STEERING_MAX_ANGLE = 100.0f;
     private static final float STEERING_CENTER = 0.0f;
     private static final float ENGINE_REVS_ACCEL = 4.2f;
     public static final float ENGINE_REVS_MAX = 100.0f;
@@ -625,8 +624,8 @@ public class KartEntity extends Entity implements RideableInventory{
 
     //@Override
     public void setInputs(boolean left, boolean right, boolean forward, boolean back) {
-        this.pressingLeft = left;
-        this.pressingRight = right;
+        this.pressingLeft = (back) ? right : left;
+        this.pressingRight = (back) ? left : right;
         this.pressingForward = forward;
         this.pressingBack = back;
 
@@ -1057,37 +1056,17 @@ public class KartEntity extends Entity implements RideableInventory{
     }
 
     private void calculateSteeringAngle() {
+        // get direction
+        // left = 1; right -1; both/none = 0
+        int steeringInput = ((this.pressingLeft) ? 1 : 0) - ((this.pressingRight) ? 1 : 0);
+        steeringInput = (this.pressingBack) ? -steeringInput : steeringInput;
 
-        if (!(pressingLeft && pressingRight)) {
-            if (pressingLeft) {
-                // steering to the left
-                this.steeringAngle += STEERING_SPEED;
-            } else if (pressingRight) {
-                // steering to the right
-                this.steeringAngle -= STEERING_SPEED;
-            } else {
-                // no button pressed => center spring
-                this.steeringAngle = applySteeringWheelCenterSpring(this.steeringAngle);
-            }
-        } else {
-            // pressing left & right => center spring
-            this.steeringAngle = applySteeringWheelCenterSpring(this.steeringAngle);
-        }
-        // clamp steering to 0 - 180 degs
-        this.steeringAngle = MathHelper.clamp(this.steeringAngle, STEERING_CENTER - (STEERING_SPEED * 5), STEERING_CENTER + (STEERING_SPEED * 5));
+        // calculate target steering angle
+        float targetAngle = STEERING_CENTER + (steeringInput * STEERING_MAX_ANGLE);
+        float delta = (steeringInput == 0) ? 0.25f : 0.15f;
 
-    }
-
-    private float applySteeringWheelCenterSpring(float angle) {
-        if(angle < (STEERING_CENTER + STEERING_SPEED) && angle > (STEERING_CENTER - STEERING_SPEED)) {
-            angle = STEERING_CENTER;
-        } else if(angle > STEERING_CENTER) {
-            angle -= STEERING_SPEED;
-        } else if(angle < STEERING_CENTER) {
-            angle += STEERING_SPEED;
-        }
-
-        return angle;
+        // lerp angle to target angle
+        this.steeringAngle = MathHelper.lerp(delta, this.steeringAngle, targetAngle);
     }
 
     private void calculateEngineRevs() {
