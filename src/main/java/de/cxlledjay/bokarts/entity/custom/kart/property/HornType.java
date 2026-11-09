@@ -15,16 +15,21 @@ import net.minecraft.util.function.ValueLists;
 import java.util.function.IntFunction;
 
 public enum HornType implements StringIdentifiable {
-    HORN1               (0,"horn_1",            "Car Horn (1)",             ModSounds.HORN_CIVIC),
-    HORN2               (1,"horn_2",            "Car Horn (2)",             ModSounds.HORN_MINI),
-    HORN3               (2,"horn_3",            "Car Horn (3)",             ModSounds.HORN_BIKE),
-    VILLAGER            (3,"villager",          "Villager Hurt",            SoundEvents.ENTITY_VILLAGER_HURT),
-    DISCORD_JOIN        (4,"discord_join",      "Discord Call Join",        ModSounds.HORN_DISCORD_JOIN),
-    DISCORD_LEAVE       (5,"discord_leave",     "Discord Call Leave",       ModSounds.HORN_DISCORD_LEAVE),
-    METAL_PIPE          (6,"metal_pipe",        "Metal Pipe Falling",       ModSounds.HORN_METAL_PIPE),
-    AUGHH               (7,"aughh",             "Snoring",                  ModSounds.HORN_AUGHH),
-    YODA                (8,"yoda",              "LEGO Yoda Death",          ModSounds.HORN_YODA),
-    RIZZ                (9,"rizz",              "Rizz",                     ModSounds.HORN_RIZZ);
+    HORN1               (0, "horn_1",            "Car Horn (1)",                ModSounds.HORN_CIVIC),
+    HORN2               (1, "horn_2",            "Car Horn (2)",                ModSounds.HORN_MINI),
+    HORN3               (2, "horn_3",            "Car Horn (3)",                ModSounds.HORN_BIKE),
+    VILLAGER            (3, "villager",          "Villager Hurt",               SoundEvents.ENTITY_VILLAGER_HURT),
+    DISCORD_JOIN        (4, "discord_join",      "Discord Call Join",           ModSounds.HORN_DISCORD_JOIN),
+    DISCORD_PING        (5, "discord_ping",      "Discord Ping",                ModSounds.HORN_DISCORD_PING),
+    DISCORD_LEAVE       (6, "discord_leave",     "Discord Call Leave",          ModSounds.HORN_DISCORD_LEAVE),
+    METAL_PIPE          (7, "metal_pipe",        "Metal Pipe Falling",          ModSounds.HORN_METAL_PIPE),
+    AUGHH               (8, "aughh",             "Snoring",                     ModSounds.HORN_AUGHH),
+    HEHEHEHA            (9, "heheheha",          "Heheheha",                    ModSounds.HORN_HEHEHEHA),
+    YODA                (10,"yoda",              "LEGO Yoda Death",             ModSounds.HORN_YODA),
+    CASH                (11,"cash",              "$ Cash $",                    ModSounds.HORN_CASH),
+    BONK                (12,"bonk",              "B o n k",                     ModSounds.HORN_BONK),
+    VINE_BOOM           (13,"vine_boom",         "Vine Boom",                   ModSounds.HORN_VINE_BOOM),
+    RIZZ                (14,"rizz",              "Rizz",                        ModSounds.HORN_RIZZ);
 
     // id to value function
     private static final IntFunction<HornType> INDEX_TO_VALUE = ValueLists.createIdToValueFunction(

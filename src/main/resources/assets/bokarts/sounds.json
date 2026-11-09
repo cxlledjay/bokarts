@@ -68,5 +68,40 @@
     "sounds": [
       "bokarts:horn_yoda"
     ]
+  },
+  "horn_bonk": {
+    "category": "player",
+    "subtitle": "sounds.bokarts.horn",
+    "sounds": [
+      "bokarts:horn_bonk"
+    ]
+  },
+  "horn_cash": {
+    "category": "player",
+    "subtitle": "sounds.bokarts.horn",
+    "sounds": [
+      "bokarts:horn_cash"
+    ]
+  },
+  "horn_discord_ping": {
+    "category": "player",
+    "subtitle": "sounds.bokarts.horn",
+    "sounds": [
+      "bokarts:horn_discord_ping"
+    ]
+  },
+  "horn_heheheha": {
+    "category": "player",
+    "subtitle": "sounds.bokarts.horn",
+    "sounds": [
+      "bokarts:horn_heheheha"
+    ]
+  },
+  "horn_vine_boom": {
+    "category": "player",
+    "subtitle": "sounds.bokarts.horn",
+    "sounds": [
+      "bokarts:horn_vine_boom"
+    ]
   }
 }

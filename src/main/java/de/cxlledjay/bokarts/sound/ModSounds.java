@@ -13,8 +13,13 @@ public class ModSounds {
     public static final SoundEvent HORN_BIKE = registerSoundEvent("horn_bike");
     public static final SoundEvent HORN_CIVIC = registerSoundEvent("horn_civic");
     public static final SoundEvent HORN_DISCORD_JOIN = registerSoundEvent("horn_discord_join");
+    public static final SoundEvent HORN_DISCORD_PING = registerSoundEvent("horn_discord_ping");
     public static final SoundEvent HORN_DISCORD_LEAVE = registerSoundEvent("horn_discord_leave");
     public static final SoundEvent HORN_METAL_PIPE = registerSoundEvent("horn_metal_pipe");
+    public static final SoundEvent HORN_BONK = registerSoundEvent("horn_bonk");
+    public static final SoundEvent HORN_CASH = registerSoundEvent("horn_cash");
+    public static final SoundEvent HORN_HEHEHEHA = registerSoundEvent("horn_heheheha");
+    public static final SoundEvent HORN_VINE_BOOM = registerSoundEvent("horn_vine_boom");
     public static final SoundEvent HORN_MINI = registerSoundEvent("horn_mini");
     public static final SoundEvent HORN_RIZZ = registerSoundEvent("horn_rizz");
     public static final SoundEvent HORN_YODA = registerSoundEvent("horn_yoda");
