@@ -14,6 +14,7 @@ import de.cxlledjay.bokarts.networking.packet.LeaderboardUpdateEntriesS2C;
 import de.cxlledjay.bokarts.networking.packet.LeaderboardUpdateFastestLapS2C;
 import de.cxlledjay.bokarts.networking.packet.LeaderboardUpdatePersonalS2C;
 import de.cxlledjay.bokarts.screen.custom.TrackTimerScreenHandler;
+import de.cxlledjay.bokarts.stats.ModStats;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -403,6 +404,12 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
                         // print track report
                         ItemStack trackReport = createGrandPrixItemStack(kart, player, bestLapTime, placement, this.settingLapCount, duration);
                         if(trackReport != null) this.tryPrintingTrackReport(trackReport);
+
+                        // increase stat
+                        if(player instanceof ServerPlayerEntity driver) {
+                            driver.increaseStat(ModStats.KART_RACES_DRIVEN, 1);
+                            if(placement == 1) driver.increaseStat(ModStats.KART_RACES_WON, 1);
+                        }
                     }
 
 

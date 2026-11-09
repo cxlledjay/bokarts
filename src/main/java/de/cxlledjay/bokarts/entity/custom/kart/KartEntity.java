@@ -12,6 +12,7 @@ import de.cxlledjay.bokarts.item.custom.KartItemv2;
 import de.cxlledjay.bokarts.networking.packet.KartEntityInputPayloadC2S;
 import de.cxlledjay.bokarts.screen.custom.KartInventoryScreenHandler;
 import de.cxlledjay.bokarts.sound.KartEngineSound;
+import de.cxlledjay.bokarts.stats.ModStats;
 import de.cxlledjay.bokarts.util.KartFuelItems;
 import de.cxlledjay.bokarts.util.ModTags;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -140,7 +141,7 @@ public class KartEntity extends Entity implements RideableInventory{
     public float steeringAnglePrev = STEERING_CENTER;
     public float engineRevsPrev = 0.0f;
     public float engineRevs = 0.0f;
-    public double distanceThisTick = 0.0f;
+    public double distanceThisTick = 0.0;
 
     // key fob tracking
     private int keyFobTimer = 0;
@@ -982,6 +983,14 @@ public class KartEntity extends Entity implements RideableInventory{
             // horn
             if(this.currentHornTicks > 0) this.currentHornTicks--;
             this.tickKeyFob();
+
+            // statistics
+            if(this.getControllingPassenger() instanceof ServerPlayerEntity driver) {
+                if (this.distanceThisTick > 0) {
+                    driver.increaseStat(ModStats.KART_ONE_CM, (int) (this.distanceThisTick * 100));
+                }
+                driver.increaseStat(ModStats.KART_TIME_DRIVEN, 1);
+            }
         }
 
         //==================== client sided animations ====================
@@ -1150,6 +1159,11 @@ public class KartEntity extends Entity implements RideableInventory{
         this.currentHornTicks = HORN_COOLDOWN; // set cooldown
 
         this.playHornSoundNoCooldown();
+
+        // increase stat
+        if(this.getControllingPassenger() instanceof ServerPlayerEntity driver) {
+            driver.increaseStat(ModStats.KART_HORN_USED, 1);
+        }
     }
 
     private void playHornSoundNoCooldown() {

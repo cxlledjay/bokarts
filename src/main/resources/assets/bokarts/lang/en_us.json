@@ -120,6 +120,10 @@
   "key.bokarts.horn_prev": "Previous Horn Sound",
 
   "stat.bokarts.kart_one_cm": "Distance by Kart",
+  "stat.bokarts.kart_time_driven": "Time spent in a Kart",
+  "stat.bokarts.kart_horn_used": "Kart Horn used",
+  "stat.bokarts.kart_races_driven": "Kart Races driven",
+  "stat.bokarts.kart_races_won": "Kart Races won",
 
   "tag.item.bokarts.karts": "Any Kart",
 
