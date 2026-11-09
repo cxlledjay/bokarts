@@ -4,6 +4,7 @@ import com.mojang.serialization.MapCodec;
 import de.cxlledjay.bokarts.block.entity.ModBlockEntities;
 import de.cxlledjay.bokarts.block.entity.custom.KartLiftBlockEntity;
 import de.cxlledjay.bokarts.block.entity.custom.TrackTimerBlockEntity;
+import de.cxlledjay.bokarts.block.entity.custom.TrophyBlockEntity;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -13,6 +14,7 @@ import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -69,6 +71,16 @@ public class TrackTimer extends BlockWithEntity {
         }
 
         return ActionResult.SUCCESS;
+    }
+
+    @Override
+    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+        if(state.getBlock() != newState.getBlock()) {
+            if(world.getBlockEntity(pos) instanceof TrackTimerBlockEntity blockEntity) {
+                ItemScatterer.spawn(world, pos, blockEntity);
+            }
+            super.onStateReplaced(state, world, pos, newState, moved);
+        }
     }
 
 

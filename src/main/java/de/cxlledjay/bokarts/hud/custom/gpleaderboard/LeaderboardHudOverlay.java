@@ -15,7 +15,7 @@ public class LeaderboardHudOverlay {
     public static final LeaderboardData LEADERBOARD_DATA = new LeaderboardData();
 
     private static final int TOTAL_WIDTH = 140;
-    private static final int TOTAL_HEIGHT_TOP = 58;
+    private static final int TOTAL_HEIGHT_TOP = 84;
 
     private static final int LINE_SPACING = 10;
     private static final int PADDING = 3;
@@ -32,7 +32,7 @@ public class LeaderboardHudOverlay {
         if(!BoKartsConfig.enableLeaderboard) return;
 
         if(!LEADERBOARD_DATA.isActive()) return;
-        if(LEADERBOARD_DATA.myStats == null || LEADERBOARD_DATA.playerStats == null) return;
+        if(LEADERBOARD_DATA.myStats == null || LEADERBOARD_DATA.fastestLap == null) return;
 
         // safety
         MinecraftClient client = MinecraftClient.getInstance();
@@ -48,7 +48,10 @@ public class LeaderboardHudOverlay {
         int screenHeight = context.getScaledWindowHeight();
         int currentY = PADDING;
 
-        int playerStatsSize = Math.min(screenHeight / 2 , LEADERBOARD_DATA.playerStats.size() * LINE_SPACING + LINE_SPACING);
+        int playerStatsSize = Math.min(
+                screenHeight / 2 ,
+                (LEADERBOARD_DATA.playerStats == null) ? (0) : LEADERBOARD_DATA.playerStats.size() * LINE_SPACING + LINE_SPACING
+        );
         int leaderboardTotalHeight = TOTAL_HEIGHT_TOP + PADDING + playerStatsSize;
 
         float actualRenderedWidth = TOTAL_WIDTH * scale;
@@ -85,13 +88,28 @@ public class LeaderboardHudOverlay {
         context.fill(0, currentY, TOTAL_WIDTH, currentY + 1, underscoreColor);
         currentY += 5;
 
+        // fastest lap
+
+        int rightAlignedFastestX = TOTAL_WIDTH - PADDING - (client.textRenderer.getWidth(LEADERBOARD_DATA.fastestLap.time()));
+        context.drawTextWithShadow(client.textRenderer, Text.literal("Fastest lap: ").formatted(Formatting.WHITE), PADDING, currentY, 0xFFFFFF);
+        context.drawTextWithShadow(client.textRenderer, LEADERBOARD_DATA.fastestLap.time(), rightAlignedFastestX, currentY, 0xFFFFFF);
+        currentY += LINE_SPACING;
+        int rightAlignedFastestPlayerX = TOTAL_WIDTH - PADDING - (client.textRenderer.getWidth(LEADERBOARD_DATA.fastestLap.name()));
+        context.drawTextWithShadow(client.textRenderer, LEADERBOARD_DATA.fastestLap.name(), rightAlignedFastestPlayerX, currentY, 0xFFFFFF);
+        currentY += 11;
+
+        // underscore
+        context.fill(0, currentY, TOTAL_WIDTH, currentY + 1, underscoreColor);
+        currentY += 5;
+
+
         // lap times
         int rightAlignedBestX = TOTAL_WIDTH - PADDING - (client.textRenderer.getWidth(LEADERBOARD_DATA.myStats.best()));
-        context.drawTextWithShadow(client.textRenderer, Text.literal("best: ").formatted(Formatting.WHITE), PADDING, currentY, 0xFFFFFF);
+        context.drawTextWithShadow(client.textRenderer, Text.literal("Personal best: ").formatted(Formatting.WHITE), PADDING, currentY, 0xFFFFFF);
         context.drawTextWithShadow(client.textRenderer, LEADERBOARD_DATA.myStats.best(), rightAlignedBestX, currentY, 0xFFFFFF);
         currentY += LINE_SPACING;
         int rightAlignedLastX = TOTAL_WIDTH - PADDING - (client.textRenderer.getWidth(LEADERBOARD_DATA.myStats.last()));
-        context.drawTextWithShadow(client.textRenderer, Text.literal("last: ").formatted(Formatting.WHITE), PADDING, currentY, 0xFFFFFF);
+        context.drawTextWithShadow(client.textRenderer, Text.literal("Last: ").formatted(Formatting.WHITE), PADDING, currentY, 0xFFFFFF);
         context.drawTextWithShadow(client.textRenderer, LEADERBOARD_DATA.myStats.last(), rightAlignedLastX, currentY, 0xFFFFFF);
         currentY += 11;
 
@@ -106,6 +124,12 @@ public class LeaderboardHudOverlay {
 
 
         // -------------------- player stats rendering --------------------
+
+        // safety when only rendering personal stats
+        if(LEADERBOARD_DATA.playerStats == null) {
+            context.getMatrices().pop();
+            return;
+        }
 
         // background
         context.fill(0, currentY, TOTAL_WIDTH - 19, currentY + playerStatsSize, 0x80000000);

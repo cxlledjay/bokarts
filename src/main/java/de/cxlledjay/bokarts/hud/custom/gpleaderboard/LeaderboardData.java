@@ -3,6 +3,7 @@ package de.cxlledjay.bokarts.hud.custom.gpleaderboard;
 import de.cxlledjay.bokarts.block.entity.custom.TrackTimerBlockEntity;
 import de.cxlledjay.bokarts.block.entity.custom.race.LeaderboardEntry;
 import de.cxlledjay.bokarts.networking.packet.LeaderboardUpdateEntriesS2C;
+import de.cxlledjay.bokarts.networking.packet.LeaderboardUpdateFastestLapS2C;
 import de.cxlledjay.bokarts.networking.packet.LeaderboardUpdatePersonalS2C;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -13,6 +14,7 @@ import java.util.List;
 public class LeaderboardData {
 
     public PersonalStats myStats = null;
+    public FastestLap fastestLap = null;
     public List<PlayerStats> playerStats = null;
     private boolean active = false;
 
@@ -22,6 +24,7 @@ public class LeaderboardData {
 
     public void reset() {
         this.myStats = null;
+        this.fastestLap = null;
         this.playerStats = null;
         this.active = false;
     }
@@ -42,10 +45,23 @@ public class LeaderboardData {
         if(packet.best() == -1) best = Text.literal("--:--.---").formatted(Formatting.WHITE);
         if(packet.last() == -1) last = Text.literal("--:--.---").formatted(Formatting.WHITE);
         if(packet.currentLap() >= packet.totalLaps()) lapInfo = Text.literal("FINISHED").formatted(Formatting.WHITE).formatted(Formatting.BOLD);
+        if(packet.totalLaps() == -1) lapInfo = Text.literal("LAP " + (packet.currentLap() + 1)).formatted(Formatting.WHITE).formatted(Formatting.BOLD);
 
         // save
         this.myStats = new PersonalStats(name, best, last, lapInfo);
         this.active = true;
+    }
+
+    public void update(LeaderboardUpdateFastestLapS2C packet) {
+        Text time = Text.literal(TrackTimerBlockEntity.getFormattedLapTime(packet.best())).formatted(Formatting.WHITE);
+        Text name = Text.literal("(by " + packet.name() + ")").formatted(Formatting.GRAY).formatted(Formatting.ITALIC);
+
+        if(packet.best() == -1) {
+            time = Text.literal("--:--.---").formatted(Formatting.WHITE);
+            name = Text.literal("").formatted(Formatting.WHITE);
+        }
+
+        this.fastestLap = new  FastestLap(time, name);
     }
 
     public void update(LeaderboardUpdateEntriesS2C packet) {
@@ -82,7 +98,6 @@ public class LeaderboardData {
 
         // save
         this.playerStats = updatedPlayerStats;
-        this.active = true;
     }
 
 
@@ -94,6 +109,11 @@ public class LeaderboardData {
             Text best,
             Text last,
             Text lapInfo
+    ) {}
+
+    public record FastestLap(
+            Text time,
+            Text name
     ) {}
 
     public record PlayerStats(

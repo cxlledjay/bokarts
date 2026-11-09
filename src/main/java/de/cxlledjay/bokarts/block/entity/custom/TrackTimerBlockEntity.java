@@ -11,6 +11,7 @@ import de.cxlledjay.bokarts.item.ModItems;
 import de.cxlledjay.bokarts.item.custom.TrackReport;
 import de.cxlledjay.bokarts.networking.packet.LeaderboardResetS2C;
 import de.cxlledjay.bokarts.networking.packet.LeaderboardUpdateEntriesS2C;
+import de.cxlledjay.bokarts.networking.packet.LeaderboardUpdateFastestLapS2C;
 import de.cxlledjay.bokarts.networking.packet.LeaderboardUpdatePersonalS2C;
 import de.cxlledjay.bokarts.screen.custom.TrackTimerScreenHandler;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -101,7 +102,7 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
 
     // --- race stats
     private boolean hasStarted = false;
-    long trackRecordLapTime = 0;
+    long trackRecordLapTime = -1;
     long raceStartTimestamp = 0;
 
     // race participant stats
@@ -121,11 +122,48 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
     private void initiateParticipation(long timestamp, PlayerEntity player, KartEntity kart) {
 
         // init stat tracking data
-        ParticipantInfo newStats = new ParticipantInfo(timestamp, 0, 0, false);
+        ParticipantInfo newStats = new ParticipantInfo(timestamp, -1, 0, false);
         this.participantInfo.put(player.getUuid(), newStats);
 
         // duration tracking
         if(this.raceStartTimestamp == 0) this.raceStartTimestamp = timestamp;
+
+        // send leaderboard packages
+        if (player instanceof ServerPlayerEntity serverPlayer) {
+
+            // reset leaderboard
+            LeaderboardResetS2C leaderboardResetS2C = new LeaderboardResetS2C();
+            ServerPlayNetworking.send(serverPlayer, leaderboardResetS2C);
+
+            // init personal data
+            LeaderboardUpdatePersonalS2C leaderboardUpdatePersonalS2C = new LeaderboardUpdatePersonalS2C(
+                    player.getNameForScoreboard() + " (" + String.format("%02d", kart.getRaceNumber()) + ")",
+                    -1,
+                    -1,
+                    false,
+                    0,
+                    (this.settingCurrentMode == TrackTimerMode.TIME_ATTACK) ? (-1) : this.settingLapCount
+            );
+            ServerPlayNetworking.send(serverPlayer, leaderboardUpdatePersonalS2C);
+
+            // get track record
+            String fastestPlayer = "N/A";
+            for (Map.Entry<UUID, ParticipantInfo> entry : this.participantInfo.entrySet()) {
+                if(entry.getValue().best() == this.trackRecordLapTime) {
+                    PlayerEntity p = this.world.getPlayerByUuid(entry.getKey());
+                    if(p != null) fastestPlayer = p.getNameForScoreboard();
+                    break;
+                }
+            }
+
+            // send track record
+            LeaderboardUpdateFastestLapS2C leaderboardUpdateFastestLapS2C = new LeaderboardUpdateFastestLapS2C(
+                    fastestPlayer,
+                    this.trackRecordLapTime
+            );
+            ServerPlayNetworking.send(serverPlayer, leaderboardUpdateFastestLapS2C);
+
+        }
 
         // send message to player
         Text msg = null;
@@ -135,22 +173,6 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
             msg = getPrefix().append(Text.literal("Race tracking started! Remaining Laps: " + this.settingLapCount).formatted(Formatting.WHITE));
 
             if (player instanceof ServerPlayerEntity serverPlayer) {
-
-                // reset leaderboard
-                LeaderboardResetS2C leaderboardResetS2C = new LeaderboardResetS2C();
-                ServerPlayNetworking.send(serverPlayer, leaderboardResetS2C);
-
-                // init personal data
-                LeaderboardUpdatePersonalS2C leaderboardUpdatePersonalS2C = new LeaderboardUpdatePersonalS2C(
-                        player.getNameForScoreboard() + " (" + String.format("%02d", kart.getRaceNumber()) + ")",
-                        -1,
-                        -1,
-                        false,
-                        0,
-                        this.settingLapCount
-                );
-                ServerPlayNetworking.send(serverPlayer, leaderboardUpdatePersonalS2C);
-
                 // init leaderboard data
                 this.calculateLeaderboard();
                 this.broadcastLeaderboardUpdate();
@@ -282,11 +304,24 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
             // 1) personal best
             long deltaToBest = currentLapTime - bestLapTime;
             boolean isNewPB = deltaToBest < 0;
-            if(isNewPB || bestLapTime == 0) bestLapTime = currentLapTime;
+            if(isNewPB || bestLapTime == -1) bestLapTime = currentLapTime;
             // 2) track best
             long deltaToRecord = currentLapTime - this.trackRecordLapTime;
             boolean isNewRecord = deltaToRecord < 0;
-            if(isNewRecord || this.trackRecordLapTime == 0) this.trackRecordLapTime = currentLapTime;
+            if(isNewRecord || this.trackRecordLapTime == -1) {
+                this.trackRecordLapTime = currentLapTime;
+                // send track record
+                LeaderboardUpdateFastestLapS2C leaderboardUpdateFastestLapS2C = new LeaderboardUpdateFastestLapS2C(
+                        player.getNameForScoreboard(),
+                        this.trackRecordLapTime
+                );
+                for(UUID uuid : this.participantInfo.keySet()) {
+                    PlayerEntity p = this.world.getPlayerByUuid(uuid);
+                    if(p instanceof ServerPlayerEntity sp) {
+                        ServerPlayNetworking.send(sp, leaderboardUpdateFastestLapS2C);
+                    }
+                }
+            }
 
             // check finished
             boolean hasFinished = ((this.settingCurrentMode == TrackTimerMode.GRAND_PRIX) && currentLap >= this.settingLapCount);
@@ -309,6 +344,19 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
             byte flagsPB = 0;
             if(isNewRecord) flagsPB = 1;
             else if(isNewPB) flagsPB = 2;
+
+            // update local stats for player who crossed line
+            if (player instanceof ServerPlayerEntity serverPlayer) {
+                LeaderboardUpdatePersonalS2C leaderboardUpdatePersonalS2C = new LeaderboardUpdatePersonalS2C(
+                        player.getNameForScoreboard() + " (" + String.format("%02d", kart.getRaceNumber()) + ")",
+                        currentLapTime,
+                        bestLapTime,
+                        bestLapTime == this.trackRecordLapTime,
+                        currentLap,
+                        (this.settingCurrentMode == TrackTimerMode.TIME_ATTACK) ? (-1) : this.settingLapCount
+                );
+                ServerPlayNetworking.send(serverPlayer, leaderboardUpdatePersonalS2C);
+            }
 
             // a) time attack
             if(this.settingCurrentMode == TrackTimerMode.TIME_ATTACK) {
@@ -370,22 +418,6 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
 
                     // update leaderboard
                     this.broadcastLeaderboardUpdate();
-
-
-                    // update local stats for player who crossed line
-                    if (player instanceof ServerPlayerEntity serverPlayer) {
-                        LeaderboardUpdatePersonalS2C leaderboardUpdatePersonalS2C = new LeaderboardUpdatePersonalS2C(
-                                player.getNameForScoreboard() + " (" + String.format("%02d", kart.getRaceNumber()) + ")",
-                                currentLapTime,
-                                bestLapTime,
-                                bestLapTime == this.trackRecordLapTime,
-                                currentLap,
-                                this.settingLapCount
-                        );
-                        ServerPlayNetworking.send(serverPlayer, leaderboardUpdatePersonalS2C);
-                    }
-
-
                 }
             }
 
@@ -745,7 +777,7 @@ public class TrackTimerBlockEntity extends BlockEntity implements NamedScreenHan
             this.trackWidth = 0;
 
             this.hasStarted = false;
-            this.trackRecordLapTime = 0;
+            this.trackRecordLapTime = -1;
             this.raceStartTimestamp = 0;
 
 

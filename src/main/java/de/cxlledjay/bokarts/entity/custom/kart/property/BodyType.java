@@ -27,7 +27,11 @@ public enum BodyType implements StringIdentifiable {
     LIVERY_SUPER_A_CAR              (12, "livery_super_a_car",              "Super A Car"),
     LIVERY_JAPANESE_RACE_CAR        (13, "livery_japanese_race_car",        "Japanese Race Car"),
     LIVERY_POLIZFI                  (14, "livery_polizfi",                  "Police"),
-    LIVERY_SAKURA                   (15, "livery_sakura",                   "Sakura");
+    LIVERY_SAKURA                   (15, "livery_sakura",                   "Sakura"),
+    LIVERY_FRAGMENTED               (16, "livery_fragmented",               "Fragmented"),
+    LIVERY_HALF_WRAPPED             (17, "livery_half_wrapped",             "Half Wrapped"),
+    LIVERY_RACE_STRIPE              (18, "livery_race_stripe",              "Race Stripe"),
+    LIVERY_BELLA_ITALIA             (19, "livery_bella_italia",             "Bella Italia");
 
 
     // id to value function
