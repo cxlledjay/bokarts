@@ -29,6 +29,10 @@ public class LeaderboardData {
         this.active = false;
     }
 
+    public void disable() {
+        this.active = false;
+    }
+
     public void update(LeaderboardUpdatePersonalS2C packet) {
 
         // formatting

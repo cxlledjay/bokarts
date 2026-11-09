@@ -32,7 +32,7 @@ public class LeaderboardHudOverlay {
         if(!BoKartsConfig.enableLeaderboard) return;
 
         if(!LEADERBOARD_DATA.isActive()) return;
-        if(LEADERBOARD_DATA.myStats == null || LEADERBOARD_DATA.fastestLap == null) return;
+        if(LEADERBOARD_DATA.myStats == null) return;
 
         // safety
         MinecraftClient client = MinecraftClient.getInstance();
@@ -89,13 +89,17 @@ public class LeaderboardHudOverlay {
         currentY += 5;
 
         // fastest lap
-
-        int rightAlignedFastestX = TOTAL_WIDTH - PADDING - (client.textRenderer.getWidth(LEADERBOARD_DATA.fastestLap.time()));
-        context.drawTextWithShadow(client.textRenderer, Text.literal("Fastest lap: ").formatted(Formatting.WHITE), PADDING, currentY, 0xFFFFFF);
-        context.drawTextWithShadow(client.textRenderer, LEADERBOARD_DATA.fastestLap.time(), rightAlignedFastestX, currentY, 0xFFFFFF);
-        currentY += LINE_SPACING;
-        int rightAlignedFastestPlayerX = TOTAL_WIDTH - PADDING - (client.textRenderer.getWidth(LEADERBOARD_DATA.fastestLap.name()));
-        context.drawTextWithShadow(client.textRenderer, LEADERBOARD_DATA.fastestLap.name(), rightAlignedFastestPlayerX, currentY, 0xFFFFFF);
+        if(LEADERBOARD_DATA.fastestLap != null) {
+            int rightAlignedFastestX = TOTAL_WIDTH - PADDING - (client.textRenderer.getWidth(LEADERBOARD_DATA.fastestLap.time()));
+            context.drawTextWithShadow(client.textRenderer, Text.literal("Fastest lap: ").formatted(Formatting.WHITE), PADDING, currentY, 0xFFFFFF);
+            context.drawTextWithShadow(client.textRenderer, LEADERBOARD_DATA.fastestLap.time(), rightAlignedFastestX, currentY, 0xFFFFFF);
+            currentY += LINE_SPACING;
+            int rightAlignedFastestPlayerX = TOTAL_WIDTH - PADDING - (client.textRenderer.getWidth(LEADERBOARD_DATA.fastestLap.name()));
+            context.drawTextWithShadow(client.textRenderer, LEADERBOARD_DATA.fastestLap.name(), rightAlignedFastestPlayerX, currentY, 0xFFFFFF);
+        } else {
+            context.drawTextWithShadow(client.textRenderer, Text.literal("Fastest lap: ").formatted(Formatting.WHITE), PADDING, currentY, 0xFFFFFF);
+            currentY += LINE_SPACING;
+        }
         currentY += 11;
 
         // underscore

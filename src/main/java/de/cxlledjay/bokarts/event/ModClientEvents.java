@@ -49,7 +49,7 @@ public class ModClientEvents {
 
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
             // reset leaderboard on disconnect
-            client.execute(LeaderboardHudOverlay.LEADERBOARD_DATA::reset);
+            client.execute(LeaderboardHudOverlay.LEADERBOARD_DATA::disable);
         });
     }
 
