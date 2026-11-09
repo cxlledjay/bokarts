@@ -1,16 +1,6 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_iron_block": {
-      "conditions": {
-        "items": [
-          {
-            "items": "minecraft:iron_block"
-          }
-        ]
-      },
-      "trigger": "minecraft:inventory_changed"
-    },
     "has_obsidian": {
       "conditions": {
         "items": [
@@ -21,11 +11,11 @@
       },
       "trigger": "minecraft:inventory_changed"
     },
-    "has_orange_wool": {
+    "has_orange_dye": {
       "conditions": {
         "items": [
           {
-            "items": "minecraft:orange_wool"
+            "items": "minecraft:orange_dye"
           }
         ]
       },
@@ -36,13 +26,23 @@
         "recipe": "bokarts:wheels_super_hard"
       },
       "trigger": "minecraft:recipe_unlocked"
+    },
+    "has_wheels_street": {
+      "conditions": {
+        "items": [
+          {
+            "items": "bokarts:wheels_street"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
     }
   },
   "requirements": [
     [
       "has_the_recipe",
-      "has_orange_wool",
-      "has_iron_block",
+      "has_wheels_street",
+      "has_orange_dye",
       "has_obsidian"
     ]
   ],

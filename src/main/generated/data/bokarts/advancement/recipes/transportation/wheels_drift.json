@@ -1,26 +1,6 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_black_wool": {
-      "conditions": {
-        "items": [
-          {
-            "items": "minecraft:black_wool"
-          }
-        ]
-      },
-      "trigger": "minecraft:inventory_changed"
-    },
-    "has_iron_block": {
-      "conditions": {
-        "items": [
-          {
-            "items": "minecraft:iron_block"
-          }
-        ]
-      },
-      "trigger": "minecraft:inventory_changed"
-    },
     "has_packed_ice": {
       "conditions": {
         "items": [
@@ -36,13 +16,22 @@
         "recipe": "bokarts:wheels_drift"
       },
       "trigger": "minecraft:recipe_unlocked"
+    },
+    "has_wheels_street": {
+      "conditions": {
+        "items": [
+          {
+            "items": "bokarts:wheels_street"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
     }
   },
   "requirements": [
     [
       "has_the_recipe",
-      "has_black_wool",
-      "has_iron_block",
+      "has_wheels_street",
       "has_packed_ice"
     ]
   ],

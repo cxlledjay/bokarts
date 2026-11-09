@@ -5,17 +5,14 @@
     "I": {
       "item": "minecraft:iron_block"
     },
-    "M": {
-      "item": "minecraft:gray_concrete_powder"
-    },
     "W": {
       "item": "minecraft:black_wool"
     }
   },
   "pattern": [
-    "MWM",
+    " W ",
     "WIW",
-    "MWM"
+    " W "
   ],
   "result": {
     "count": 1,

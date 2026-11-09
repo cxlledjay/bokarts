@@ -2,20 +2,17 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "I": {
-      "item": "minecraft:iron_block"
+    "B": {
+      "item": "bokarts:wheels_street"
     },
     "M": {
       "item": "minecraft:packed_ice"
-    },
-    "W": {
-      "item": "minecraft:black_wool"
     }
   },
   "pattern": [
-    "MWM",
-    "WIW",
-    "MWM"
+    "MMM",
+    "MBM",
+    "MMM"
   ],
   "result": {
     "count": 1,

@@ -11,21 +11,11 @@
       },
       "trigger": "minecraft:inventory_changed"
     },
-    "has_iron_block": {
+    "has_light_blue_dye": {
       "conditions": {
         "items": [
           {
-            "items": "minecraft:iron_block"
-          }
-        ]
-      },
-      "trigger": "minecraft:inventory_changed"
-    },
-    "has_light_blue_wool": {
-      "conditions": {
-        "items": [
-          {
-            "items": "minecraft:light_blue_wool"
+            "items": "minecraft:light_blue_dye"
           }
         ]
       },
@@ -36,13 +26,23 @@
         "recipe": "bokarts:wheels_hard"
       },
       "trigger": "minecraft:recipe_unlocked"
+    },
+    "has_wheels_street": {
+      "conditions": {
+        "items": [
+          {
+            "items": "bokarts:wheels_street"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
     }
   },
   "requirements": [
     [
       "has_the_recipe",
-      "has_light_blue_wool",
-      "has_iron_block",
+      "has_wheels_street",
+      "has_light_blue_dye",
       "has_gray_concrete"
     ]
   ],

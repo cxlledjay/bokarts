@@ -2,20 +2,20 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "I": {
-      "item": "minecraft:iron_block"
+    "B": {
+      "item": "bokarts:wheels_street"
+    },
+    "D": {
+      "item": "minecraft:yellow_dye"
     },
     "M": {
-      "item": "minecraft:honey_bottle"
-    },
-    "W": {
-      "item": "minecraft:yellow_wool"
+      "item": "minecraft:honeycomb"
     }
   },
   "pattern": [
-    "MWM",
-    "WIW",
-    "MWM"
+    "MDM",
+    "DBD",
+    "MDM"
   ],
   "result": {
     "count": 1,

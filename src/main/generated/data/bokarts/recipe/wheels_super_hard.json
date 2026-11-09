@@ -2,20 +2,20 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "I": {
-      "item": "minecraft:iron_block"
+    "B": {
+      "item": "bokarts:wheels_street"
+    },
+    "D": {
+      "item": "minecraft:orange_dye"
     },
     "M": {
       "item": "minecraft:obsidian"
-    },
-    "W": {
-      "item": "minecraft:orange_wool"
     }
   },
   "pattern": [
-    "MWM",
-    "WIW",
-    "MWM"
+    "MDM",
+    "DBD",
+    "MDM"
   ],
   "result": {
     "count": 1,

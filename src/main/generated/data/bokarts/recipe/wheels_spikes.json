@@ -2,20 +2,20 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "I": {
-      "item": "minecraft:iron_block"
+    "B": {
+      "item": "bokarts:wheels_offroad"
     },
-    "M": {
+    "D": {
       "item": "minecraft:pointed_dripstone"
     },
-    "W": {
-      "item": "minecraft:black_wool"
+    "M": {
+      "item": "minecraft:iron_nugget"
     }
   },
   "pattern": [
-    "MWM",
-    "WIW",
-    "MWM"
+    "MDM",
+    "DBD",
+    "MDM"
   ],
   "result": {
     "count": 1,

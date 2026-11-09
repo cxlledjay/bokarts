@@ -1,21 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_black_wool": {
+    "has_iron_nugget": {
       "conditions": {
         "items": [
           {
-            "items": "minecraft:black_wool"
-          }
-        ]
-      },
-      "trigger": "minecraft:inventory_changed"
-    },
-    "has_iron_block": {
-      "conditions": {
-        "items": [
-          {
-            "items": "minecraft:iron_block"
+            "items": "minecraft:iron_nugget"
           }
         ]
       },
@@ -36,13 +26,23 @@
         "recipe": "bokarts:wheels_spikes"
       },
       "trigger": "minecraft:recipe_unlocked"
+    },
+    "has_wheels_offroad": {
+      "conditions": {
+        "items": [
+          {
+            "items": "bokarts:wheels_offroad"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
     }
   },
   "requirements": [
     [
       "has_the_recipe",
-      "has_black_wool",
-      "has_iron_block",
+      "has_wheels_offroad",
+      "has_iron_nugget",
       "has_pointed_dripstone"
     ]
   ],

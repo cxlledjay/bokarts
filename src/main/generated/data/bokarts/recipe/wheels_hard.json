@@ -2,20 +2,20 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "I": {
-      "item": "minecraft:iron_block"
+    "B": {
+      "item": "bokarts:wheels_street"
+    },
+    "D": {
+      "item": "minecraft:light_blue_dye"
     },
     "M": {
       "item": "minecraft:gray_concrete"
-    },
-    "W": {
-      "item": "minecraft:light_blue_wool"
     }
   },
   "pattern": [
-    "MWM",
-    "WIW",
-    "MWM"
+    "MDM",
+    "DBD",
+    "MDM"
   ],
   "result": {
     "count": 1,
