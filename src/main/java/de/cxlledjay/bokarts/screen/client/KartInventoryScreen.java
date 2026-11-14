@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import de.cxlledjay.bokarts.BoKarts;
 import de.cxlledjay.bokarts.config.ClientSyncedConfig;
 import de.cxlledjay.bokarts.entity.custom.kart.KartEntity;
+import de.cxlledjay.bokarts.entity.custom.kart.property.HornType;
 import de.cxlledjay.bokarts.networking.packet.KartEntityAddFuelPayloadC2S;
 import de.cxlledjay.bokarts.networking.packet.HornCyclePayloadC2S;
 import de.cxlledjay.bokarts.screen.custom.KartInventoryScreenHandler;
@@ -160,7 +161,7 @@ public class KartInventoryScreen extends HandledScreen<KartInventoryScreenHandle
         if(this.kart != null){
             fuelCapacityString = KartEntity.getFormattedFuelCapacityString(this.kart.currentFuel);
             odoString = KartEntity.getFormattedDistanceString(this.kart.currentOdometer);
-            hornString = "[" + (this.kart.getHornType().getId()+1) + "/10]";
+            hornString = "[" + (this.kart.getHornType().getId()+1) + "/" + HornType.values().length + "]";
 
             float fuelCapacityPercentage = this.kart.currentFuel / ClientSyncedConfig.getMaxFuelCapacity();
             if(fuelCapacityPercentage > 0.5) {
