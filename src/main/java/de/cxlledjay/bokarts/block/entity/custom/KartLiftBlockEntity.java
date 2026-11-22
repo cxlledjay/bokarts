@@ -296,6 +296,9 @@ public class KartLiftBlockEntity extends BlockEntity implements ExtendedScreenHa
         storedKart.setBodyType(bodyType);
         storedKart.setBodyColor(bodyColor);
         storedKart.setWheelColor(wheelColor);
+
+        // bugfix custom name not changing with new livery
+        storedKart.setCustomName(storedKart.getCustomName());
     }
 
     public void setRaceNumber(int num) {

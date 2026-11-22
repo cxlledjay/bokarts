@@ -520,11 +520,21 @@ public class KartEntity extends Entity implements RideableInventory{
 
     // ==================== item management ====================
 
+    // naming
     @Override
     public boolean isCustomNameVisible() {
         return false;
     }
 
+    public Text getCustomName() {
+        return Text.literal("Kart [").formatted(Formatting.WHITE)
+                .append(KartItemv2.getFormattedLiveryName(this.getBodyType(), this.getBodyColor())
+                        .append(Text.literal("]")))
+                .styled(style -> style.withItalic(false));
+    }
+
+
+    // the item
     protected Item asItem() {
         return ModItems.KART_ITEM;
     }
@@ -560,11 +570,7 @@ public class KartEntity extends Entity implements RideableInventory{
         // set name with livery
         Text kartName = this.getCustomName();
         if(kartName == null || kartName.equals(Text.translatable("item.bokarts.kart_item"))) {
-             MutableText name = Text.literal("Kart [").formatted(Formatting.WHITE)
-                    .append(KartItemv2.getFormattedLiveryName(this.getBodyType(), this.getBodyColor())
-                            .append(Text.literal("]")))
-                    .styled(style -> style.withItalic(false));
-            stack.set(DataComponentTypes.CUSTOM_NAME, name);
+            stack.set(DataComponentTypes.CUSTOM_NAME, getCustomName());
         } else {
             stack.set(DataComponentTypes.CUSTOM_NAME, kartName);
         }
