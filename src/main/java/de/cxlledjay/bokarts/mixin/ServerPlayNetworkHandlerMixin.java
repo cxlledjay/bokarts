@@ -32,7 +32,7 @@ public class ServerPlayNetworkHandlerMixin {
         Entity vehicle = this.player.getRootVehicle();
 
         if (vehicle instanceof KartEntity) {
-            return 4d;
+            return 16d;
         }
 
         // If they are driving a normal boat or pig, keep the vanilla strict rubberband rules
