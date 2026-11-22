@@ -162,6 +162,11 @@ public class KartRenderer extends EntityRenderer<KartEntity> {
         // stop if it is "only" solid color overlay
         if(bodyType == BodyType.SOLID_COLOR_OVERLAY) return;
 
+        // bugfix for optimized iris batching
+        if (vertexConsumers instanceof VertexConsumerProvider.Immediate immediate) {
+            immediate.draw();
+        }
+
         // ----- draw livery overlay texture -----
         Identifier overlayTexture = bodyType.getTexture();
 
