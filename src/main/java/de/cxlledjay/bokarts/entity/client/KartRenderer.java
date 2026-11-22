@@ -201,6 +201,10 @@ public class KartRenderer extends EntityRenderer<KartEntity> {
         VertexConsumer baseConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityCutoutNoCull(wheelBaseTexture));
         wheelModel.render(matrices, baseConsumer, light, OverlayTexture.DEFAULT_UV, 0xFFFFFFFF);
 
+        if (vertexConsumers instanceof VertexConsumerProvider.Immediate immediate) {
+            immediate.draw();
+        }
+
         // draw overlay texture
         VertexConsumer overlayConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityCutoutNoCull(wheelOverlayTexture));
         wheelModel.render(matrices, overlayConsumer, light, OverlayTexture.DEFAULT_UV, rimColor);
