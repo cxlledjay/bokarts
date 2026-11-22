@@ -36,7 +36,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
@@ -712,7 +711,7 @@ public class KartEntity extends Entity implements RideableInventory{
 
 
 
-    private void updateMovement() {
+    private void applyFrictionAndGravity() {
         double gravity = -this.getFinalGravity();
         float appliedFriction = 0.3f; //< default
 
@@ -755,13 +754,12 @@ public class KartEntity extends Entity implements RideableInventory{
         Vec3d vec3d = this.getVelocity();
         this.setVelocity(vec3d.x * decay, vec3d.y + gravity, vec3d.z * decay);
         this.yawVelocity = this.yawVelocity * decay;
-
     }
 
-    private void updateAcceleration() {
+    private void applyAcceleration() {
         if (this.hasPassengers()) {
 
-            if(!this.isDrivable()) return; // no update when undrivable
+            if(this.canNotDrive()) return; // no update when out of fuel etc
 
             // result
             float appliedAcceleration = 0.0f;
@@ -840,7 +838,6 @@ public class KartEntity extends Entity implements RideableInventory{
     public void tick() {
 
         // underwater check
-
         if (!this.isTouchingWater()) {
             this.ticksTouchingWater = 0.0F;
         } else {
@@ -861,58 +858,55 @@ public class KartEntity extends Entity implements RideableInventory{
         this.updatePositionAndRotation();
 
 
-        // -------------------- input handling --------------------
+        // -------------------- physics --------------------
         if (this.isLogicalSideForUpdatingMovement()) {
-
-            // set inputs
+            // set inputs by driver
             if (this.getControllingPassenger() instanceof PlayerEntity player) {
                 boolean forward = player.forwardSpeed > 0.0F;
                 boolean backward = player.forwardSpeed < 0.0F;
                 boolean left = player.sidewaysSpeed > 0.0F;
                 boolean right = player.sidewaysSpeed < 0.0F;
-
                 this.setInputs(left, right, forward, backward);
             }
-        }
 
-        else {
-            // track input from all other clients spectating the kart
-            if (this.getWorld().isClient()) {
-                byte flags = this.getPlayerInput();
-                this.pressingForward = (flags & FLAG_FORWARD) != 0;
-                this.pressingBack    = (flags & FLAG_BACKWARD) != 0;
-                this.pressingLeft    = (flags & FLAG_LEFT) != 0;
-                this.pressingRight   = (flags & FLAG_RIGHT) != 0;
-                this.pressingSlow    = (flags & FLAG_SLOW) != 0;
+            // ==================== movement physics ====================
+            this.applyFrictionAndGravity();
+            if (!this.canNotDrive()) {
+                this.applyAcceleration();
             }
-        }
 
-
-        // ==================== movement physics ====================
-        this.updateMovement();
-        if (!this.canNotDrive()) {
-            this.updateAcceleration();
-        }
-
-        // --- interpolate steps for fast vehicles ---
-        Vec3d totalVel = this.getVelocity();
-        double horizontalSpeed = Math.sqrt(totalVel.x * totalVel.x + totalVel.z * totalVel.z);
-        // moving faster than 2 bps => steps > 1
-        int steps = (int) Math.ceil(horizontalSpeed);
-        if (steps > 1) {
-            // get equal sized chunks
-            Vec3d chunkVel = totalVel.multiply(1.0 / steps);
-            // call move function multiple times with chunked velocity
-            for (int i = 0; i < steps; i++) {
-                this.move(MovementType.SELF, chunkVel);
-                if (this.horizontalCollision) {
-                    break;
+            // --- interpolate steps for fast vehicles ---
+            Vec3d totalVel = this.getVelocity();
+            double horizontalSpeed = Math.sqrt(totalVel.x * totalVel.x + totalVel.z * totalVel.z);
+            // moving faster than 2 bps => steps > 1
+            int steps = (int) Math.ceil(horizontalSpeed);
+            if (steps > 1) {
+                double invSteps = 1.0 / steps;
+                for (int i = 0; i < steps; i++) {
+                    Vec3d currentVel = this.getVelocity();
+                    if (currentVel.lengthSquared() < 1.0E-7) {
+                        break; // full stop
+                    }
+                    // call move multiple times with chunked velocity
+                    this.move(MovementType.SELF, currentVel.multiply(invSteps));
                 }
+            } else {
+                // as normal
+                this.move(MovementType.SELF, totalVel);
             }
-        } else {
-            // as normal
-            this.move(MovementType.SELF, totalVel);
         }
+        else if (this.getWorld().isClient()) {
+            // spectators tracking the drivers inputs for animations etc
+            byte flags = this.getPlayerInput();
+            this.pressingForward = (flags & FLAG_FORWARD) != 0;
+            this.pressingBack    = (flags & FLAG_BACKWARD) != 0;
+            this.pressingLeft    = (flags & FLAG_LEFT) != 0;
+            this.pressingRight   = (flags & FLAG_RIGHT) != 0;
+            this.pressingSlow    = (flags & FLAG_SLOW) != 0;
+        }
+
+
+
 
 
         // ==================== post movement calculations ====================
@@ -933,12 +927,16 @@ public class KartEntity extends Entity implements RideableInventory{
         this.checkBlockCollision();
         this.handleKartCollisions(movementThisTick.normalize(), this.distanceThisTick);
 
-        // -------------------- server synced animations --------------------
-        this.steeringAnglePrev = this.steeringAngle;
+        // -------------------- synced animations --------------------
+        // all clients
+        if(this.getWorld().isClient) {
+            this.steeringAnglePrev = this.steeringAngle;
+            this.calculateSteeringAngle();
+        }
+        // server + all clients
         this.engineRevsPrev = this.engineRevs;
-        this.calculateSteeringAngle();
-        this.calculateEngineRevs();
-        this.calculateHandBrake();
+        this.calculateEngineRevs(); // server + clients
+        this.calculateHandBrake(); // server + clients
 
         // -------------------- kart stats --------------------
         // init
