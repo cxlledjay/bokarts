@@ -135,9 +135,8 @@
 
 
 
-  "bokarts.midnightconfig.category.hud": "Kart HUD",
-  "bokarts.midnightconfig.category.race": "Race",
-  "bokarts.midnightconfig.category.sounds": "Sound",
+  "bokarts.midnightconfig.category.general": "General",
+  "bokarts.midnightconfig.category.hud": "HUD",
   "bokarts.midnightconfig.category.server": "Server Only",
 
   "bokarts.midnightconfig.headingHud": "Kart HUD Settings",
@@ -161,8 +160,21 @@
   "bokarts.midnightconfig.leaderboardScale": "Scale",
 
 
+
   "bokarts.midnightconfig.headingSounds": "Sound Settings",
   "bokarts.midnightconfig.hornPreviewVolume": "Horn preview volume",
+
+  "bokarts.midnightconfig.headingSmoothing": "Multiplayer Race Settings",
+  "bokarts.midnightconfig.networkSmoothing": "Network Smoothing",
+  "bokarts.midnightconfig.networkSmoothing.tooltip": "Controls how smoothly other players' karts move on your screen.\nLower values are more real-time; higher values hide ping spikes.",
+
+  "bokarts.midnightconfig.enum.NetworkSmoothing.REALTIME": "Realtime (1 tick)",
+  "bokarts.midnightconfig.enum.NetworkSmoothing.COMPETITIVE": "Competitive (2 ticks)",
+  "bokarts.midnightconfig.enum.NetworkSmoothing.BALANCED": "Balanced (3 ticks)",
+  "bokarts.midnightconfig.enum.NetworkSmoothing.SMOOTH": "Smooth (4 ticks)",
+  "bokarts.midnightconfig.enum.NetworkSmoothing.VANILLA": "Vanilla (10 ticks)",
+
+
 
   "bokarts.midnightconfig.headingFuel": "Fuel Settings",
   "bokarts.midnightconfig.maxFuelCapacity": "Fuel tank size (in mL)",

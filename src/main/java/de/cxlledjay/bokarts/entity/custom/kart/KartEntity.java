@@ -62,6 +62,14 @@ public class KartEntity extends Entity implements RideableInventory{
     private float ticksTouchingWater;
     private float yawVelocity;
 
+    // position lerping
+    private int lerpTicks;
+    private double lerpX;
+    private double lerpY;
+    private double lerpZ;
+    private double lerpYaw;
+    private double lerpPitch;
+
 
     // kart specific variables
 
@@ -183,28 +191,39 @@ public class KartEntity extends Entity implements RideableInventory{
 
     @Override
     public void updateTrackedPositionAndAngles(double x, double y, double z, float yaw, float pitch, int interpolationSteps) {
+        // Store the target from the server packet instead of snapping immediately
+        this.lerpX = x;
+        this.lerpY = y;
+        this.lerpZ = z;
+        this.lerpYaw = yaw;
+        this.lerpPitch = pitch;
 
-        // distance to actual position
-        double desyncOffset = this.squaredDistanceTo(x, y, z);
-
-        if (desyncOffset > 25.0) {
-            // huge lag => reset syncing
-            this.setPosition(x, y, z);
-            this.setYaw(yaw);
-        } else {
-            // smoothly sync
-            this.setPosition(
-                    this.getX() + (x - this.getX()) * 0.1,
-                    this.getY() + (y - this.getY()) * 0.1,
-                    this.getZ() + (z - this.getZ()) * 0.1
-            );
-            this.setYaw(this.getYaw() + MathHelper.wrapDegrees(yaw - this.getYaw()) * 0.1f);
-        }
+        // get lerp ticks from config
+        this.lerpTicks = MathHelper.clamp(BoKartsConfig.networkSmoothing.getLerpTicks(), 1, 10);
     }
 
     private void updatePositionAndRotation() {
+        // 1. If we control physics (driver's client or empty server), reset lerp and sync tracker
         if (this.isLogicalSideForUpdatingMovement()) {
+            this.lerpTicks = 0;
             this.updateTrackedPosition(this.getX(), this.getY(), this.getZ());
+            return;
+        }
+
+        // 2. If we are a spectating client, smoothly glide toward the latest packet
+        if (this.lerpTicks > 0) {
+            double nextX = this.getX() + (this.lerpX - this.getX()) / (double) this.lerpTicks;
+            double nextY = this.getY() + (this.lerpY - this.getY()) / (double) this.lerpTicks;
+            double nextZ = this.getZ() + (this.lerpZ - this.getZ()) / (double) this.lerpTicks;
+
+            // wrapDegrees prevents the kart from spinning 360° when crossing -180° / +180°
+            double deltaYaw = MathHelper.wrapDegrees(this.lerpYaw - (double) this.getYaw());
+            float nextYaw = this.getYaw() + (float) deltaYaw / (float) this.lerpTicks;
+            float nextPitch = this.getPitch() + (float) (this.lerpPitch - (double) this.getPitch()) / (float) this.lerpTicks;
+
+            this.lerpTicks--;
+            this.setPosition(nextX, nextY, nextZ);
+            this.setRotation(nextYaw, nextPitch);
         }
     }
 
@@ -882,13 +901,18 @@ public class KartEntity extends Entity implements RideableInventory{
             int steps = (int) Math.ceil(horizontalSpeed);
             if (steps > 1) {
                 double invSteps = 1.0 / steps;
+                double downwardChunkY = totalVel.y / steps;
+
                 for (int i = 0; i < steps; i++) {
                     Vec3d currentVel = this.getVelocity();
-                    if (currentVel.lengthSquared() < 1.0E-7) {
+                    if (currentVel.lengthSquared() < 1.0E-7 && totalVel.y >= 0) {
                         break; // full stop
                     }
                     // call move multiple times with chunked velocity
-                    this.move(MovementType.SELF, currentVel.multiply(invSteps));
+                    double stepY = (totalVel.y < 0) ? downwardChunkY : (currentVel.y * invSteps);
+                    Vec3d chunkVel = new Vec3d(currentVel.x * invSteps, stepY, currentVel.z * invSteps);
+
+                    this.move(MovementType.SELF, chunkVel);
                 }
             } else {
                 // as normal
@@ -1198,8 +1222,8 @@ public class KartEntity extends Entity implements RideableInventory{
 
         // preview HornSound
         Identifier oldSoundId = this.getHornType().getSoundEvent().getId();
-        player.networkHandler.sendPacket(new StopSoundS2CPacket(oldSoundId, SoundCategory.PLAYERS));
-        player.playSoundToPlayer(newHorn.getSoundEvent(), SoundCategory.PLAYERS, BoKartsConfig.hornPreviewVolume, 1.0f);
+        player.networkHandler.sendPacket(new StopSoundS2CPacket(oldSoundId, SoundCategory.RECORDS));
+        player.playSoundToPlayer(newHorn.getSoundEvent(), SoundCategory.RECORDS, BoKartsConfig.hornPreviewVolume, 1.0f);
         String msg = getFormattedHornName(newHorn);
         player.sendMessage(Text.literal(msg).formatted(Formatting.YELLOW), true);
 

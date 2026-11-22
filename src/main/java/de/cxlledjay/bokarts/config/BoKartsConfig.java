@@ -9,13 +9,47 @@ public class BoKartsConfig extends MidnightConfig {
     // ========================================
 
 
+    // GENERAL SETTINGS
+
+    @Comment(category = "general", centered = true)
+    public static Comment headingSounds;
+
+    @Entry(category = "general", min = 0.0f, max = 1.0f, isSlider = true)
+    public static float hornPreviewVolume = 0.75f;
+
+    @Comment(category = "general", centered = true)
+    public static Comment headingSmoothing;
+
+    @Entry(category = "general")
+    public static NetworkSmoothing networkSmoothing = NetworkSmoothing.BALANCED;
+
+    public enum NetworkSmoothing {
+        REALTIME(1),
+        COMPETITIVE(2),
+        BALANCED(3),
+        SMOOTH(4),
+        VANILLA(10);
+
+        private final int lerpTicks;
+
+        NetworkSmoothing(int lerpTicks) {
+            this.lerpTicks = lerpTicks;
+        }
+
+        public int getLerpTicks() {
+            return this.lerpTicks;
+        }
+    }
+
+
+
     // HUD SETTINGS
 
     @Comment(category = "hud", centered = true)
     public static Comment headingHud;
 
     @Entry(category = "hud")
-    public static boolean enableKartHud = false;
+    public static boolean enableKartHud = true;
 
     @Entry(category = "hud", min = 0.1f, max = 2.0f, isSlider = true)
     public static float kartHudScale = 1.0f;
@@ -38,29 +72,17 @@ public class BoKartsConfig extends MidnightConfig {
         BURGERS_PER_FREEDOM
     }
 
-
-
-
-    @Comment(category = "race", centered = true)
+    @Comment(category = "hud", centered = true)
     public static Comment headingLeaderboard;
 
-    @Entry(category = "race")
-    public static boolean enableLeaderboard = false;
+    @Entry(category = "hud")
+    public static boolean enableLeaderboard = true;
 
-    @Entry(category = "race")
+    @Entry(category = "hud")
     public static boolean displayOnLeft = true;
 
-    @Entry(category = "race", min = 0.1f, max = 2.0f, isSlider = true)
+    @Entry(category = "hud", min = 0.1f, max = 2.0f, isSlider = true)
     public static float leaderboardScale = 1.0f;
-
-
-    // sounds
-
-    @Comment(category = "sounds", centered = true)
-    public static Comment headingSounds;
-
-    @Entry(category = "sounds", min = 0.0f, max = 1.0f, isSlider = true)
-    public static float hornPreviewVolume = 0.75f;
 
 
 

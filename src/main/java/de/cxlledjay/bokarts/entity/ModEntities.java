@@ -16,6 +16,7 @@ public class ModEntities {
                     .dimensions(1.2f, 0.8f)
                     .eyeHeight(0.5625F)
                     .maxTrackingRange(10)
+                    .trackingTickInterval(1)
                     .build());
 
     public static void registerModEntities() {
